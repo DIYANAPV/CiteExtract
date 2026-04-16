@@ -1,0 +1,28 @@
+# CheckCitation dependencies
+
+# Session 1: Parsing
+pydantic>=2.0
+bibtexparser
+spacy>=3.7
+rapidfuzz>=3.0
+unidecode>=1.3
+pyyaml>=6.0
+requests>=2.31
+tenacity>=8.2
+defusedxml>=0.7
+
+# Session 2: Existence checking
+httpx>=0.27
+aiolimiter>=1.1
+aiosqlite>=0.20
+
+# Session 3: Semantic verification
+openai>=1.30
+
+# Session 4: Comprehension support (passage retrieval)
+bm25s>=0.2
+sentence-transformers>=2.2       # dense retrieval (Phase B), pulls in torch (~2GB)
+flashrank>=0.2                   # neural reranker (cross-encoder, CPU-only, ~4MB model)
+
+# Web UI
+gradio>=4.0

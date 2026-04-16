@@ -1,0 +1,66 @@
+{
+  "AI-Researcher-AI_Safety": {
+    "total": 12,
+    "integrity": 0.0,
+    "by_verdict": {
+      "FABRICATED": 11,
+      "CHIMERIC": 1
+    }
+  },
+  "AI-Researcher-Collabllm": {
+    "total": 19,
+    "integrity": 0.105,
+    "by_verdict": {
+      "VALID_EXISTENCE": 2,
+      "FABRICATED": 16,
+      "MISATTRIBUTED": 1
+    }
+  },
+  "AI-Researcher-Conformal_Prediction_as_Bayesian_Quadrature": {
+    "total": 17,
+    "integrity": 0.059,
+    "by_verdict": {
+      "MISATTRIBUTED": 3,
+      "VALID_EXISTENCE": 1,
+      "FABRICATED": 12,
+      "CHIMERIC": 1
+    }
+  },
+  "AI-Researcher-Roll_the_dice": {
+    "total": 13,
+    "integrity": 0.077,
+    "by_verdict": {
+      "FABRICATED": 11,
+      "VALID_EXISTENCE": 1,
+      "MISATTRIBUTED": 1
+    }
+  },
+  "AI-Researcher-Score_matching_with_missing_data": {
+    "total": 23,
+    "integrity": 0.043,
+    "by_verdict": {
+      "MISATTRIBUTED": 2,
+      "FABRICATED": 17,
+      "CHIMERIC": 3,
+      "VALID_EXISTENCE": 1
+    }
+  },
+  "AI-Researcher-The_value_of_prediction": {
+    "total": 15,
+    "integrity": 0.0,
+    "by_verdict": {
+      "FABRICATED": 13,
+      "CHIMERIC": 2
+    }
+  },
+  "AI-Researcher_Train_for_the_worst": {
+    "total": 19,
+    "integrity": 0.105,
+    "by_verdict": {
+      "FABRICATED": 13,
+      "VALID_EXISTENCE": 2,
+      "CHIMERIC": 3,
+      "MISATTRIBUTED": 1
+    }
+  }
+}

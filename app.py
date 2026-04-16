@@ -1,0 +1,1014 @@
+"""CheckCitation Web UI — local Gradio interface for citation verification.
+
+Launch with:
+    python app.py
+
+Requires:
+    - GROBID running for PDF input: docker run -d -p 8070:8070 grobid/grobid:0.8.2-crf
+    - .env with OPENAI_API_KEY for Claim Verification (Standard/Agentic modes)
+"""
+
+import json
+import logging
+import os
+import shutil
+import tempfile
+import time
+from html import escape
+from pathlib import Path
+from typing import Optional
+
+import gradio as gr
+import requests
+
+from src import config
+from src.models.report import PaperReport
+from src.parsers.router import parse_file
+from src.pipeline import run_unified
+
+logging.basicConfig(level=logging.INFO)
+
+# ---------------------------------------------------------------------------
+# Constants
+# ---------------------------------------------------------------------------
+
+VERDICT_STYLES = {
+    "VALID":          {"color": "#16a34a", "bg": "#f0fdf4", "border": "#22c55e", "icon": "&#x2705;", "label": "Valid"},
+    "FABRICATED":     {"color": "#dc2626", "bg": "#fef2f2", "border": "#ef4444", "icon": "&#x274C;", "label": "Fabricated"},
+    "MISREPRESENTED": {"color": "#d97706", "bg": "#fffbeb", "border": "#f59e0b", "icon": "&#x26A0;&#xFE0F;", "label": "Misrepresented"},
+    "UNVERIFIABLE":   {"color": "#6b7280", "bg": "#f9fafb", "border": "#9ca3af", "icon": "&#x2753;", "label": "Unverifiable"},
+}
+
+RISK_COLORS = {"LOW": "#16a34a", "MEDIUM": "#d97706", "HIGH": "#dc2626", "CRITICAL": "#7f1d1d"}
+
+BASE_CSS = """
+/* ── Layout ── */
+.gradio-container {
+    max-width: 1200px !important;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+}
+
+/* ── Subtle entrance ── */
+@keyframes cc-fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Header ── */
+.cc-header {
+    text-align: center; padding: 24px 0 16px;
+    border-bottom: 2px solid #e2e8f0; margin-bottom: 4px;
+}
+.cc-header h1 {
+    font-size: 22px; font-weight: 700; color: #0f172a;
+    letter-spacing: -0.01em; margin: 0;
+}
+.cc-header p {
+    font-size: 13px; color: #64748b; margin: 4px 0 0; font-weight: 400;
+}
+
+/* ── Section labels ── */
+.cc-section-label {
+    font-size: 11px; font-weight: 600; color: #475569;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    margin: 12px 0 6px; padding-bottom: 6px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+/* ── Cards ── */
+.card {
+    border-radius: 8px; padding: 16px 20px; margin-bottom: 10px;
+    border-left: 4px solid; background: #fff;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    animation: cc-fadeIn 0.25s ease-out both;
+}
+.card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.card summary { cursor: pointer; font-weight: 600; font-size: 14px; line-height: 1.5; }
+
+/* ── Metadata table ── */
+.meta-table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 13px; }
+.meta-table th, .meta-table td { text-align: left; padding: 7px 10px; border-bottom: 1px solid #f1f5f9; }
+.meta-table th {
+    background: #f8fafc; font-weight: 600; color: #475569;
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em;
+}
+.meta-table tr:hover td { background: #fafbfd; }
+.meta-table td { max-width: 300px; word-break: break-word; }
+.status-match    { color: #16a34a; font-weight: 600; }
+.status-close    { color: #d97706; font-weight: 600; }
+.status-mismatch { color: #dc2626; font-weight: 600; }
+.status-missing  { color: #cbd5e1; }
+
+/* ── Dashboard ── */
+.dashboard {
+    background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px;
+    padding: 20px 24px; margin-bottom: 14px;
+    animation: cc-fadeIn 0.3s ease-out both;
+}
+.stat-cards { display: flex; gap: 10px; flex-wrap: wrap; margin: 14px 0; }
+.stat-card {
+    flex: 1; min-width: 100px; text-align: center;
+    padding: 14px 10px; border-radius: 8px;
+    border: 1px solid #e5e7eb; background: white;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+}
+.stat-card:hover { box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
+.stat-card .num { font-size: 26px; font-weight: 700; line-height: 1.2; }
+.stat-card .lbl {
+    font-size: 11px; color: #64748b; margin-top: 2px;
+    font-weight: 500; text-transform: uppercase; letter-spacing: 0.03em;
+}
+.progress-bar { height: 6px; border-radius: 6px; background: #e5e7eb; overflow: hidden; margin: 6px 0; }
+.progress-fill { height: 100%; border-radius: 6px; transition: width 0.5s ease-out; }
+
+/* ── Claims & passages ── */
+.claim-box {
+    background: #fff; border: 1px solid #e5e7eb; border-radius: 8px;
+    padding: 12px 14px; margin: 6px 0; font-size: 13px; line-height: 1.6;
+}
+.claim-arrow { text-align: center; font-size: 18px; margin: 4px 0; color: #cbd5e1; }
+.claim-section {
+    background: #f8fafc; border: 1px solid #e2e8f0;
+    border-radius: 8px; padding: 12px 14px; margin: 8px 0;
+}
+.passage-card {
+    background: #fff; border: 1px solid #e5e7eb; border-radius: 8px;
+    padding: 12px 14px; margin: 6px 0;
+}
+.passage-card:hover { border-color: #93c5fd; }
+.passage-header { font-size: 11px; color: #64748b; margin-bottom: 4px; font-weight: 500; }
+.passage-text { font-size: 13px; line-height: 1.65; color: #1e293b; }
+
+/* ── Links & pills ── */
+.link-pill {
+    display: inline-block; background: #eff6ff; color: #2563eb;
+    padding: 2px 10px; border-radius: 12px; font-size: 11px;
+    text-decoration: none; margin-right: 4px; font-weight: 500;
+}
+.link-pill:hover { background: #dbeafe; }
+
+/* ── Coverage ── */
+.coverage-bar { display: flex; gap: 8px; align-items: center; margin: 5px 0; font-size: 12px; }
+.coverage-fill { height: 6px; border-radius: 3px; }
+.info-row { font-size: 12px; color: #64748b; margin-top: 8px; }
+
+/* ── Empty state ── */
+.cc-empty { text-align: center; padding: 48px 20px; color: #94a3b8; }
+.cc-empty-icon { font-size: 36px; margin-bottom: 8px; opacity: 0.35; }
+.cc-empty-title { font-size: 14px; font-weight: 600; color: #64748b; margin-bottom: 4px; }
+.cc-empty-sub { font-size: 12px; color: #94a3b8; }
+
+/* ── Tab styling ── */
+.tab-nav button { font-weight: 600 !important; font-size: 13px !important; }
+"""
+
+
+# ---------------------------------------------------------------------------
+# Prerequisite checks
+# ---------------------------------------------------------------------------
+
+def check_prerequisites(file_path: str, mode: str) -> None:
+    if file_path and file_path.lower().endswith(".pdf"):
+        try:
+            requests.get("http://localhost:8070/api/isalive", timeout=3)
+        except Exception:
+            raise gr.Error(
+                "GROBID is not running. PDF parsing requires GROBID.\n"
+                "Run: docker run -d --name grobid -p 8070:8070 grobid/grobid:0.8.2-crf"
+            )
+    if mode in ("standard", "agentic"):
+        if not config.openai_api_key():
+            raise gr.Error(
+                f"{mode.title()} mode requires an OpenAI API key.\n"
+                "Add OPENAI_API_KEY to your .env file."
+            )
+
+
+# ---------------------------------------------------------------------------
+# File helpers
+# ---------------------------------------------------------------------------
+
+def prepare_ref_pdfs_dir(pdf_paths: Optional[list[str]]) -> Optional[str]:
+    if not pdf_paths:
+        return None
+    tmp_dir = tempfile.mkdtemp(prefix="checkcitation_refs_")
+    for p in pdf_paths:
+        src = Path(p)
+        shutil.copy2(str(src), str(Path(tmp_dir) / src.name))
+    return tmp_dir
+
+
+# ---------------------------------------------------------------------------
+# HTML formatting helpers
+# ---------------------------------------------------------------------------
+
+def _esc(text: Optional[str], max_len: int = 0) -> str:
+    if not text:
+        return ""
+    s = escape(str(text))
+    if max_len and len(s) > max_len:
+        s = s[:max_len] + "..."
+    return s
+
+
+def build_links(verdict) -> str:
+    links = []
+    ex = verdict.existence
+    if not ex:
+        return ""
+    if ex.matched_doi:
+        links.append(f'<a class="link-pill" href="https://doi.org/{escape(ex.matched_doi)}" target="_blank">DOI</a>')
+    if ex.matched_arxiv_id:
+        links.append(f'<a class="link-pill" href="https://arxiv.org/abs/{escape(ex.matched_arxiv_id)}" target="_blank">arXiv</a>')
+    if ex.oa_url:
+        links.append(f'<a class="link-pill" href="{escape(ex.oa_url)}" target="_blank">Open Access</a>')
+    return " ".join(links)
+
+
+def _progress_color(score: float) -> str:
+    if score >= 0.9:
+        return "#22c55e"
+    if score >= 0.7:
+        return "#f59e0b"
+    return "#ef4444"
+
+
+def _field_status_icon(status: str) -> str:
+    icons = {
+        "MATCH": '<span class="status-match">&#x2714;</span>',
+        "CLOSE_MATCH": '<span class="status-close">&#x2248;</span>',
+        "MISMATCH": '<span class="status-mismatch">&#x2716;</span>',
+        "MISSING": '<span class="status-missing">&mdash;</span>',
+        "MISSING_REF": '<span class="status-missing">&mdash;</span>',
+        "MISSING_BOTH": '<span class="status-missing">&mdash;</span>',
+    }
+    return icons.get(status, status)
+
+
+# ---------------------------------------------------------------------------
+# Dashboard (verification summary)
+# ---------------------------------------------------------------------------
+
+def format_dashboard(report: PaperReport, selected_mode: str = "", elapsed: float = 0) -> str:
+    s = report.summary
+    score_pct = int(s.integrity_score * 100)
+    risk_color = RISK_COLORS.get(s.risk_level, "#6b7280")
+    bar_color = _progress_color(s.integrity_score)
+
+    by_v = s.by_verdict
+    cards_html = ""
+    for key in ["VALID", "FABRICATED", "MISREPRESENTED", "UNVERIFIABLE"]:
+        count = by_v.get(key, 0)
+        st = VERDICT_STYLES.get(key, VERDICT_STYLES["VALID"])
+        cards_html += f'''
+        <div class="stat-card" style="border-top: 3px solid {st['border']};">
+            <div class="num" style="color: {st['color']};">{count}</div>
+            <div class="lbl">{st['label']}</div>
+        </div>'''
+
+    warnings_html = ""
+    if report.warnings:
+        items = "".join(f"<li>{_esc(w)}</li>" for w in report.warnings)
+        warnings_html = f'<div style="margin-top:10px;font-size:13px;color:#6b7280;"><b>Notes:</b><ul style="margin:4px 0;">{items}</ul></div>'
+
+    # Show selected vs resolved mode
+    mode_html = f"<b>{_esc(report.mode)}</b>"
+    if selected_mode and selected_mode != report.mode:
+        mode_html = (
+            f"<b>{_esc(report.mode)}</b> "
+            f'<span style="font-size:11px;color:#9ca3af;">'
+            f"(selected: {_esc(selected_mode)}"
+            f"{' &rarr; resolved based on input' if selected_mode == 'auto' else ' &rarr; adjusted based on input'})"
+            f"</span>"
+        )
+
+    return f'''
+    <div class="dashboard">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
+            <div>
+                <div style="font-size:14px; color:#6b7280;">Integrity Score</div>
+                <div style="font-size:36px; font-weight:800; color:{bar_color};">{score_pct}%</div>
+            </div>
+            <div style="text-align:right;">
+                <span style="display:inline-block; background:{risk_color}; color:white; padding:4px 14px; border-radius:20px; font-weight:600; font-size:14px;">
+                    {s.risk_level} RISK
+                </span>
+            </div>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" style="width:{score_pct}%; background:{bar_color};"></div>
+        </div>
+        <div class="stat-cards">{cards_html}</div>
+        <div class="info-row">
+            Mode: {mode_html} &nbsp;|&nbsp;
+            Format: <b>{_esc(report.input_format)}</b> &nbsp;|&nbsp;
+            References: <b>{report.total_references}</b>
+            {f"&nbsp;|&nbsp; Time: <b>{elapsed:.1f}s</b>" if elapsed else ""}
+        </div>
+        {warnings_html}
+    </div>'''
+
+
+# ---------------------------------------------------------------------------
+# Metadata comparison table
+# ---------------------------------------------------------------------------
+
+def format_metadata_table(verdict) -> str:
+    meta = verdict.metadata
+    if not meta or not meta.comparisons:
+        return ""
+    rows = ""
+    for c in meta.comparisons:
+        icon = _field_status_icon(c.status)
+        ref_val = _esc(c.ref_value) or '<span class="status-missing">—</span>'
+        db_val = _esc(c.db_value) or '<span class="status-missing">—</span>'
+        sim = f" ({c.similarity:.0%})" if c.similarity is not None else ""
+        rows += f"<tr><td><b>{_esc(c.field.title())}</b></td><td>{ref_val}</td><td>{db_val}</td><td>{icon}{sim}</td></tr>"
+    return f'''
+    <table class="meta-table">
+        <thead><tr><th>Field</th><th>In Paper</th><th>In Database</th><th>Status</th></tr></thead>
+        <tbody>{rows}</tbody>
+    </table>'''
+
+
+# ---------------------------------------------------------------------------
+# Synthesized metadata table for agentic mode (no MetadataResult object)
+# ---------------------------------------------------------------------------
+
+def format_agentic_metadata_table(verdict, ref) -> str:
+    """Build a comparison table from Reference + ExistenceResult when MetadataResult is absent."""
+    ex = verdict.existence
+    if not ex or not ref:
+        return ""
+    # Only useful if the agent found something
+    has_any = ex.matched_title or ex.matched_authors or ex.matched_year or ex.matched_venue
+    if not has_any:
+        return ""
+
+    rows = ""
+
+    def _row(field, ref_val, db_val, similarity=None):
+        if not ref_val and not db_val:
+            return ""
+        ref_str = _esc(str(ref_val)) if ref_val else '<span class="status-missing">&mdash;</span>'
+        db_str = _esc(str(db_val)) if db_val else '<span class="status-missing">&mdash;</span>'
+        sim_str = f" ({similarity:.0%})" if similarity is not None else ""
+        if not ref_val or not db_val:
+            icon = '<span class="status-missing">&mdash;</span>'
+        elif str(ref_val).strip().lower() == str(db_val).strip().lower():
+            icon = f'<span class="status-match">&#x2714;</span>{sim_str}'
+        elif similarity is not None and similarity >= 0.8:
+            icon = f'<span class="status-match">&#x2714;</span>{sim_str}'
+        elif similarity is not None and similarity >= 0.5:
+            icon = f'<span class="status-close">&#x2248;</span>{sim_str}'
+        elif similarity is not None:
+            icon = f'<span class="status-mismatch">&#x2716;</span>{sim_str}'
+        else:
+            # No similarity score — compare as strings
+            ref_lower = str(ref_val).strip().lower()
+            db_lower = str(db_val).strip().lower()
+            if ref_lower == db_lower:
+                icon = '<span class="status-match">&#x2714;</span>'
+            elif ref_lower in db_lower or db_lower in ref_lower:
+                icon = '<span class="status-close">&#x2248;</span>'
+            else:
+                icon = '<span class="status-mismatch">&#x2716;</span>'
+        return f"<tr><td><b>{_esc(field)}</b></td><td>{ref_str}</td><td>{db_str}</td><td>{icon}</td></tr>"
+
+    rows += _row("Title", ref.title, ex.matched_title, ex.title_similarity)
+    ref_authors = "; ".join(ref.authors) if ref.authors else None
+    db_authors = "; ".join(ex.matched_authors) if ex.matched_authors else None
+    rows += _row("Authors", ref_authors, db_authors)
+    rows += _row("Year", ref.year, ex.matched_year)
+    rows += _row("Venue", ref.venue, ex.matched_venue)
+    if ex.matched_doi:
+        rows += _row("DOI", ref.doi, ex.matched_doi)
+
+    if not rows:
+        return ""
+
+    return f'''
+    <table class="meta-table">
+        <thead><tr><th>Field</th><th>In Paper</th><th>In Database</th><th>Status</th></tr></thead>
+        <tbody>{rows}</tbody>
+    </table>'''
+
+
+# ---------------------------------------------------------------------------
+# Passages section for a single reference (used inside unified cards)
+# ---------------------------------------------------------------------------
+
+CLAIM_VERDICT_STYLES = {
+    "SUPPORTS":    {"color": "#15803d", "bg": "#dcfce7", "border": "#86efac", "label": "Supports"},
+    "CONTRADICTS": {"color": "#b91c1c", "bg": "#fee2e2", "border": "#fca5a5", "label": "Contradicts"},
+    "NEUTRAL":     {"color": "#6b7280", "bg": "#f3f4f6", "border": "#d1d5db", "label": "Neutral"},
+}
+
+
+def _format_claim_verdict(cv) -> str:
+    """Render a claim verdict card with colored background."""
+    if not cv:
+        return ""
+    st = CLAIM_VERDICT_STYLES.get(cv.verdict, CLAIM_VERDICT_STYLES["NEUTRAL"])
+    evidence = ""
+    if cv.evidence_quote:
+        evidence = f'<div style="margin-top:8px;font-size:13px;color:{st["color"]};font-style:italic;opacity:0.85;">"{_esc(cv.evidence_quote)}"</div>'
+    return f'''
+    <div style="background:{st['bg']};border:1px solid {st['border']};border-left:4px solid {st['color']};
+                border-radius:10px;padding:14px 16px;margin:10px 0;">
+        <div style="display:flex;align-items:center;gap:8px;">
+            <span style="display:inline-block;background:{st['color']};color:white;
+                         padding:3px 12px;border-radius:14px;font-size:12px;font-weight:700;letter-spacing:0.03em;">
+                {st['label'].upper()}
+            </span>
+        </div>
+        <div style="margin-top:8px;font-size:13px;color:#374151;line-height:1.6;">
+            {_esc(cv.explanation)}
+        </div>
+        {evidence}
+    </div>'''
+
+
+def _format_passages_for_ref(comp_results: list) -> str:
+    """Render passage retrieval + claim verification results for one reference."""
+    if not comp_results:
+        return ""
+    # Filter trivial citing sentences
+    substantive = [r for r in comp_results if r.citing_sentence and len(r.citing_sentence.split()) >= 5]
+    if not substantive:
+        return ""
+
+    # Source info from first result
+    first = substantive[0]
+    ft_icon = "&#x2705;" if first.full_text_available else "&#x1F4C4;"
+    ft_label = "Full text" if first.full_text_available else "Abstract only"
+    source = _esc(first.full_text_source or "unknown")
+
+    inner = ""
+    for r in substantive:
+        # Claim verdict badge (if LLM analysis was run)
+        claim_html = _format_claim_verdict(r.claim_verdict) if r.claim_verdict else ""
+
+        # Build citing context display: combine before + citing + after into
+        # one readable block. When context_before or context_after exist, show
+        # them so the claim is always visible even if the citing_sentence field
+        # is just a trailing author-year fragment from sentence splitting.
+        parts = []
+        if r.context_before:
+            parts.append(_esc(r.context_before))
+        parts.append(_esc(r.citing_sentence))
+        if r.context_after:
+            parts.append(_esc(r.context_after))
+        full_context = " ".join(parts)
+
+        inner += f'''
+        <div style="margin-top:8px;font-size:12px;color:#6b7280;">Citing context:</div>
+        <div class="claim-box" style="border-left:3px solid #3b82f6;">
+            <span style="color:#1e293b;">{full_context}</span>
+        </div>
+        {claim_html}'''
+        for i, sc in enumerate(r.top_passages, 1):
+            score_val = sc.rrf_score if sc.rrf_score is not None else (sc.dense_score if sc.dense_score is not None else sc.bm25_score)
+            score_type = "RRF" if sc.rrf_score is not None else ("Dense" if sc.dense_score is not None else "BM25")
+            section = f" &middot; Section: {_esc(sc.chunk.section_name)}" if sc.chunk.section_name else ""
+            inner += f'''
+            <div class="passage-card">
+                <div class="passage-header">Passage {i}{section} &middot; {score_type}: {score_val:.3f}</div>
+                <div class="passage-text">{_esc(sc.chunk.text)}</div>
+            </div>'''
+        if not r.top_passages:
+            inner += '<div style="font-size:13px;color:#6b7280;padding:8px;">No passages retrieved.</div>'
+
+    return f'''
+    <details style="margin-top:10px;" open>
+        <summary style="font-size:13px;color:#6b7280;cursor:pointer;">
+            Claim Verification &nbsp;
+            <span style="font-size:11px;">Source: {source} &middot; {ft_icon} {ft_label}</span>
+        </summary>
+        {inner}
+    </details>'''
+
+
+# ---------------------------------------------------------------------------
+# Unified reference cards (verification + comprehension combined)
+# ---------------------------------------------------------------------------
+
+def format_unified_cards(
+    report, comp_report, references: list,
+    has_verification: bool = True, has_passages: bool = False,
+) -> str:
+    ref_map = {r.ref_id: r for r in references}
+
+    # Build comp results grouped by ref_id
+    comp_by_ref: dict[str, list] = {}
+    if comp_report and has_passages:
+        for cr in comp_report.results:
+            comp_by_ref.setdefault(cr.ref_id, []).append(cr)
+
+    # If verification ran, iterate over verdicts (sorted by severity)
+    if has_verification and report and report.verdicts:
+        order = {"FABRICATED": 0, "MISREPRESENTED": 1, "UNVERIFIABLE": 2, "VALID": 3}
+        sorted_verdicts = sorted(report.verdicts, key=lambda v: order.get(v.verdict, 9))
+
+        cards = ""
+        for v in sorted_verdicts:
+            ref = ref_map.get(v.ref_id)
+            passages_html = _format_passages_for_ref(comp_by_ref.get(v.ref_id, [])) if has_passages else ""
+            cards += _render_verdict_card(v, ref, passages_html)
+        return cards if cards else '<div style="color:#6b7280;text-align:center;padding:40px;">No references found.</div>'
+
+    # Passage-only mode (no verification) — neutral blue cards per reference
+    if has_passages and comp_by_ref:
+        cards = ""
+        for ref in references:
+            results = comp_by_ref.get(ref.ref_id, [])
+            if not results:
+                continue
+            passages_html = _format_passages_for_ref(results)
+            if not passages_html:
+                continue
+            title = _esc(ref.title) if ref.title else "<em>No title</em>"
+            authors = _esc("; ".join(ref.authors)) if ref.authors else ""
+            year = f" ({ref.year})" if ref.year else ""
+            venue = _esc(ref.venue) if ref.venue else ""
+            cards += f'''
+            <details class="card" style="background:#f8fafc; border-left-color:#3b82f6;" open>
+                <summary style="color:#1e40af;">
+                    [{_esc(ref.ref_id)}] {authors}{year}
+                </summary>
+                <div style="margin-top:8px;">
+                    <div style="font-size:15px;font-weight:600;color:#1f2937;">{title}</div>
+                    {"<div style='font-size:13px;color:#6b7280;'>" + venue + "</div>" if venue else ""}
+                    {passages_html}
+                </div>
+            </details>'''
+        return cards if cards else '<div style="color:#6b7280;text-align:center;padding:40px;">No passages found.</div>'
+
+    return '<div style="color:#6b7280;text-align:center;padding:40px;">No results.</div>'
+
+
+def _render_verdict_card(v, ref, passages_html: str = "") -> str:
+    """Render a single reference card with verdict + optional passages."""
+    st = VERDICT_STYLES.get(v.verdict, VERDICT_STYLES["VALID"])
+    is_problem = v.verdict in ("FABRICATED", "MISREPRESENTED")
+    open_attr = " open" if is_problem else ""
+
+    title = _esc(ref.title) if ref and ref.title else "<em>No title</em>"
+    authors = _esc("; ".join(ref.authors)) if ref and ref.authors else ""
+    year = f" ({ref.year})" if ref and ref.year else ""
+    venue = _esc(ref.venue) if ref and ref.venue else ""
+
+    # Citation format badge (e.g., APA, Vancouver, IEEE)
+    fmt = getattr(ref, 'citation_format', None) if ref else None
+    fmt_badge = ""
+    if fmt:
+        fmt_badge = (
+            f'<span style="display:inline-block;background:#f0f4ff;color:#4b5563;'
+            f'padding:1px 8px;border-radius:10px;font-size:11px;margin-left:6px;'
+            f'border:1px solid #d1d5db;">{_esc(fmt.upper())}</span>'
+        )
+
+    links_html = build_links(v)
+
+    source_info = ""
+    if v.existence and v.existence.status == "FOUND":
+        src = _esc(v.existence.source or "")
+        sim = f" &middot; similarity: {v.existence.title_similarity:.0%}" if v.existence.title_similarity else ""
+        source_info = f'<div style="font-size:12px;color:#6b7280;margin-top:4px;">Found via: <b>{src}</b>{sim}</div>'
+    elif v.existence and v.existence.status == "NOT_FOUND":
+        dbs = ", ".join(v.existence.databases_checked) if v.existence.databases_checked else "none"
+        source_info = f'<div style="font-size:12px;color:#dc2626;margin-top:4px;">Not found in: {_esc(dbs)}</div>'
+
+    action_html = ""
+    if v.action == "remove_citation":
+        action_html = '<span style="display:inline-block;background:#fef2f2;color:#dc2626;padding:2px 10px;border-radius:12px;font-size:12px;font-weight:600;margin-top:6px;">Remove Citation</span>'
+    elif v.action == "verify_claim":
+        action_html = '<span style="display:inline-block;background:#fffbeb;color:#d97706;padding:2px 10px;border-radius:12px;font-size:12px;font-weight:600;margin-top:6px;">Verify Claim</span>'
+
+    explanation = f'<div style="font-size:13px;margin-top:8px;color:#4b5563;line-height:1.5;">{_esc(v.explanation)}</div>'
+
+    meta_table = format_metadata_table(v) or format_agentic_metadata_table(v, ref)
+    meta_section = ""
+    if meta_table:
+        meta_section = f'''
+        <details style="margin-top:10px;">
+            <summary style="font-size:13px;color:#6b7280;cursor:pointer;">Metadata Comparison</summary>
+            {meta_table}
+        </details>'''
+
+    flags_html = ""
+    if v.flags:
+        flag_items = " ".join(
+            f'<span style="display:inline-block;background:#f3f4f6;color:#6b7280;padding:1px 8px;border-radius:10px;font-size:11px;margin:2px;">{_esc(f)}</span>'
+            for f in v.flags
+        )
+        flags_html = f'<div style="margin-top:8px;">{flag_items}</div>'
+
+    return f'''
+    <details class="card" style="background:{st['bg']}; border-left-color:{st['border']};" {open_attr}>
+        <summary>
+            <span style="color:{st['color']};">{st['icon']} {st['label'].upper()}</span>
+            &nbsp;&mdash;&nbsp;
+            [{_esc(v.ref_id)}] {authors}{year}
+        </summary>
+        <div style="margin-top:8px;">
+            <div style="font-size:15px;font-weight:600;color:#1f2937;">{title}</div>
+            {"<div style='font-size:13px;color:#6b7280;'>" + venue + fmt_badge + "</div>" if venue else (fmt_badge if fmt_badge else "")}
+            {links_html}
+            {source_info}
+            {action_html}
+            {explanation}
+            {meta_section}
+            {passages_html}
+            {flags_html}
+        </div>
+    </details>'''
+
+
+# ---------------------------------------------------------------------------
+# Comprehension formatting
+# ---------------------------------------------------------------------------
+
+def format_comprehension_coverage(report) -> str:
+    cov = report.coverage
+    total = sum(cov.values()) or 1
+    ft = cov.get("full_text", 0)
+    ab = cov.get("abstract_only", 0)
+    nf = cov.get("not_found", 0)
+
+    def bar(count, color, label):
+        pct = int(count / total * 100)
+        return f'''
+        <div class="coverage-bar">
+            <div style="width:200px;background:#e5e7eb;border-radius:4px;overflow:hidden;">
+                <div class="coverage-fill" style="width:{pct}%;background:{color};"></div>
+            </div>
+            <span><b>{count}</b> {label}</span>
+        </div>'''
+
+    return f'''
+    <div class="dashboard">
+        <div style="font-size:14px;color:#6b7280;">Coverage</div>
+        <div style="font-size:28px;font-weight:800;color:#1f2937;">{report.total_citations} <span style="font-size:14px;font-weight:400;color:#6b7280;">citations analyzed</span></div>
+        {bar(ft, "#22c55e", "Full text")}
+        {bar(ab, "#f59e0b", "Abstract only")}
+        {bar(nf, "#ef4444", "Not found")}
+    </div>'''
+
+
+
+
+# ---------------------------------------------------------------------------
+# Parse output formatting
+# ---------------------------------------------------------------------------
+
+def format_parse_output(parsed) -> str:
+    # Summary
+    ref_count = len(parsed.references)
+    cit_count = len(parsed.citations)
+    fmt = _esc(parsed.input_format)
+    body = "Yes" if parsed.has_body_text else "No"
+
+    warnings_html = ""
+    if parsed.warnings:
+        items = "".join(f"<li>{_esc(w)}</li>" for w in parsed.warnings)
+        warnings_html = f'<ul style="margin:4px 0;color:#d97706;">{items}</ul>'
+
+    # References table
+    ref_rows = ""
+    for r in parsed.references:
+        title = _esc(r.title) if r.title else "<em>—</em>"
+        authors = _esc("; ".join(r.authors)) if r.authors else "—"
+        year = r.year or "—"
+        venue = _esc(r.venue) if r.venue else "—"
+        cfmt = getattr(r, 'citation_format', None)
+        cfmt_str = _esc(cfmt.upper()) if cfmt else "—"
+        ref_rows += f"<tr><td><b>{_esc(r.ref_id)}</b></td><td>{title}</td><td>{authors}</td><td>{year}</td><td>{venue}</td><td>{cfmt_str}</td></tr>"
+
+    refs_html = f'''
+    <table class="meta-table">
+        <thead><tr><th>ID</th><th>Title</th><th>Authors</th><th>Year</th><th>Venue</th><th>Format</th></tr></thead>
+        <tbody>{ref_rows}</tbody>
+    </table>''' if ref_rows else '<div style="color:#6b7280;">No references extracted.</div>'
+
+    # Citations
+    cit_html = ""
+    for c in parsed.citations[:50]:
+        section = f' <span style="font-size:11px;color:#6b7280;">({_esc(c.section)})</span>' if c.section else ""
+        # Combine full context so the claim is always visible
+        parts = []
+        if c.context_before:
+            parts.append(_esc(c.context_before, 150))
+        parts.append(f'<b>{_esc(c.citing_sentence, 200)}</b>')
+        if c.context_after:
+            parts.append(_esc(c.context_after, 150))
+        full_context = " ".join(parts)
+        cit_html += f'''
+        <div style="padding:8px 12px;margin:4px 0;background:#f8fafc;border-radius:6px;font-size:13px;line-height:1.6;">
+            <span style="font-weight:600;color:#3b82f6;">[{_esc(c.ref_id)}]</span>{section}<br>
+            {full_context}
+        </div>'''
+    if not cit_html:
+        cit_html = '<div style="color:#6b7280;">No in-text citations found (expected for BibTeX-only input).</div>'
+
+    return f'''
+    <div class="dashboard">
+        <div style="font-size:14px;color:#6b7280;">Parse Results</div>
+        <div style="display:flex;gap:20px;margin:10px 0;flex-wrap:wrap;">
+            <div><b>Format:</b> {fmt}</div>
+            <div><b>References:</b> {ref_count}</div>
+            <div><b>Citations:</b> {cit_count}</div>
+            <div><b>Body text:</b> {body}</div>
+        </div>
+        {warnings_html}
+    </div>
+    <h3 style="margin-top:16px;">References</h3>
+    {refs_html}
+    <h3 style="margin-top:20px;">Citations</h3>
+    {cit_html}'''
+
+
+# ---------------------------------------------------------------------------
+# Callbacks
+# ---------------------------------------------------------------------------
+
+def run_analyze(file, ref_pdfs, check_existence, check_claims, mode, retry_failed):
+    if file is None:
+        raise gr.Error("Please upload a file.")
+    if not check_existence and not check_claims:
+        raise gr.Error("Select at least one analysis option.")
+
+    file_path = file if isinstance(file, str) else file.name
+
+    # Resolve effective mode
+    effective_mode = mode
+    if check_claims:
+        check_prerequisites(file_path, mode)
+    else:
+        check_prerequisites(file_path, "quick")
+        effective_mode = "quick"
+
+    ref_dir = prepare_ref_pdfs_dir(ref_pdfs) if check_claims else None
+
+    try:
+        start = time.time()
+        paper_report, comp_report, parsed = run_unified(
+            file_path,
+            mode=effective_mode,
+            run_verification=check_existence,
+            run_claim_verification=check_claims,
+            run_comprehension=check_claims,
+            ref_pdfs_dir=ref_dir,
+            retry_failed=retry_failed,
+        )
+        elapsed = time.time() - start
+    finally:
+        if ref_dir:
+            shutil.rmtree(ref_dir, ignore_errors=True)
+
+    # Dashboard (only if verification ran)
+    dashboard_html = ""
+    if paper_report:
+        dashboard_html = format_dashboard(paper_report, selected_mode=mode, elapsed=elapsed)
+
+    # Coverage (only if claim verification ran)
+    coverage_html = ""
+    if comp_report and check_claims:
+        coverage_html = format_comprehension_coverage(comp_report)
+
+    # Unified cards
+    cards_html = format_unified_cards(
+        paper_report, comp_report, parsed.references,
+        has_verification=bool(paper_report),
+        has_passages=check_claims,
+    )
+
+    # JSON report
+    combined = {}
+    if paper_report:
+        combined["verification"] = paper_report.model_dump()
+    if comp_report:
+        combined["comprehension"] = comp_report.model_dump()
+    report_json = json.dumps(combined, indent=2, default=str)
+
+    tmp = tempfile.NamedTemporaryFile(
+        suffix=".json", prefix="checkcitation_report_", delete=False, mode="w"
+    )
+    tmp.write(report_json)
+    tmp.close()
+
+    return dashboard_html, coverage_html, cards_html, report_json, tmp.name
+
+
+def run_parse(file):
+    if file is None:
+        raise gr.Error("Please upload a file.")
+    file_path = file if isinstance(file, str) else file.name
+    check_prerequisites(file_path, "quick")
+    parsed = parse_file(file_path)
+    return format_parse_output(parsed)
+
+
+# ---------------------------------------------------------------------------
+# About page
+# ---------------------------------------------------------------------------
+
+ABOUT_MD = """
+# CheckCitation
+
+**Open-source citation hallucination detection for academic papers.**
+
+CheckCitation analyzes a paper's reference list and in-text citations to detect:
+- **Fabricated citations** — references that don't exist in any scholarly database
+- **Misrepresented citations** — real papers cited but whose content contradicts the claims made
+
+---
+
+## Analysis Options
+
+| Option | What it does | Cost |
+|--------|-------------|------|
+| **Existence & Metadata** | Checks if references exist in CrossRef, Semantic Scholar, OpenAlex, PubMed and validates metadata fields | Free |
+| **Claim Verification** | Retrieves full text of cited papers, finds relevant passages, and uses an LLM to check if the citing sentence accurately represents the cited paper | Requires OpenAI key |
+
+## Modes (for Claim Verification)
+
+| Mode | How it works | Cost |
+|------|-------------|------|
+| **Standard** | Pipeline: fetch full text → retrieve passages → LLM verifies each claim | ~$0.01–0.05/paper |
+| **Agentic** | Autonomous LLM agent per reference with database + passage retrieval tools | ~$0.17/paper |
+
+When only "Existence & Metadata" is checked, the mode dropdown is disabled (no LLM needed).
+
+---
+
+## Prerequisites
+
+1. **GROBID** (for PDF input only):
+   ```
+   docker run -d --name grobid -p 8070:8070 grobid/grobid:0.8.2-crf
+   ```
+
+2. **OpenAI API key** (for Claim Verification):
+   ```
+   # Add to .env file:
+   OPENAI_API_KEY=sk-...
+   ```
+
+3. **Python dependencies:**
+   ```
+   pip install -r requirements.txt
+   ```
+
+---
+
+## Reference PDFs
+
+You can upload PDFs of cited papers for better claim verification (useful for non-open-access papers). Files are matched to references by:
+1. **Filename matches ref_id** — e.g., `ref_1.pdf` matches `[1]`
+2. **Filename contains DOI** — e.g., `10.1234_example.pdf` (use `_` instead of `/`)
+3. **Title similarity** — filename compared to reference titles (threshold: 70%)
+
+If you don't upload PDFs, the system fetches full text from Semantic Scholar, Unpaywall, and arXiv.
+
+---
+
+## Credits
+
+Built as part of PhD research at **TIB — Leibniz Information Centre for Science and Technology, Hannover**.
+"""
+
+
+# ---------------------------------------------------------------------------
+# Gradio app
+# ---------------------------------------------------------------------------
+
+def create_app() -> gr.Blocks:
+    theme = gr.themes.Soft(
+        primary_hue=gr.themes.colors.blue,
+        secondary_hue=gr.themes.colors.slate,
+        neutral_hue=gr.themes.colors.slate,
+        font=[gr.themes.GoogleFont("Inter"), "system-ui", "sans-serif"],
+        radius_size=gr.themes.sizes.radius_sm,
+    )
+
+    with gr.Blocks(title="CheckCitation", theme=theme, css=BASE_CSS) as demo:
+
+        gr.HTML('''
+        <div class="cc-header">
+            <h1>CheckCitation</h1>
+            <p>Detect fabricated and misrepresented citations in academic papers</p>
+        </div>
+        ''')
+
+        with gr.Tabs():
+            # ── Tab 1: Analyze ─────────────────────────────────
+            with gr.TabItem("Analyze"):
+                with gr.Row(equal_height=False):
+                    with gr.Column(scale=3):
+                        analyze_file = gr.File(
+                            label="Upload Paper",
+                            file_types=[".pdf", ".tex", ".bib", ".txt"],
+                            type="filepath",
+                        )
+                        analyze_refs = gr.File(
+                            label="Reference PDFs (optional — for non-open-access cited papers)",
+                            file_types=[".pdf"],
+                            file_count="multiple",
+                            type="filepath",
+                            visible=False,
+                        )
+                    with gr.Column(scale=2):
+                        gr.HTML('<div class="cc-section-label">Analysis Options</div>')
+                        chk_existence = gr.Checkbox(
+                            label="Existence & Metadata",
+                            value=True,
+                            info="Check references against CrossRef, Semantic Scholar, OpenAlex, PubMed",
+                        )
+                        chk_claims = gr.Checkbox(
+                            label="Claim Verification",
+                            value=False,
+                            info="Retrieve cited paper text and verify claims with LLM (requires OpenAI key)",
+                        )
+                        analyze_mode = gr.Dropdown(
+                            choices=["standard", "agentic"],
+                            value="agentic",
+                            label="Mode",
+                            info="Standard: pipeline | Agentic: smart triage + focused agents",
+                            interactive=False,
+                        )
+                        analyze_retry = gr.Checkbox(label="Retry failed references", value=False)
+                        analyze_btn = gr.Button("Analyze", variant="primary", size="lg")
+
+                        chk_claims.change(
+                            fn=lambda checked: (gr.update(interactive=checked), gr.update(visible=checked)),
+                            inputs=[chk_claims],
+                            outputs=[analyze_mode, analyze_refs],
+                        )
+
+                # ── Results section ──
+                gr.HTML('<div class="cc-section-label" style="margin-top:20px;">Results</div>')
+                analyze_dashboard = gr.HTML()
+                analyze_coverage = gr.HTML()
+                analyze_cards = gr.HTML(
+                    value='''<div class="cc-empty">
+                        <div class="cc-empty-icon">&#x1F50D;</div>
+                        <div class="cc-empty-title">Ready to analyze</div>
+                        <div class="cc-empty-sub">Upload a paper and click Analyze to begin</div>
+                    </div>''',
+                )
+
+                with gr.Accordion("JSON Report", open=False):
+                    analyze_json = gr.Code(language="json", label="Report JSON")
+                analyze_download = gr.File(label="Download Report", interactive=False)
+
+                # Single click handler — Gradio shows its own loading state
+                analyze_btn.click(
+                    fn=run_analyze,
+                    inputs=[
+                        analyze_file, analyze_refs,
+                        chk_existence, chk_claims,
+                        analyze_mode, analyze_retry,
+                    ],
+                    outputs=[
+                        analyze_dashboard, analyze_coverage, analyze_cards,
+                        analyze_json, analyze_download,
+                    ],
+                )
+
+            # ── Tab 2: Parse ───────────────────────────────────
+            with gr.TabItem("Parse"):
+                with gr.Row(equal_height=False):
+                    with gr.Column(scale=3):
+                        parse_file_input = gr.File(
+                            label="Upload Paper",
+                            file_types=[".pdf", ".tex", ".bib", ".txt"],
+                            type="filepath",
+                        )
+                    with gr.Column(scale=2):
+                        gr.HTML('''
+                        <div style="padding-top:12px;font-size:13px;color:#64748b;line-height:1.6;">
+                            Extract references and in-text citations without running
+                            verification. Useful for inspecting what the parser sees
+                            before a full analysis.
+                        </div>
+                        ''')
+                        parse_btn = gr.Button("Parse", variant="primary")
+                parse_output = gr.HTML()
+
+                parse_btn.click(
+                    fn=run_parse,
+                    inputs=[parse_file_input],
+                    outputs=[parse_output],
+                )
+
+            # ── Tab 3: About ──────────────────────────────────
+            with gr.TabItem("About"):
+                gr.Markdown(ABOUT_MD)
+
+    return demo
+
+
+if __name__ == "__main__":
+    demo = create_app()
+    demo.launch(share=False)

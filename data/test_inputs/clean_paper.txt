@@ -1,0 +1,31 @@
+Deep Learning for Sequence Modeling: A Brief Survey
+
+1. Introduction
+
+Deep learning has transformed many areas of artificial intelligence, particularly in sequence modeling tasks. Recurrent neural networks were the dominant approach for many years, with Long Short-Term Memory networks [1] addressing the vanishing gradient problem that plagued earlier architectures. LSTM introduced gating mechanisms including an input gate, forget gate, and output gate that allow the network to selectively retain or forget information over long sequences.
+
+2. The Transformer Revolution
+
+The introduction of the Transformer architecture [2] marked a fundamental shift in how sequence-to-sequence models are designed. By relying entirely on self-attention mechanisms rather than recurrence, the Transformer enabled significantly more parallelizable training. The multi-head attention mechanism allows the model to jointly attend to information from different representation subspaces at different positions.
+
+3. Pre-trained Language Models
+
+Building on the Transformer, BERT [3] demonstrated the power of bidirectional pre-training for language understanding. Through masked language modeling and next sentence prediction objectives, BERT achieved state-of-the-art results on eleven natural language processing benchmarks including SQuAD and GLUE. This pre-train and fine-tune paradigm has since become the standard approach in NLP.
+
+4. Visual Recognition
+
+In computer vision, deep residual networks [4] solved the degradation problem that prevented training of very deep networks. By introducing skip connections that enable identity mappings, ResNets demonstrated that networks with over 100 layers could be trained effectively. The residual learning framework won the ImageNet Large Scale Visual Recognition Challenge in 2015 with a top-5 error rate of 3.57%.
+
+5. Conclusion
+
+The developments surveyed here, from LSTMs to Transformers to pre-trained models, have established deep learning as the dominant paradigm across sequence modeling and beyond.
+
+References
+
+[1] Hochreiter, S. and Schmidhuber, J. (1997). Long Short-Term Memory. Neural Computation, 9(8), 1735-1780.
+
+[2] Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A. N., Kaiser, L., and Polosukhin, I. (2017). Attention is All You Need. Advances in Neural Information Processing Systems, 30.
+
+[3] Devlin, J., Chang, M., Lee, K., and Toutanova, K. (2019). BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding. Proceedings of the 2019 Conference of the North American Chapter of the Association for Computational Linguistics.
+
+[4] He, K., Zhang, X., Ren, S., and Sun, J. (2016). Deep Residual Learning for Image Recognition. Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition, 770-778.

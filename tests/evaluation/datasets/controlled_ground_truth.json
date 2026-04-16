@@ -1,0 +1,21 @@
+{
+  "_description": "Ground truth for controlled.bib. Keys are ref_ids from BibTeX.",
+  "_categories": {
+    "VALID": "Real paper, metadata correct",
+    "FABRICATED": "Paper does not exist, is retracted, or has incorrect metadata"
+  },
+  "annotations": {
+    "vaswani2017attention": {"expected": "VALID", "notes": "Real NeurIPS 2017 paper"},
+    "devlin2019bert": {"expected": "VALID", "notes": "Real NAACL 2019 paper"},
+    "brown2020language": {"expected": "VALID", "notes": "Real NeurIPS 2020 paper (GPT-3)"},
+    "lecun2015deep": {"expected": "VALID", "notes": "Real Nature 2015 paper, has DOI"},
+    "krizhevsky2012imagenet": {"expected": "VALID", "notes": "Real NeurIPS 2012 paper (AlexNet)"},
+    "zhangwei2024quantum": {"expected": "FABRICATED", "notes": "Completely fabricated paper"},
+    "oconnor2023meta": {"expected": "FABRICATED", "notes": "Completely fabricated paper"},
+    "liuchen2022neuro": {"expected": "FABRICATED", "notes": "Completely fabricated paper"},
+    "chimeric1": {"expected": "FABRICATED", "notes": "Title=Attention, Authors=BERT authors, Year=2020"},
+    "chimeric2": {"expected": "FABRICATED", "notes": "Title=Deep Learning (LeCun), Authors=AlexNet authors, Year=2020"},
+    "misattr1": {"expected": "FABRICATED", "notes": "Attention paper but year says 2019 instead of 2017"},
+    "misattr2": {"expected": "FABRICATED", "notes": "Deep Learning paper but year says 2018 instead of 2015"}
+  }
+}

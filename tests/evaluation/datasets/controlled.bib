@@ -1,0 +1,99 @@
+% CONTROLLED EVALUATION DATASET
+% Ground truth annotations in controlled_ground_truth.json
+%
+% Mix of: real papers and fabricated (non-existent, wrong metadata)
+
+% --- REAL PAPERS (should be VALID) ---
+
+@article{vaswani2017attention,
+  title={Attention Is All You Need},
+  author={Vaswani, Ashish and Shazeer, Noam and Parmar, Niki and Uszkoreit, Jakob and Jones, Llion and Gomez, Aidan N and Kaiser, Lukasz and Polosukhin, Illia},
+  journal={Advances in Neural Information Processing Systems},
+  year={2017}
+}
+
+@article{devlin2019bert,
+  title={BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding},
+  author={Devlin, Jacob and Chang, Ming-Wei and Lee, Kenton and Toutanova, Kristina},
+  booktitle={NAACL-HLT},
+  year={2019}
+}
+
+@article{brown2020language,
+  title={Language Models are Few-Shot Learners},
+  author={Brown, Tom B and Mann, Benjamin and Ryder, Nick and Subbiah, Melanie and Kaplan, Jared and Dhariwal, Prafulla and Neelakantan, Arvind and Shyam, Pranav and Sastry, Girish and Askell, Amanda},
+  journal={Advances in Neural Information Processing Systems},
+  year={2020}
+}
+
+@article{lecun2015deep,
+  title={Deep Learning},
+  author={LeCun, Yann and Bengio, Yoshua and Hinton, Geoffrey},
+  journal={Nature},
+  volume={521},
+  pages={436--444},
+  year={2015},
+  doi={10.1038/nature14539}
+}
+
+@article{krizhevsky2012imagenet,
+  title={ImageNet Classification with Deep Convolutional Neural Networks},
+  author={Krizhevsky, Alex and Sutskever, Ilya and Hinton, Geoffrey E},
+  journal={Advances in Neural Information Processing Systems},
+  year={2012}
+}
+
+% --- FABRICATED PAPERS (should be FABRICATED) ---
+
+@article{zhangwei2024quantum,
+  title={Quantum-Enhanced Recursive Backpropagation for Hyperdimensional Feature Spaces},
+  author={Zhang, Wei and Nakamura, Hiro and Petrov, Alexei},
+  journal={Journal of Advanced Neural Architectures},
+  year={2024}
+}
+
+@article{oconnor2023meta,
+  title={Meta-Cognitive Transformer Networks with Emergent Self-Supervised Reasoning},
+  author={O'Connor, Sarah and Dimitriou, Konstantinos and Al-Rashid, Fatima},
+  journal={International Journal of Cognitive Computing},
+  year={2023}
+}
+
+@article{liuchen2022neuro,
+  title={Neuro-Symbolic Integration via Differentiable Logic Programming with Attention},
+  author={Liu, Chen and Park, Jae-Won and Volkov, Dmitri},
+  journal={Proceedings of the European Conference on Artificial Intelligence},
+  year={2022}
+}
+
+% --- CHIMERIC (title from paper A, authors from paper B) (should be CHIMERIC) ---
+
+@article{chimeric1,
+  title={Attention Is All You Need},
+  author={Devlin, Jacob and Chang, Ming-Wei and Lee, Kenton},
+  journal={ICML},
+  year={2020}
+}
+
+@article{chimeric2,
+  title={Deep Learning},
+  author={Krizhevsky, Alex and Sutskever, Ilya},
+  journal={NeurIPS},
+  year={2020}
+}
+
+% --- WRONG METADATA (real title, wrong year) (should be FABRICATED) ---
+
+@article{misattr1,
+  title={Attention Is All You Need},
+  author={Vaswani, Ashish and Shazeer, Noam and Parmar, Niki},
+  journal={NeurIPS},
+  year={2019}
+}
+
+@article{misattr2,
+  title={Deep Learning},
+  author={LeCun, Yann and Bengio, Yoshua and Hinton, Geoffrey},
+  journal={Nature},
+  year={2018}
+}
