@@ -77,6 +77,11 @@ def annotate_pdf(
 
     stats = AnnotationStats(pages=doc.page_count)
 
+    # Track already-annotated marker positions so a repeated marker like "[12]"
+    # that appears on pages 3 and 7 annotates both occurrences, not the same one
+    # twice.
+    used_positions: set[tuple[int, int, int]] = set()
+
     try:
         for cit in citations:
             verdict = verdicts_by_ref.get(cit.ref_id)
@@ -91,10 +96,15 @@ def annotate_pdf(
                 stats.skipped_no_marker += 1
                 continue
 
-            if _place_annotation_on_first_match(doc, cit, verdict, marker, color):
-                stats.annotated += 1
-            else:
+            target = _find_citation_target(doc, cit, marker, used_positions)
+            if target is None:
                 stats.skipped_not_found += 1
+                continue
+
+            page_idx, rect = target
+            _draw_highlight_with_note(doc[page_idx], rect, verdict, color)
+            used_positions.add((page_idx, int(rect.x0), int(rect.y0)))
+            stats.annotated += 1
 
         # garbage=4 + deflate keeps the resulting file size reasonable
         doc.save(output_path, garbage=4, deflate=True)
@@ -109,35 +119,46 @@ def annotate_pdf(
     return stats
 
 
-def _place_annotation_on_first_match(doc, cit, verdict, marker: str, color) -> bool:
-    """Find the best occurrence of ``marker`` for this citation and annotate it.
+def _find_citation_target(
+    doc, cit, marker: str, used_positions: set[tuple[int, int, int]],
+) -> Optional[tuple[int, "fitz.Rect"]]:
+    """Return ``(page_index, rect)`` for the best place to annotate this
+    citation, or ``None`` if the marker cannot be located.
 
-    Strategy: search every page for the marker string. When a page has only one
-    occurrence, use it. When there are multiple, use the citing sentence prefix
-    to pick the one physically closest to where the sentence appears. When all
-    else fails, fall back to the first occurrence on the first page that has any.
-    Returns True if we placed at least one annotation.
+    Strategy (in order, each skipping positions already annotated):
+      1. Locate the citing sentence on some page; pick the marker rect closest
+         to it on that page. This handles repeated markers correctly.
+      2. Fall back to the first not-yet-used marker occurrence anywhere in
+         the document.
     """
     sentence_prefix = _safe_sentence_prefix(cit.citing_sentence)
 
-    for page in doc:
-        rects = page.search_for(marker)
-        if not rects:
-            continue
-
-        target_rect = rects[0]
-        if len(rects) > 1 and sentence_prefix:
+    # Strategy 1: sentence-first — find the page holding this citing sentence
+    if sentence_prefix:
+        for page_idx, page in enumerate(doc):
             sentence_rects = page.search_for(sentence_prefix)
-            if sentence_rects:
-                s0 = sentence_rects[0]
-                target_rect = min(
-                    rects, key=lambda r: abs(r.y0 - s0.y0) + abs(r.x0 - s0.x0)
-                )
+            if not sentence_rects:
+                continue
+            marker_rects = page.search_for(marker)
+            if not marker_rects:
+                continue
+            s0 = sentence_rects[0]
+            for rect in sorted(
+                marker_rects,
+                key=lambda r: abs(r.y0 - s0.y0) + abs(r.x0 - s0.x0),
+            ):
+                key = (page_idx, int(rect.x0), int(rect.y0))
+                if key not in used_positions:
+                    return page_idx, rect
 
-        _draw_highlight_with_note(page, target_rect, verdict, color)
-        return True
+    # Strategy 2: first unused occurrence anywhere in the document
+    for page_idx, page in enumerate(doc):
+        for rect in page.search_for(marker):
+            key = (page_idx, int(rect.x0), int(rect.y0))
+            if key not in used_positions:
+                return page_idx, rect
 
-    return False
+    return None
 
 
 def _safe_sentence_prefix(sentence: Optional[str], length: int = 40) -> str:
