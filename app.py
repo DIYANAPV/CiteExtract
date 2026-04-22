@@ -5,7 +5,7 @@ Launch with:
 
 Requires:
     - GROBID running for PDF input: docker run -d -p 8070:8070 grobid/grobid:0.8.2-crf
-    - .env with OPENAI_API_KEY for Claim Verification (Standard/Agentic modes)
+    - .env with OPENAI_API_KEY for Claim Verification (Agentic mode)
 """
 
 import json
@@ -13,7 +13,9 @@ import logging
 import os
 import shutil
 import tempfile
+import threading
 import time
+from collections import defaultdict
 from html import escape
 from pathlib import Path
 from typing import Optional
@@ -160,6 +162,71 @@ BASE_CSS = """
 
 /* ── Tab styling ── */
 .tab-nav button { font-weight: 600 !important; font-size: 13px !important; }
+
+/* ── HITL review controls ── */
+.cc-review-bar {
+    background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px;
+    padding: 12px 16px; margin: 0 0 12px; display: flex; align-items: center;
+    gap: 14px; font-size: 13px;
+}
+.cc-review-progress {
+    flex: 1; display: flex; align-items: center; gap: 10px;
+    color: #475569; font-weight: 500;
+}
+.cc-review-progress .cc-pb {
+    flex: 1; height: 6px; background: #e5e7eb; border-radius: 6px; overflow: hidden;
+}
+.cc-review-progress .cc-pb-fill {
+    height: 100%; background: #3b82f6; border-radius: 6px;
+    transition: width 0.25s ease-out;
+}
+.cc-review-counts .tag {
+    display: inline-block; padding: 2px 8px; border-radius: 10px;
+    font-size: 11px; font-weight: 600; margin-left: 4px;
+}
+.cc-review-counts .tag-agree    { background: #dcfce7; color: #15803d; }
+.cc-review-counts .tag-disagree { background: #fee2e2; color: #b91c1c; }
+.cc-review-counts .tag-info     { background: #fef9c3; color: #a16207; }
+.cc-review-btn-reset {
+    background: #f1f5f9; border: 1px solid #cbd5e1; color: #475569;
+    padding: 4px 10px; border-radius: 6px; font-size: 12px; cursor: pointer;
+}
+.cc-review-btn-reset:hover { background: #e2e8f0; }
+.cc-review-btn-export {
+    background: #eff6ff; border: 1px solid #bfdbfe; color: #1d4ed8;
+    padding: 4px 10px; border-radius: 6px; font-size: 12px; cursor: pointer;
+}
+.cc-review-btn-export:hover { background: #dbeafe; }
+
+.cc-review-row {
+    display: flex; gap: 6px; margin-top: 12px; padding-top: 10px;
+    border-top: 1px dashed #e2e8f0;
+}
+.cc-review-row .cc-btn {
+    font-size: 12px; font-weight: 600; padding: 5px 12px; border-radius: 6px;
+    cursor: pointer; border: 1px solid transparent; background: #f8fafc;
+    color: #475569; transition: all 0.15s ease;
+}
+.cc-review-row .cc-btn:hover { background: #f1f5f9; }
+.cc-review-row .cc-btn[data-active="agree"],
+.cc-review-row .cc-btn.agree:hover {
+    background: #dcfce7; color: #15803d; border-color: #86efac;
+}
+.cc-review-row .cc-btn[data-active="disagree"],
+.cc-review-row .cc-btn.disagree:hover {
+    background: #fee2e2; color: #b91c1c; border-color: #fca5a5;
+}
+.cc-review-row .cc-btn[data-active="info"],
+.cc-review-row .cc-btn.info:hover {
+    background: #fef9c3; color: #a16207; border-color: #fde047;
+}
+.cc-review-row .cc-btn[data-active] {
+    box-shadow: inset 0 0 0 1px currentColor;
+}
+.cc-review-row .cc-label {
+    font-size: 11px; color: #94a3b8; align-self: center; margin-right: auto;
+    text-transform: uppercase; letter-spacing: 0.04em; font-weight: 600;
+}
 """
 
 
@@ -169,8 +236,9 @@ BASE_CSS = """
 
 def check_prerequisites(file_path: str, mode: str) -> None:
     if file_path and file_path.lower().endswith(".pdf"):
+        grobid_url = config.grobid()["service_url"]
         try:
-            requests.get("http://localhost:8070/api/isalive", timeout=3)
+            requests.get(f"{grobid_url}/api/isalive", timeout=3)
         except Exception:
             raise gr.Error(
                 "GROBID is not running. PDF parsing requires GROBID.\n"
@@ -399,9 +467,13 @@ def format_agentic_metadata_table(verdict, ref) -> str:
 # ---------------------------------------------------------------------------
 
 CLAIM_VERDICT_STYLES = {
-    "SUPPORTS":    {"color": "#15803d", "bg": "#dcfce7", "border": "#86efac", "label": "Supports"},
-    "CONTRADICTS": {"color": "#b91c1c", "bg": "#fee2e2", "border": "#fca5a5", "label": "Contradicts"},
-    "NEUTRAL":     {"color": "#6b7280", "bg": "#f3f4f6", "border": "#d1d5db", "label": "Neutral"},
+    # 3-class scheme (agentic.claim_agent.verdict_classes = 3)
+    "SUPPORTS":      {"color": "#15803d", "bg": "#dcfce7", "border": "#86efac", "label": "Supports"},
+    "CONTRADICTS":   {"color": "#b91c1c", "bg": "#fee2e2", "border": "#fca5a5", "label": "Contradicts"},
+    "NEUTRAL":       {"color": "#6b7280", "bg": "#f3f4f6", "border": "#d1d5db", "label": "Neutral"},
+    # 2-class scheme (agentic.claim_agent.verdict_classes = 2)
+    "SUPPORTED":     {"color": "#15803d", "bg": "#dcfce7", "border": "#86efac", "label": "Supported"},
+    "NOT_SUPPORTED": {"color": "#b91c1c", "bg": "#fee2e2", "border": "#fca5a5", "label": "Not Supported"},
 }
 
 
@@ -493,6 +565,117 @@ def _format_passages_for_ref(comp_results: list) -> str:
 # Unified reference cards (verification + comprehension combined)
 # ---------------------------------------------------------------------------
 
+def _review_ui_bootstrap() -> str:
+    """Progress bar + JavaScript that powers per-card HITL review controls.
+
+    Reviews persist in the browser's localStorage keyed by ref_id so users
+    can re-analyze without losing state. A Reset button clears reviews for
+    the current browser; an Export button downloads a CSV of
+    {ref_id, verdict, review} for auditing or user-study data capture.
+    """
+    return '''
+<div class="cc-review-bar" id="cc-review-bar">
+    <div class="cc-review-progress">
+        <span id="cc-review-progress-label">Reviewed <b>0</b> / <b>0</b></span>
+        <div class="cc-pb"><div class="cc-pb-fill" id="cc-pb-fill" style="width:0%;"></div></div>
+    </div>
+    <div class="cc-review-counts" id="cc-review-counts"></div>
+    <button type="button" class="cc-review-btn-export" onclick="ccExportReviews()">Export CSV</button>
+    <button type="button" class="cc-review-btn-reset" onclick="ccResetReviews()">Reset</button>
+</div>
+<script>
+(function() {
+    if (window.__ccReviewLoaded) { window.ccRefreshReviews(); return; }
+    window.__ccReviewLoaded = true;
+    const KEY_PREFIX = 'checkcite-review-v1-';
+
+    function getState(refId) {
+        try { return localStorage.getItem(KEY_PREFIX + refId) || ''; }
+        catch (e) { return ''; }
+    }
+    function setState(refId, state) {
+        try {
+            if (state) localStorage.setItem(KEY_PREFIX + refId, state);
+            else       localStorage.removeItem(KEY_PREFIX + refId);
+        } catch (e) { /* ignore */ }
+    }
+    function applyCardState(card) {
+        const refId = card.getAttribute('data-cc-ref');
+        const state = getState(refId);
+        card.querySelectorAll('.cc-review-row .cc-btn').forEach(b => b.removeAttribute('data-active'));
+        if (!state) return;
+        const row = card.querySelector('.cc-review-row');
+        if (!row) return;
+        const btn = row.querySelector('.cc-btn.' + state);
+        if (btn) btn.setAttribute('data-active', state);
+    }
+    function refresh() {
+        const cards = document.querySelectorAll('details.card[data-cc-ref]');
+        let total = cards.length, reviewed = 0, agree = 0, disagree = 0, info = 0;
+        cards.forEach(card => {
+            applyCardState(card);
+            const s = getState(card.getAttribute('data-cc-ref'));
+            if (s) { reviewed += 1; if (s==='agree') agree++; else if (s==='disagree') disagree++; else if (s==='info') info++; }
+        });
+        const label = document.getElementById('cc-review-progress-label');
+        const fill  = document.getElementById('cc-pb-fill');
+        const counts = document.getElementById('cc-review-counts');
+        if (label) label.innerHTML = 'Reviewed <b>' + reviewed + '</b> / <b>' + total + '</b>';
+        if (fill)  fill.style.width = (total ? (100 * reviewed / total) : 0) + '%';
+        if (counts) {
+            counts.innerHTML =
+                '<span class="tag tag-agree">✓ ' + agree + '</span>' +
+                '<span class="tag tag-disagree">✗ ' + disagree + '</span>' +
+                '<span class="tag tag-info">? ' + info + '</span>';
+        }
+    }
+    window.ccRefreshReviews = refresh;
+    window.ccSetReview = function(refId, state) {
+        const cur = getState(refId);
+        setState(refId, cur === state ? '' : state);  // toggle off if same
+        refresh();
+    };
+    window.ccResetReviews = function() {
+        if (!confirm('Clear all review marks in this browser?')) return;
+        try {
+            const toRemove = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const k = localStorage.key(i);
+                if (k && k.indexOf(KEY_PREFIX) === 0) toRemove.push(k);
+            }
+            toRemove.forEach(k => localStorage.removeItem(k));
+        } catch (e) { /* ignore */ }
+        refresh();
+    };
+    window.ccExportReviews = function() {
+        const rows = [['ref_id', 'verdict', 'review']];
+        document.querySelectorAll('details.card[data-cc-ref]').forEach(card => {
+            const refId = card.getAttribute('data-cc-ref');
+            const verdict = card.getAttribute('data-cc-verdict') || '';
+            const s = getState(refId);
+            if (s) rows.push([refId, verdict, s]);
+        });
+        const csv = rows.map(r => r.map(v => '"' + String(v).replace(/"/g, '""') + '"').join(',')).join('\\n');
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url  = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'checkcite-reviews.csv';
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    };
+    // Re-apply when Gradio replaces the HTML (MutationObserver is safer than onload).
+    const target = document.body;
+    if (target) {
+        const obs = new MutationObserver(() => refresh());
+        obs.observe(target, { childList: true, subtree: true });
+    }
+    refresh();
+})();
+</script>
+'''
+
+
 def format_unified_cards(
     report, comp_report, references: list,
     has_verification: bool = True, has_passages: bool = False,
@@ -515,7 +698,9 @@ def format_unified_cards(
             ref = ref_map.get(v.ref_id)
             passages_html = _format_passages_for_ref(comp_by_ref.get(v.ref_id, [])) if has_passages else ""
             cards += _render_verdict_card(v, ref, passages_html)
-        return cards if cards else '<div style="color:#6b7280;text-align:center;padding:40px;">No references found.</div>'
+        if not cards:
+            return '<div style="color:#6b7280;text-align:center;padding:40px;">No references found.</div>'
+        return _review_ui_bootstrap() + cards
 
     # Passage-only mode (no verification) — neutral blue cards per reference
     if has_passages and comp_by_ref:
@@ -604,12 +789,25 @@ def _render_verdict_card(v, ref, passages_html: str = "") -> str:
         )
         flags_html = f'<div style="margin-top:8px;">{flag_items}</div>'
 
+    ref_id_attr = _esc(v.ref_id)
+    review_row = f'''
+        <div class="cc-review-row" data-cc-review-ref="{ref_id_attr}">
+            <span class="cc-label">Your review</span>
+            <button type="button" class="cc-btn agree"
+                    onclick="ccSetReview('{ref_id_attr}','agree')">✓ Agree</button>
+            <button type="button" class="cc-btn disagree"
+                    onclick="ccSetReview('{ref_id_attr}','disagree')">✗ Disagree</button>
+            <button type="button" class="cc-btn info"
+                    onclick="ccSetReview('{ref_id_attr}','info')">? Need info</button>
+        </div>'''
+
     return f'''
-    <details class="card" style="background:{st['bg']}; border-left-color:{st['border']};" {open_attr}>
+    <details class="card" data-cc-ref="{ref_id_attr}" data-cc-verdict="{_esc(v.verdict)}"
+             style="background:{st['bg']}; border-left-color:{st['border']};" {open_attr}>
         <summary>
             <span style="color:{st['color']};">{st['icon']} {st['label'].upper()}</span>
             &nbsp;&mdash;&nbsp;
-            [{_esc(v.ref_id)}] {authors}{year}
+            [{ref_id_attr}] {authors}{year}
         </summary>
         <div style="margin-top:8px;">
             <div style="font-size:15px;font-weight:600;color:#1f2937;">{title}</div>
@@ -621,6 +819,7 @@ def _render_verdict_card(v, ref, passages_html: str = "") -> str:
             {meta_section}
             {passages_html}
             {flags_html}
+            {review_row}
         </div>
     </details>'''
 
@@ -732,21 +931,39 @@ def format_parse_output(parsed) -> str:
 # Callbacks
 # ---------------------------------------------------------------------------
 
-def run_analyze(file, ref_pdfs, check_existence, check_claims, mode, retry_failed):
+# Simple daily rate limit to protect API keys on hosted demo
+_daily_analyses = defaultdict(int)  # date_str -> count
+_daily_lock = threading.Lock()
+_DAILY_LIMIT = int(os.environ.get("DAILY_ANALYSIS_LIMIT", "40"))
+
+
+def _check_rate_limit() -> None:
+    today = time.strftime("%Y-%m-%d")
+    with _daily_lock:
+        if _daily_analyses[today] >= _DAILY_LIMIT:
+            raise gr.Error(
+                f"Daily analysis limit ({_DAILY_LIMIT}) reached. "
+                "This is a research demo — please try again tomorrow."
+            )
+        _daily_analyses[today] += 1
+        # Clean old entries
+        for k in list(_daily_analyses):
+            if k != today:
+                del _daily_analyses[k]
+
+
+def run_analyze(file, ref_pdfs, check_existence, check_claims, retry_failed):
     if file is None:
         raise gr.Error("Please upload a file.")
+    _check_rate_limit()
     if not check_existence and not check_claims:
         raise gr.Error("Select at least one analysis option.")
 
     file_path = file if isinstance(file, str) else file.name
 
-    # Resolve effective mode
-    effective_mode = mode
-    if check_claims:
-        check_prerequisites(file_path, mode)
-    else:
-        check_prerequisites(file_path, "quick")
-        effective_mode = "quick"
+    # Claim verification triggers agentic mode; otherwise rule-based (internal: "quick")
+    effective_mode = "agentic" if check_claims else "quick"
+    check_prerequisites(file_path, effective_mode)
 
     ref_dir = prepare_ref_pdfs_dir(ref_pdfs) if check_claims else None
 
@@ -769,7 +986,7 @@ def run_analyze(file, ref_pdfs, check_existence, check_claims, mode, retry_faile
     # Dashboard (only if verification ran)
     dashboard_html = ""
     if paper_report:
-        dashboard_html = format_dashboard(paper_report, selected_mode=mode, elapsed=elapsed)
+        dashboard_html = format_dashboard(paper_report, selected_mode=effective_mode, elapsed=elapsed)
 
     # Coverage (only if claim verification ran)
     coverage_html = ""
@@ -828,17 +1045,10 @@ CheckCitation analyzes a paper's reference list and in-text citations to detect:
 
 | Option | What it does | Cost |
 |--------|-------------|------|
-| **Existence & Metadata** | Checks if references exist in CrossRef, Semantic Scholar, OpenAlex, PubMed and validates metadata fields | Free |
-| **Claim Verification** | Retrieves full text of cited papers, finds relevant passages, and uses an LLM to check if the citing sentence accurately represents the cited paper | Requires OpenAI key |
+| **Existence & Metadata (Rule-based)** | Checks references against CrossRef, Semantic Scholar, OpenAlex, PubMed and validates metadata fields. No LLM — rule-based matching only. | Free |
+| **Claim Verification (Agentic)** | LLM agents retrieve cited paper text, find relevant passages, and check if the citing sentence accurately represents the cited paper. | ~$0.01–0.02/paper |
 
-## Modes (for Claim Verification)
-
-| Mode | How it works | Cost |
-|------|-------------|------|
-| **Standard** | Pipeline: fetch full text → retrieve passages → LLM verifies each claim | ~$0.01–0.05/paper |
-| **Agentic** | Autonomous LLM agent per reference with database + passage retrieval tools | ~$0.17/paper |
-
-When only "Existence & Metadata" is checked, the mode dropdown is disabled (no LLM needed).
+Either or both can be checked. Rule-based alone is fastest; adding claim verification triggers the agentic pipeline.
 
 ---
 
@@ -921,29 +1131,22 @@ def create_app() -> gr.Blocks:
                     with gr.Column(scale=2):
                         gr.HTML('<div class="cc-section-label">Analysis Options</div>')
                         chk_existence = gr.Checkbox(
-                            label="Existence & Metadata",
+                            label="Existence & Metadata (Rule-based)",
                             value=True,
-                            info="Check references against CrossRef, Semantic Scholar, OpenAlex, PubMed",
+                            info="Fast, no LLM. Checks refs against CrossRef, Semantic Scholar, OpenAlex, PubMed.",
                         )
                         chk_claims = gr.Checkbox(
-                            label="Claim Verification",
+                            label="Claim Verification (Agentic)",
                             value=False,
-                            info="Retrieve cited paper text and verify claims with LLM (requires OpenAI key)",
-                        )
-                        analyze_mode = gr.Dropdown(
-                            choices=["standard", "agentic"],
-                            value="agentic",
-                            label="Mode",
-                            info="Standard: pipeline | Agentic: smart triage + focused agents",
-                            interactive=False,
+                            info="LLM agents retrieve cited paper text and verify claims. Slower, costs OpenAI credits.",
                         )
                         analyze_retry = gr.Checkbox(label="Retry failed references", value=False)
                         analyze_btn = gr.Button("Analyze", variant="primary", size="lg")
 
                         chk_claims.change(
-                            fn=lambda checked: (gr.update(interactive=checked), gr.update(visible=checked)),
+                            fn=lambda checked: gr.update(visible=checked),
                             inputs=[chk_claims],
-                            outputs=[analyze_mode, analyze_refs],
+                            outputs=[analyze_refs],
                         )
 
                 # ── Results section ──
@@ -968,7 +1171,7 @@ def create_app() -> gr.Blocks:
                     inputs=[
                         analyze_file, analyze_refs,
                         chk_existence, chk_claims,
-                        analyze_mode, analyze_retry,
+                        analyze_retry,
                     ],
                     outputs=[
                         analyze_dashboard, analyze_coverage, analyze_cards,
@@ -1011,4 +1214,4 @@ def create_app() -> gr.Blocks:
 
 if __name__ == "__main__":
     demo = create_app()
-    demo.launch(share=False)
+    demo.launch(server_name="0.0.0.0", share=False)
