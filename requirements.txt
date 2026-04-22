@@ -27,3 +27,6 @@ flashrank==0.2.10                # neural reranker (cross-encoder, CPU-only, ~4M
 
 # Web UI
 gradio==6.11.0
+
+# Annotated PDF export (writes highlights + sticky-notes onto user-uploaded PDFs)
+pymupdf==1.27.2.2

@@ -1342,8 +1342,15 @@ def run_analyze(file, ref_pdfs, check_existence, check_claims, retry_failed,
         source_label=Path(file_path).name,
     )
 
+    annotated_pdf_path, annotate_status_html = _try_annotate_pdf(
+        file_path, paper_report, parsed,
+    )
+
     progress(1.0, desc="Done")
-    return dashboard_html, coverage_html, cards_html, report_json, tmp.name, bib_path
+    return (
+        dashboard_html, coverage_html, cards_html, report_json,
+        tmp.name, bib_path, annotated_pdf_path, annotate_status_html,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -1485,6 +1492,56 @@ def _format_batch_per_paper(per_paper: list[dict], has_passages: bool) -> str:
         + "".join(chunks) +
         '</div>'
     )
+
+
+def _try_annotate_pdf(source_path: str, paper_report, parsed) -> tuple[Optional[str], str]:
+    """Produce an annotated copy of the user's PDF, with inline status.
+
+    Returns (output_path_or_None, status_html).
+    - Non-PDF uploads: no file, neutral "not available for X inputs" message.
+    - Annotation failure: no file, short reason string (placed next to the
+      download buttons in the UI, not at the top of the page).
+    - Success: (path, "") — empty status so the UI area stays clean.
+    """
+    def status(msg: str, tone: str = "info") -> str:
+        bg = {"info": "#f3f4f6", "warn": "#fef3c7"}.get(tone, "#f3f4f6")
+        fg = {"info": "#4b5563", "warn": "#92400e"}.get(tone, "#4b5563")
+        return (
+            f'<div style="font-size:12px;color:{fg};background:{bg};'
+            f'padding:6px 10px;border-radius:6px;display:inline-block;">'
+            f'{_esc(msg)}</div>'
+        )
+
+    if not source_path or Path(source_path).suffix.lower() != ".pdf":
+        return None, status("Annotated PDF export is available for PDF uploads only.")
+
+    if paper_report is None or parsed is None:
+        return None, status("No verdicts to annotate.")
+
+    from src.report.pdf_annotator import annotate_pdf
+
+    out_tmp = tempfile.NamedTemporaryFile(
+        suffix="_annotated.pdf", prefix="checkcitation_",
+        delete=False, mode="wb",
+    )
+    out_tmp.close()
+    try:
+        stats = annotate_pdf(source_path, paper_report, parsed, out_tmp.name)
+    except Exception as e:
+        logging.getLogger(__name__).warning(f"Annotated PDF failed: {e}")
+        Path(out_tmp.name).unlink(missing_ok=True)
+        return None, status(
+            f"Annotated PDF could not be generated: {e}",
+            tone="warn",
+        )
+
+    if stats.annotated == 0:
+        Path(out_tmp.name).unlink(missing_ok=True)
+        return None, status(
+            "Annotated PDF skipped: no citation markers could be located on any page.",
+            tone="warn",
+        )
+    return out_tmp.name, ""
 
 
 _PROBLEM_VERDICTS = {"FABRICATED", "MISREPRESENTED", "UNVERIFIABLE"}
@@ -1985,6 +2042,10 @@ def create_app() -> gr.Blocks:
                     analyze_bib = gr.File(
                         label="Download problematic refs (.bib)", interactive=False,
                     )
+                    analyze_annotated_pdf = gr.File(
+                        label="Download annotated PDF", interactive=False,
+                    )
+                analyze_annotated_status = gr.HTML()
 
                 # Single click handler — Gradio shows its own loading state
                 analyze_btn.click(
@@ -1997,6 +2058,7 @@ def create_app() -> gr.Blocks:
                     outputs=[
                         analyze_dashboard, analyze_coverage, analyze_cards,
                         analyze_json, analyze_download, analyze_bib,
+                        analyze_annotated_pdf, analyze_annotated_status,
                     ],
                 )
 

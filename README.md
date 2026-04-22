@@ -179,6 +179,16 @@ Verdicts are written to `data/output/` as JSON. Each reference gets:
 - For `VALID` references in Agentic mode: corrected APA and BibTeX
   generated from the matched database record.
 
+The web UI additionally offers:
+
+- **Annotated PDF** (PDF uploads only) — the original paper with every
+  detected citation marker highlighted in color by verdict, plus click-to-expand
+  sticky notes carrying the verdict + explanation.
+- **Problematic-refs BibTeX** — `.bib` file containing only flagged references,
+  with an audit trail in each entry's `note` field.
+- **Batch mode** — upload multiple papers or a `.zip`; get one aggregate
+  dashboard, a per-paper rollup table, and CSV / JSON / BibTeX exports.
+
 ## Project structure
 
 ```
