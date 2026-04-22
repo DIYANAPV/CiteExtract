@@ -1348,17 +1348,83 @@ def create_app() -> gr.Blocks:
     return demo
 
 
+_ACCESS_TOKEN_COOKIE = "checkcitation_token"
+_ACCESS_TOKEN_QUERY = "token"
+_ACCESS_TOKEN_COOKIE_MAX_AGE = 60 * 60 * 24 * 30  # 30 days
+
+_GATE_PAGE = """<!doctype html>
+<html><head><meta charset="utf-8"><title>CheckCitation — access required</title>
+<style>
+body{{font-family:-apple-system,system-ui,sans-serif;background:#f8fafc;color:#334155;
+    display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;}}
+.box{{max-width:420px;padding:32px;background:#fff;border-radius:12px;
+    box-shadow:0 4px 24px rgba(0,0,0,0.06);text-align:center;}}
+h1{{margin:0 0 12px;font-size:20px;}}
+p{{margin:8px 0;font-size:14px;line-height:1.5;}}
+code{{background:#f1f5f9;padding:2px 6px;border-radius:4px;font-size:13px;}}
+</style></head><body>
+<div class="box">
+<h1>Access required</h1>
+<p>This instance of CheckCitation is gated for a specific set of users.</p>
+<p>Append the access token to the URL, for example:</p>
+<p><code>{url}?token=YOUR_TOKEN</code></p>
+</div></body></html>"""
+
+
+def _token_gate_middleware(expected_token: str):
+    """FastAPI middleware that requires `?token=<expected>` or a matching cookie.
+
+    Bypasses `/health` so container healthchecks don't need the token.
+    On successful query-param match, sets a 30-day cookie so reviewers
+    don't have to keep pasting the token.
+    """
+    from fastapi.responses import HTMLResponse
+
+    async def middleware(request, call_next):
+        if request.url.path == "/health":
+            return await call_next(request)
+
+        submitted = (
+            request.cookies.get(_ACCESS_TOKEN_COOKIE)
+            or request.query_params.get(_ACCESS_TOKEN_QUERY)
+        )
+        if submitted != expected_token:
+            base = f"{request.url.scheme}://{request.url.netloc}{request.url.path}"
+            return HTMLResponse(_GATE_PAGE.format(url=base), status_code=403)
+
+        response = await call_next(request)
+        # Refresh cookie on every valid request so the session stays alive
+        response.set_cookie(
+            _ACCESS_TOKEN_COOKIE, expected_token,
+            max_age=_ACCESS_TOKEN_COOKIE_MAX_AGE,
+            httponly=True, samesite="lax",
+        )
+        return response
+
+    return middleware
+
+
 def _build_fastapi_with_health():
     """Wrap the Gradio Blocks in a FastAPI app so we can expose /health.
 
     Cloud Run / docker-compose healthchecks hit /health. It returns plain
     text 'ok' and does NOT touch any pipeline or LLM — a 200 here just means
     the process is up and the HTTP server is responding.
+
+    If REVIEW_ACCESS_TOKEN is set in the environment, all routes except
+    /health require the token. Unset = gate disabled (dev mode).
     """
     from fastapi import FastAPI
     from fastapi.responses import PlainTextResponse
 
     api = FastAPI()
+
+    expected = os.environ.get("REVIEW_ACCESS_TOKEN", "").strip()
+    if expected:
+        api.middleware("http")(_token_gate_middleware(expected))
+        logging.getLogger(__name__).info(
+            "REVIEW_ACCESS_TOKEN set — token gate enabled for all non-/health routes"
+        )
 
     @api.get("/health")
     def _health():
