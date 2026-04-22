@@ -12,11 +12,27 @@ Set these in `.env` (local) or via your host's secret manager (cloud).
 | --- | --- | --- |
 | `OPENAI_API_KEY` | Required for Agentic mode | LLM calls during claim verification |
 | `REVIEW_ACCESS_TOKEN` | Recommended for public URLs | Unguessable string; anyone without it sees a 403 page |
-| `DAILY_ANALYSIS_LIMIT` | Optional | Global analyses/day (default: 40) |
-| `HOURLY_IP_LIMIT` | Optional | Analyses/hour per IP (default: 10) |
+| `DAILY_ANALYSIS_LIMIT` | Optional | Global papers/day across all users, counts singles + batch papers (default: 40) |
+| `HOURLY_IP_LIMIT` | Optional | Single-paper analyses/hour per IP (default: 10) |
+| `HOURLY_IP_BATCH_LIMIT` | Optional | Batch submissions/hour per IP (default: 2) |
+| `BATCH_MAX_PAPERS_PER_BATCH` | Optional | Papers allowed in one batch submission (default: 30) |
 | `PORT` | Optional | HTTP port (default: 7860) |
 | `S2_API_KEY` | Optional | Lifts Semantic Scholar's 1 RPS free-tier limit |
 | `GROBID_SERVICE_URL` | Auto in docker-compose | URL of the GROBID service |
+
+## HTTP routes
+
+| Path | Purpose | Gate |
+| --- | --- | --- |
+| `/` | Gradio web UI | token required (if `REVIEW_ACCESS_TOKEN` set) |
+| `/health` | Liveness probe, plain `ok` | public |
+| `/docs` | Swagger UI — programmatic API spec | public |
+| `/redoc` | Alternative API docs | public |
+| `/openapi.json` | Machine-readable OpenAPI schema | public |
+
+The spec paths are intentionally public so that developers can discover the
+API surface without the access token. Actual API calls still require the
+token in `?token=` or as the `checkcitation_token` cookie.
 
 Leaving `REVIEW_ACCESS_TOKEN` unset disables the gate — fine for local dev, **do not do this on a public URL**.
 

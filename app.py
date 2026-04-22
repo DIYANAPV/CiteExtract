@@ -2109,17 +2109,27 @@ code{{background:#f1f5f9;padding:2px 6px;border-radius:4px;font-size:13px;}}
 </div></body></html>"""
 
 
+_PUBLIC_PATHS = {
+    "/health",           # container healthcheck
+    "/docs",             # Swagger UI — API discoverability
+    "/redoc",            # alternative API docs
+    "/openapi.json",     # machine-readable API spec
+}
+
+
 def _token_gate_middleware(expected_token: str):
     """FastAPI middleware that requires `?token=<expected>` or a matching cookie.
 
-    Bypasses `/health` so container healthchecks don't need the token.
+    Bypasses a small allowlist (`/health`, `/docs`, `/redoc`, `/openapi.json`)
+    so healthchecks and API-spec discovery work without a token. Actual API
+    calls still require the token.
     On successful query-param match, sets a 30-day cookie so reviewers
     don't have to keep pasting the token.
     """
     from fastapi.responses import HTMLResponse
 
     async def middleware(request, call_next):
-        if request.url.path == "/health":
+        if request.url.path in _PUBLIC_PATHS:
             return await call_next(request)
 
         submitted = (
