@@ -64,9 +64,7 @@ cache:
 # Comprehension support (passage retrieval from cited papers)
 comprehension:
   top_k: 3                          # number of passages to retrieve
-  chunk_max_chars: 800              # max characters per chunk
-  chunk_min_words: 10               # minimum words to keep a chunk
-  notice_enabled: false             # LLM notice generation (Session 6)
+  notice_enabled: false
   # Dense retrieval settings (Phase B)
   dense_model: "all-MiniLM-L6-v2"  # null to disable dense, use BM25 only
   bm25_candidates: 10               # BM25 candidates for RRF
@@ -77,7 +75,7 @@ comprehension:
 agentic:
   model: "gpt-4o-mini"
   temperature: 0.0
-  max_concurrent_agents: 5
+  max_concurrent_agents: 15
   timeout: 60
   metadata_agent:
     max_tool_rounds: 5
@@ -85,6 +83,12 @@ agentic:
   claim_agent:
     max_tool_rounds: 2
     max_tokens: 2048
+    verdict_classes: 3              # 2 (SUPPORTED/NOT_SUPPORTED) or 3 (SUPPORTS/CONTRADICTS/NEUTRAL)
+    enable_multiquery: true         # decompose claim + retrieve per sub-claim at pre-retrieval
+    multiquery:
+      n_sub_claims: 2               # number of sub-claims to decompose into
+      full_top_k: 3                 # passages retrieved for the full claim
+      sub_top_k: 3                  # passages retrieved per sub-claim (before dedup)
   triage:
     title_exact_threshold: 0.95    # above this = title match, no agent needed
     min_databases_for_fabricated: 2
