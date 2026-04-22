@@ -587,26 +587,27 @@ async def _pre_retrieve_passages(
     if not refs_needing_passages:
         return passages_by_ref, fulltext_by_ref
 
+    max_concurrent = int(config.get("max_concurrent_agents", 15)) if config else 15
     log.info(
         f"Pre-retrieving passages for {len(refs_needing_passages)} references "
-        f"(multiquery={multiquery_enabled})"
+        f"(multiquery={multiquery_enabled}, concurrency={max_concurrent})"
     )
 
     cache = APICache()
-    async with httpx.AsyncClient(follow_redirects=True) as client:
-        for ref, exist, substantive in refs_needing_passages:
+    semaphore = asyncio.Semaphore(max_concurrent)
+
+    async def _process_ref(ref, exist, substantive, client):
+        async with semaphore:
             try:
                 ft = await get_full_text(exist, client, cache)
-                fulltext_by_ref[ref.ref_id] = ft
-
                 text = ft.full_text or ft.abstract or ""
                 if not text.strip():
-                    continue
+                    return ref.ref_id, ft, None
 
                 sections = ft.sections if ft.sections else None
                 chunks = chunk_text(text, sections=sections)
                 if not chunks:
-                    continue
+                    return ref.ref_id, ft, None
 
                 ref_passages: dict[str, list] = {}
                 for cit in substantive:
@@ -615,7 +616,9 @@ async def _pre_retrieve_passages(
                         markers=[cit.marker] if cit.marker else None,
                     )
                     if multiquery_enabled and mq_llm is not None:
-                        sub_claims = await decompose(cit.citing_sentence, mq_llm, n=mq_n_sub)
+                        sub_claims = await decompose(
+                            cit.citing_sentence, mq_llm, n=mq_n_sub,
+                        )
                         scored = multi_query_retrieve(
                             full_claim=query,
                             sub_claims=sub_claims,
@@ -639,11 +642,28 @@ async def _pre_retrieve_passages(
                         scored = retrieve_passages_bm25(query, chunks, top_k=top_k)
                     ref_passages[cit.citing_sentence] = scored
 
-                passages_by_ref[ref.ref_id] = ref_passages
+                return ref.ref_id, ft, ref_passages
 
             except Exception as e:
                 log.warning(f"Passage pre-retrieval failed for {ref.ref_id}: {e}")
-                continue
+                return ref.ref_id, None, None
+
+    async with httpx.AsyncClient(follow_redirects=True) as client:
+        tasks = [
+            _process_ref(ref, exist, substantive, client)
+            for ref, exist, substantive in refs_needing_passages
+        ]
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+
+    for result in results:
+        if isinstance(result, Exception):
+            log.warning(f"Passage pre-retrieval task raised: {result}")
+            continue
+        ref_id, ft, ref_passages = result
+        if ft is not None:
+            fulltext_by_ref[ref_id] = ft
+        if ref_passages is not None:
+            passages_by_ref[ref_id] = ref_passages
 
     await cache.close()
     return passages_by_ref, fulltext_by_ref
