@@ -81,10 +81,15 @@ async def run_agentic_verification(
     # --- Group citations by ref ---
     citation_groups = _group_citations_by_ref(parsed.citations)
 
+    # Single CostTracker shared by pre-retrieve decompose calls AND by the
+    # metadata / claim agents further down. Created here so decompose costs
+    # are counted even when triage clears every reference.
+    cost_tracker = CostTracker()
+
     # --- Pre-retrieve passages for FOUND refs with substantive citations ---
     with stage("agentic_pre_retrieve", refs=len(parsed.references)):
         passages_by_ref, fulltext_by_ref = await _pre_retrieve_passages(
-            parsed, exist_map, citation_groups, agentic_config,
+            parsed, exist_map, citation_groups, agentic_config, cost_tracker,
         )
 
     # --- Triage all references ---
@@ -127,11 +132,11 @@ async def run_agentic_verification(
     # --- Skip agents if nothing needs them ---
     if agent_count == 0:
         ordered = [verdicts[ref.ref_id] for ref in parsed.references if ref.ref_id in verdicts]
-        return ordered, 0.0
+        # Return whatever pre-retrieve already spent on decompose calls
+        return ordered, cost_tracker.estimated_cost_usd
 
     # --- Set up shared resources ---
     openai_client = AsyncOpenAI(api_key=api_key)
-    cost_tracker = CostTracker()
     cache = APICache()
     max_concurrent = agentic_config.get("max_concurrent_agents", 5)
     semaphore = asyncio.Semaphore(max_concurrent)
@@ -514,6 +519,7 @@ async def _pre_retrieve_passages(
     exist_map: dict[str, ExistenceResult],
     citation_groups: dict[str, list[Citation]],
     config: dict,
+    cost_tracker: Optional[CostTracker] = None,
 ) -> tuple[dict[str, dict[str, list]], dict]:
     """Pre-retrieve passages for all FOUND refs with substantive citations.
 
@@ -552,10 +558,14 @@ async def _pre_retrieve_passages(
     mq_sub_top_k = int(mq_cfg.get("sub_top_k", 3))
 
     # Lazy-init the decomposition LLM client only if multi-query is enabled.
+    # Share the caller's CostTracker so decompose calls count toward the
+    # agentic total (otherwise they silently escape the budget).
     mq_llm = None
     if multiquery_enabled:
         try:
             mq_llm = create_llm_client(config)
+            if cost_tracker is not None:
+                mq_llm.cost_tracker = cost_tracker
         except Exception as e:
             log.warning(f"multi-query decomposition disabled — LLM client init failed: {e}")
             multiquery_enabled = False
