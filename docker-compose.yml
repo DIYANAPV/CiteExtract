@@ -1,0 +1,36 @@
+services:
+  grobid:
+    image: grobid/grobid:0.8.2-crf
+    ports:
+      - "8070:8070"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8070/api/isalive"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+  checkcitation:
+    build: .
+    ports:
+      - "7860:7860"
+    env_file:
+      - .env
+    environment:
+      - GROBID_SERVICE_URL=http://grobid:8070
+    volumes:
+      - cache-data:/app/data/cache
+    depends_on:
+      grobid:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7860/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+    restart: unless-stopped
+
+volumes:
+  cache-data:

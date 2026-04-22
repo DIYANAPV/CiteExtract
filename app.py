@@ -1348,6 +1348,27 @@ def create_app() -> gr.Blocks:
     return demo
 
 
-if __name__ == "__main__":
+def _build_fastapi_with_health():
+    """Wrap the Gradio Blocks in a FastAPI app so we can expose /health.
+
+    Cloud Run / docker-compose healthchecks hit /health. It returns plain
+    text 'ok' and does NOT touch any pipeline or LLM — a 200 here just means
+    the process is up and the HTTP server is responding.
+    """
+    from fastapi import FastAPI
+    from fastapi.responses import PlainTextResponse
+
+    api = FastAPI()
+
+    @api.get("/health")
+    def _health():
+        return PlainTextResponse("ok")
+
     demo = create_app()
-    demo.launch(server_name="0.0.0.0", share=False)
+    return gr.mount_gradio_app(api, demo, path="/")
+
+
+if __name__ == "__main__":
+    import uvicorn
+    port = int(os.environ.get("PORT", 7860))
+    uvicorn.run(_build_fastapi_with_health(), host="0.0.0.0", port=port)
