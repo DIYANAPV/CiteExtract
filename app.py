@@ -1188,6 +1188,13 @@ def create_app() -> gr.Blocks:
         with gr.Tabs():
             # ── Tab 1: Analyze ─────────────────────────────────
             with gr.TabItem("Analyze"):
+                gr.Markdown(
+                    "**Upload a paper → pick what to check → click Analyze.** "
+                    "Rule-based check is free and fast. Agentic check uses an LLM "
+                    "to verify claims against cited paper text (slower, costs a few "
+                    "cents per paper). Click **Try sample paper** below if you just "
+                    "want to see how it works."
+                )
                 with gr.Row(equal_height=False):
                     with gr.Column(scale=3):
                         analyze_file = gr.File(
@@ -1216,11 +1223,21 @@ def create_app() -> gr.Blocks:
                         )
                         analyze_retry = gr.Checkbox(label="Retry failed references", value=False)
                         analyze_btn = gr.Button("Analyze", variant="primary", size="lg")
+                        sample_btn = gr.Button(
+                            "Try sample paper",
+                            variant="secondary", size="sm",
+                        )
 
                         chk_claims.change(
                             fn=lambda checked: gr.update(visible=checked),
                             inputs=[chk_claims],
                             outputs=[analyze_refs],
+                        )
+
+                        sample_btn.click(
+                            fn=lambda: str(Path("data/test_inputs/clean_paper.tex").resolve()),
+                            inputs=None,
+                            outputs=[analyze_file],
                         )
 
                 # ── Results section ──
