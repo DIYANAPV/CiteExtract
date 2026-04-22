@@ -257,9 +257,52 @@ def check_prerequisites(file_path: str, mode: str) -> None:
 # File helpers
 # ---------------------------------------------------------------------------
 
+MAX_UPLOAD_BYTES = 10 * 1024 * 1024  # 10 MB hard cap per file
+PDF_MAGIC = b"%PDF-"
+ALLOWED_SUFFIXES = {".pdf", ".tex", ".bib", ".txt"}
+
+
+def _validate_upload(file_path: str, label: str = "file") -> None:
+    """Reject files that are too large or lying about their type.
+
+    Raises gr.Error with a user-facing message. Called by every upload entry
+    point so a malicious / malformed upload never reaches the pipeline.
+    """
+    p = Path(file_path)
+    if not p.exists() or not p.is_file():
+        raise gr.Error(f"Uploaded {label} is missing or not a regular file.")
+
+    suffix = p.suffix.lower()
+    if suffix not in ALLOWED_SUFFIXES:
+        raise gr.Error(
+            f"{label.capitalize()} type '{suffix}' not allowed. "
+            f"Accepted: {', '.join(sorted(ALLOWED_SUFFIXES))}"
+        )
+
+    size = p.stat().st_size
+    if size > MAX_UPLOAD_BYTES:
+        raise gr.Error(
+            f"{label.capitalize()} is {size / 1024 / 1024:.1f} MB — "
+            f"limit is {MAX_UPLOAD_BYTES // 1024 // 1024} MB."
+        )
+    if size == 0:
+        raise gr.Error(f"{label.capitalize()} is empty.")
+
+    if suffix == ".pdf":
+        with open(p, "rb") as f:
+            head = f.read(len(PDF_MAGIC))
+        if head != PDF_MAGIC:
+            raise gr.Error(
+                f"{label.capitalize()} has a .pdf extension but is not a valid PDF "
+                "(missing %PDF- header)."
+            )
+
+
 def prepare_ref_pdfs_dir(pdf_paths: Optional[list[str]]) -> Optional[str]:
     if not pdf_paths:
         return None
+    for p in pdf_paths:
+        _validate_upload(p, label="reference PDF")
     tmp_dir = tempfile.mkdtemp(prefix="checkcitation_refs_")
     for p in pdf_paths:
         src = Path(p)
@@ -982,6 +1025,7 @@ def run_analyze(file, ref_pdfs, check_existence, check_claims, retry_failed,
         raise gr.Error("Select at least one analysis option.")
 
     file_path = file if isinstance(file, str) else file.name
+    _validate_upload(file_path, label="paper")
 
     # Claim verification triggers agentic mode; otherwise rule-based (internal: "quick")
     effective_mode = "agentic" if check_claims else "quick"
@@ -1095,6 +1139,7 @@ def run_parse(file):
     if file is None:
         raise gr.Error("Please upload a file.")
     file_path = file if isinstance(file, str) else file.name
+    _validate_upload(file_path, label="paper")
     check_prerequisites(file_path, "quick")
     parsed = parse_file(file_path)
     return format_parse_output(parsed)
