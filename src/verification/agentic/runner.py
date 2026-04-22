@@ -25,6 +25,7 @@ from src.models.comprehension import ScoredChunk
 from src.models.parsed_paper import ParsedPaper
 from src.models.verdict import ExistenceResult
 from src.verification.api_clients.llm_client import CostTracker
+from src.utils.timing import stage
 from src.verification.cache import APICache
 from src.verification.metadata import MetadataResult
 from src.verification.agentic.tools import ToolExecutor
@@ -90,20 +91,22 @@ async def run_agentic_verification(
     citation_groups = _group_citations_by_ref(parsed.citations)
 
     # --- Pre-retrieve passages for FOUND refs with substantive citations ---
-    passages_by_ref, fulltext_by_ref = await _pre_retrieve_passages(
-        parsed, exist_map, citation_groups, agentic_config,
-    )
+    with stage("agentic_pre_retrieve", refs=len(parsed.references)):
+        passages_by_ref, fulltext_by_ref = await _pre_retrieve_passages(
+            parsed, exist_map, citation_groups, agentic_config,
+        )
 
     # --- Triage all references ---
-    triage_config = agentic_config.get("triage", {})
-    triage_results = triage_all(
-        exist_map=exist_map,
-        metadata_map=metadata_map,
-        citations_by_ref=citation_groups,
-        passages_by_ref=passages_by_ref,
-        fulltext_by_ref=fulltext_by_ref,
-        triage_config=triage_config,
-    )
+    with stage("agentic_triage", refs=len(parsed.references)):
+        triage_config = agentic_config.get("triage", {})
+        triage_results = triage_all(
+            exist_map=exist_map,
+            metadata_map=metadata_map,
+            citations_by_ref=citation_groups,
+            passages_by_ref=passages_by_ref,
+            fulltext_by_ref=fulltext_by_ref,
+            triage_config=triage_config,
+        )
 
     # --- Resolve clear-cut cases ---
     verdicts: dict[str, CitationVerdict] = {}
@@ -174,6 +177,7 @@ async def run_agentic_verification(
             max_tokens=claim_cfg.get("max_tokens", 1024),
             timeout=agentic_config.get("timeout", 60),
             cost_tracker=cost_tracker,
+            verdict_classes=int(claim_cfg.get("verdict_classes", 3)),
         )
 
         # --- Dispatch metadata agents in parallel ---
@@ -183,9 +187,11 @@ async def run_agentic_verification(
 
         meta_tasks = {tr.ref_id: _run_metadata(tr) for tr in needs_metadata}
         if meta_tasks:
-            meta_results = await asyncio.gather(
-                *meta_tasks.values(), return_exceptions=True,
-            )
+            with stage("agentic_metadata_dispatch", count=len(meta_tasks),
+                       concurrency=max_concurrent):
+                meta_results = await asyncio.gather(
+                    *meta_tasks.values(), return_exceptions=True,
+                )
             for ref_id, result in zip(meta_tasks.keys(), meta_results):
                 tr = next(t for t in needs_metadata if t.ref_id == ref_id)
                 if isinstance(result, Exception):
@@ -201,9 +207,11 @@ async def run_agentic_verification(
 
         claim_tasks = {tr.ref_id: _run_claim(tr) for tr in needs_claim}
         if claim_tasks:
-            claim_results = await asyncio.gather(
-                *claim_tasks.values(), return_exceptions=True,
-            )
+            with stage("agentic_claim_dispatch", count=len(claim_tasks),
+                       concurrency=max_concurrent):
+                claim_results = await asyncio.gather(
+                    *claim_tasks.values(), return_exceptions=True,
+                )
             for ref_id, result in zip(claim_tasks.keys(), claim_results):
                 tr = next(t for t in needs_claim if t.ref_id == ref_id)
                 if isinstance(result, Exception):
@@ -219,9 +227,11 @@ async def run_agentic_verification(
 
         both_tasks = {tr.ref_id: _run_both(tr) for tr in needs_both}
         if both_tasks:
-            both_results = await asyncio.gather(
-                *both_tasks.values(), return_exceptions=True,
-            )
+            with stage("agentic_both_dispatch", count=len(both_tasks),
+                       concurrency=max_concurrent):
+                both_results = await asyncio.gather(
+                    *both_tasks.values(), return_exceptions=True,
+                )
             for ref_id, result in zip(both_tasks.keys(), both_results):
                 tr = next(t for t in needs_both if t.ref_id == ref_id)
                 if isinstance(result, Exception):
@@ -516,6 +526,11 @@ async def _pre_retrieve_passages(
 ) -> tuple[dict[str, dict[str, list]], dict]:
     """Pre-retrieve passages for all FOUND refs with substantive citations.
 
+    When `agentic.claim_agent.enable_multiquery` is true and a dense
+    model is configured, each citing sentence is decomposed into
+    sub-claims (via one LLM call) and passages are retrieved for the
+    full claim AND each sub-claim, then unioned + deduped.
+
     Returns:
         (passages_by_ref, fulltext_by_ref) where:
         - passages_by_ref: {ref_id: {citing_sentence: [ScoredChunk]}}
@@ -524,6 +539,7 @@ async def _pre_retrieve_passages(
     from src import config as app_cfg
     from src.models.comprehension import FullTextResult
     from src.verification.api_clients.fulltext import get_full_text
+    from src.verification.api_clients.llm_client import create_llm_client
     from src.verification.comprehension import (
         build_retrieval_query,
         chunk_text,
@@ -531,10 +547,27 @@ async def _pre_retrieve_passages(
         retrieve_passages_hybrid,
     )
     from src.verification.filters import is_substantive_citation
+    from src.verification.multiquery import decompose, multi_query_retrieve
 
     comp_cfg = app_cfg.comprehension()
     top_k = comp_cfg.get("top_k", 3)
     dense_model = comp_cfg.get("dense_model")
+
+    claim_cfg = config.get("claim_agent", {}) if config else {}
+    multiquery_enabled = bool(claim_cfg.get("enable_multiquery", False)) and bool(dense_model)
+    mq_cfg = claim_cfg.get("multiquery", {}) if multiquery_enabled else {}
+    mq_n_sub = int(mq_cfg.get("n_sub_claims", 2))
+    mq_full_top_k = int(mq_cfg.get("full_top_k", 3))
+    mq_sub_top_k = int(mq_cfg.get("sub_top_k", 3))
+
+    # Lazy-init the decomposition LLM client only if multi-query is enabled.
+    mq_llm = None
+    if multiquery_enabled:
+        try:
+            mq_llm = create_llm_client(config)
+        except Exception as e:
+            log.warning(f"multi-query decomposition disabled — LLM client init failed: {e}")
+            multiquery_enabled = False
 
     passages_by_ref: dict[str, dict[str, list]] = {}
     fulltext_by_ref: dict[str, FullTextResult] = {}
@@ -554,7 +587,10 @@ async def _pre_retrieve_passages(
     if not refs_needing_passages:
         return passages_by_ref, fulltext_by_ref
 
-    log.info(f"Pre-retrieving passages for {len(refs_needing_passages)} references")
+    log.info(
+        f"Pre-retrieving passages for {len(refs_needing_passages)} references "
+        f"(multiquery={multiquery_enabled})"
+    )
 
     cache = APICache()
     async with httpx.AsyncClient(follow_redirects=True) as client:
@@ -578,7 +614,20 @@ async def _pre_retrieve_passages(
                         cit.citing_sentence, cit.context_before, cit.context_after,
                         markers=[cit.marker] if cit.marker else None,
                     )
-                    if dense_model:
+                    if multiquery_enabled and mq_llm is not None:
+                        sub_claims = await decompose(cit.citing_sentence, mq_llm, n=mq_n_sub)
+                        scored = multi_query_retrieve(
+                            full_claim=query,
+                            sub_claims=sub_claims,
+                            chunks=chunks,
+                            model_name=dense_model,
+                            bm25_candidates=comp_cfg.get("bm25_candidates", 10),
+                            dense_candidates=comp_cfg.get("dense_candidates", 10),
+                            rrf_k=comp_cfg.get("rrf_k", 60),
+                            full_top_k=mq_full_top_k,
+                            sub_top_k=mq_sub_top_k,
+                        )
+                    elif dense_model:
                         scored = retrieve_passages_hybrid(
                             query, chunks, top_k=top_k,
                             model_name=dense_model,

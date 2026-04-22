@@ -19,6 +19,7 @@ from src.models.report import PaperReport
 from src.models.verdict import ExistenceResult
 from src.parsers.router import parse_file
 from src.report.generator import build_report, save_json
+from src.utils.timing import stage
 from src.verification.cache import APICache
 from src.verification.existence import check_all_references
 from src.verification.matching import WEB_SOURCES
@@ -608,55 +609,100 @@ async def run_unified_pipeline(
     run_comprehension: bool = False,
     ref_pdfs_dir: Optional[str] = None,
     retry_failed: bool = False,
+    force_refresh: bool = False,
 ) -> tuple:
     """Unified pipeline: shared L1+L2 for verification and comprehension.
+
+    Caches full reports on disk keyed by (file, mode, options, config). Pass
+    ``force_refresh=True`` or ``retry_failed=True`` to bypass the cache.
 
     Returns:
         (paper_report or None, comprehension_report or None, parsed)
     """
     from src.models.comprehension import ComprehensionReport
+    from src.verification import report_cache
 
-    # L1: Parse (once)
-    parsed = parse_file(file_path)
-
-    # Mode resolution: if no claim verification requested and not agentic,
-    # fall back to quick mode
+    # Resolve effective mode before hashing so the cache key matches post-resolution
+    effective_mode = mode
     if not run_claim_verification and mode != "agentic":
-        mode = "quick"
+        effective_mode = "quick"
 
-    paper_report: Optional[PaperReport] = None
-    comp_report: Optional[ComprehensionReport] = None
-
-    # Shared L2 for all modes
-    existence_results = await check_all_references(
-        parsed.references, retry_failed=retry_failed
-    )
-    exist_map = {r.ref_id: r for r in existence_results}
-
-    # Agentic branch: triage + focused agents for ambiguous cases
-    if mode == "agentic":
-        if run_verification:
-            paper_report = await _run_agentic(parsed, exist_map, file_path)
-        if run_comprehension:
-            comp_report = await _run_comprehension_from_exist_map(
-                parsed, exist_map, file_path, ref_pdfs_dir,
-                verify_claims=run_claim_verification,
-            )
-        return paper_report, comp_report, parsed
-
-    # Quick/Standard branch: L3 → L5
-    if run_verification:
-        verdicts = _run_quick_verification(parsed.references, exist_map, mode)
-        paper_report = build_report(parsed, verdicts, mode, input_file=file_path)
-
-    # Comprehension + claim verification (reuse exist_map)
-    if run_comprehension or run_claim_verification:
-        comp_report = await _run_comprehension_from_exist_map(
-            parsed, exist_map, file_path, ref_pdfs_dir,
-            verify_claims=run_claim_verification,
+    use_cache = not force_refresh and not retry_failed
+    cache_key: Optional[str] = None
+    if use_cache:
+        cache_key = report_cache.make_key(
+            file_path, effective_mode,
+            run_verification, run_claim_verification, run_comprehension,
+            ref_pdfs_dir,
         )
+        cached = report_cache.load(cache_key)
+        if cached is not None:
+            paper_cached, comp_cached = cached
+            log.info(
+                f"report_cache: HIT {cache_key} "
+                f"(mode={effective_mode}, file={Path(file_path).name})"
+            )
+            # Still need parsed for callers that use it; parse_file is itself cached
+            with stage("pipeline_total_cached",
+                       mode=effective_mode, file=Path(file_path).name):
+                with stage("L1_parse_only"):
+                    parsed = parse_file(file_path)
+            return paper_cached, comp_cached, parsed
 
-    return paper_report, comp_report, parsed
+    with stage("pipeline_total", mode=effective_mode, file=Path(file_path).name):
+        # L1: Parse (once)
+        with stage("L1_parse"):
+            parsed = parse_file(file_path)
+
+        # Mode resolution: if no claim verification requested and not agentic,
+        # fall back to quick mode
+        if not run_claim_verification and mode != "agentic":
+            mode = "quick"
+
+        paper_report: Optional[PaperReport] = None
+        comp_report: Optional[ComprehensionReport] = None
+
+        # Shared L2 for all modes
+        with stage("L2_existence", refs=len(parsed.references)):
+            existence_results = await check_all_references(
+                parsed.references, retry_failed=retry_failed
+            )
+            exist_map = {r.ref_id: r for r in existence_results}
+
+        # Agentic branch: triage + focused agents for ambiguous cases
+        if mode == "agentic":
+            if run_verification:
+                with stage("L5_agentic", refs=len(parsed.references)):
+                    paper_report = await _run_agentic(parsed, exist_map, file_path)
+            if run_comprehension:
+                with stage("L4_comprehension", refs=len(parsed.references),
+                           verify_claims=run_claim_verification):
+                    comp_report = await _run_comprehension_from_exist_map(
+                        parsed, exist_map, file_path, ref_pdfs_dir,
+                        verify_claims=run_claim_verification,
+                    )
+            if use_cache and cache_key is not None:
+                report_cache.save(cache_key, paper_report, comp_report)
+            return paper_report, comp_report, parsed
+
+        # Quick/Standard branch: L3 → L5
+        if run_verification:
+            with stage("L3_L5_quick", refs=len(parsed.references), mode=mode):
+                verdicts = _run_quick_verification(parsed.references, exist_map, mode)
+                paper_report = build_report(parsed, verdicts, mode, input_file=file_path)
+
+        # Comprehension + claim verification (reuse exist_map)
+        if run_comprehension or run_claim_verification:
+            with stage("L4_comprehension", refs=len(parsed.references),
+                       verify_claims=run_claim_verification):
+                comp_report = await _run_comprehension_from_exist_map(
+                    parsed, exist_map, file_path, ref_pdfs_dir,
+                    verify_claims=run_claim_verification,
+                )
+
+        if use_cache and cache_key is not None:
+            report_cache.save(cache_key, paper_report, comp_report)
+        return paper_report, comp_report, parsed
 
 
 def run_unified(
@@ -667,9 +713,10 @@ def run_unified(
     run_comprehension: bool = False,
     ref_pdfs_dir: Optional[str] = None,
     retry_failed: bool = False,
+    force_refresh: bool = False,
 ) -> tuple:
     """Sync wrapper for run_unified_pipeline."""
     return asyncio.run(run_unified_pipeline(
         file_path, mode, run_verification, run_claim_verification,
-        run_comprehension, ref_pdfs_dir, retry_failed,
+        run_comprehension, ref_pdfs_dir, retry_failed, force_refresh,
     ))
