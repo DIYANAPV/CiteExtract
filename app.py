@@ -1093,13 +1093,16 @@ def format_parse_output(parsed) -> str:
 #   2. Per-IP hourly cap — stops a single reviewer (or bot) burning through it
 # Both are in-memory, fine for a single-container deploy.
 
-_daily_analyses = defaultdict(int)  # date_str -> count
+_daily_analyses = defaultdict(int)  # date_str -> count of papers (single + batch)
 _daily_lock = threading.Lock()
 _DAILY_LIMIT = int(os.environ.get("DAILY_ANALYSIS_LIMIT", "40"))
 
-_ip_requests: dict[str, list[float]] = defaultdict(list)  # ip -> [timestamps]
+_ip_requests: dict[str, list[float]] = defaultdict(list)  # ip -> single-analysis timestamps
+_ip_batch_requests: dict[str, list[float]] = defaultdict(list)  # ip -> batch-submission timestamps
 _ip_lock = threading.Lock()
 _HOURLY_IP_LIMIT = int(os.environ.get("HOURLY_IP_LIMIT", "10"))
+_HOURLY_IP_BATCH_LIMIT = int(os.environ.get("HOURLY_IP_BATCH_LIMIT", "2"))
+_BATCH_MAX_PAPERS = int(os.environ.get("BATCH_MAX_PAPERS_PER_BATCH", "30"))
 _HOUR_SECONDS = 3600
 
 
@@ -1117,20 +1120,27 @@ def _client_ip(request: "gr.Request") -> str:
     return "unknown"
 
 
-def _check_rate_limit(request: Optional["gr.Request"] = None) -> None:
-    """Enforce both the daily global cap and the per-IP hourly cap."""
+def _reserve_daily_papers(n: int) -> None:
+    """Reserve n slots in the global daily cap atomically. Raises gr.Error if over."""
     today = time.strftime("%Y-%m-%d")
     with _daily_lock:
-        if _daily_analyses[today] >= _DAILY_LIMIT:
+        if _daily_analyses[today] + n > _DAILY_LIMIT:
+            remaining = max(0, _DAILY_LIMIT - _daily_analyses[today])
             raise gr.Error(
-                f"Daily analysis limit ({_DAILY_LIMIT}) reached. "
-                "This is a research demo — please try again tomorrow."
+                f"Daily analysis limit ({_DAILY_LIMIT}) would be exceeded. "
+                f"Only {remaining} paper(s) remaining today — "
+                "this is a research demo, please try again tomorrow."
             )
-        _daily_analyses[today] += 1
+        _daily_analyses[today] += n
         # Clean old entries
         for k in list(_daily_analyses):
             if k != today:
                 del _daily_analyses[k]
+
+
+def _check_rate_limit(request: Optional["gr.Request"] = None) -> None:
+    """Enforce the daily global cap and the per-IP hourly single-paper cap."""
+    _reserve_daily_papers(1)
 
     ip = _client_ip(request)
     now = time.time()
@@ -1139,7 +1149,7 @@ def _check_rate_limit(request: Optional["gr.Request"] = None) -> None:
         recent = [t for t in _ip_requests[ip] if t > cutoff]
         if len(recent) >= _HOURLY_IP_LIMIT:
             raise gr.Error(
-                f"Hourly limit reached for your IP ({_HOURLY_IP_LIMIT} analyses/hour). "
+                f"Hourly limit reached for your IP ({_HOURLY_IP_LIMIT} single analyses/hour). "
                 "Please try again later."
             )
         recent.append(now)
@@ -1152,6 +1162,44 @@ def _check_rate_limit(request: Optional["gr.Request"] = None) -> None:
                     _ip_requests[key] = live
                 else:
                     del _ip_requests[key]
+
+
+def _check_batch_rate_limit(
+    n_papers: int,
+    request: Optional["gr.Request"] = None,
+) -> None:
+    """Enforce the hourly per-IP batch cap, the batch-size cap, and reserve
+    n_papers against the global daily cap atomically.
+
+    Separate from `_check_rate_limit` so singles and batches don't consume
+    each other's hourly pools — a user can do 10 singles AND 2 batches/hour.
+    """
+    if n_papers <= 0:
+        raise gr.Error("Please upload at least one paper.")
+    if n_papers > _BATCH_MAX_PAPERS:
+        raise gr.Error(
+            f"Too many papers in one batch ({n_papers}). "
+            f"Maximum is {_BATCH_MAX_PAPERS} per submission."
+        )
+
+    ip = _client_ip(request)
+    now = time.time()
+    cutoff = now - _HOUR_SECONDS
+    with _ip_lock:
+        recent = [t for t in _ip_batch_requests[ip] if t > cutoff]
+        if len(recent) >= _HOURLY_IP_BATCH_LIMIT:
+            raise gr.Error(
+                f"Hourly batch limit reached for your IP "
+                f"({_HOURLY_IP_BATCH_LIMIT} batches/hour). "
+                "Please try again later."
+            )
+
+        # Reserve the daily slots BEFORE recording the batch, so a daily-cap
+        # rejection doesn't consume the hourly batch slot.
+        _reserve_daily_papers(n_papers)
+
+        recent.append(now)
+        _ip_batch_requests[ip] = recent
 
 
 # Maps timing-log STAGE names to (progress_fraction, user-facing message).
@@ -1291,6 +1339,343 @@ def run_analyze(file, ref_pdfs, check_existence, check_claims, retry_failed,
 
     progress(1.0, desc="Done")
     return dashboard_html, coverage_html, cards_html, report_json, tmp.name
+
+
+# ---------------------------------------------------------------------------
+# Batch mode
+# ---------------------------------------------------------------------------
+
+def _format_batch_summary(per_paper: list[dict], elapsed: float, mode: str) -> str:
+    """Top-of-page aggregate ribbon for a batch run."""
+    ok = [p for p in per_paper if p["status"] == "ok"]
+    failed = [p for p in per_paper if p["status"] != "ok"]
+    total_refs = sum(p.get("total_refs", 0) for p in ok)
+
+    agg = defaultdict(int)
+    for p in ok:
+        for k, v in p.get("counts", {}).items():
+            agg[k] += v
+
+    def pill(label, count, bg, fg):
+        return (
+            f'<span style="display:inline-block;background:{bg};color:{fg};'
+            f'padding:4px 12px;border-radius:14px;font-size:13px;'
+            f'font-weight:600;margin:0 6px 6px 0;">'
+            f'{count} {label}</span>'
+        )
+
+    pills = "".join([
+        pill("fabricated", agg["FABRICATED"], "#fef2f2", "#b91c1c"),
+        pill("misrepresented", agg["MISREPRESENTED"], "#fffbeb", "#b45309"),
+        pill("unverifiable", agg["UNVERIFIABLE"], "#f9fafb", "#4b5563"),
+        pill("valid", agg["VALID"], "#f0fdf4", "#15803d"),
+    ])
+
+    failed_chip = ""
+    if failed:
+        failed_chip = pill("failed", len(failed), "#fef2f2", "#991b1b")
+
+    return (
+        f'<div class="dashboard" style="padding:16px 20px;">'
+        f'<div style="font-size:14px;color:#6b7280;margin-bottom:8px;">'
+        f'Batch results · mode: <b>{_esc(mode)}</b> · elapsed: <b>{elapsed:.1f}s</b></div>'
+        f'<div style="display:flex;gap:18px;margin-bottom:12px;flex-wrap:wrap;font-size:14px;">'
+        f'<div><b>{len(ok)}</b> papers analyzed</div>'
+        f'<div><b>{total_refs}</b> total references</div>'
+        f'{"<div>" + str(len(failed)) + " failed</div>" if failed else ""}'
+        f'</div>'
+        f'<div style="margin-top:4px;">{pills}{failed_chip}</div>'
+        f'</div>'
+    )
+
+
+def _format_batch_rollup(per_paper: list[dict]) -> str:
+    """Sortable-ish per-paper table. One row per paper, counts by verdict type."""
+    if not per_paper:
+        return ""
+    rows = []
+    for p in per_paper:
+        name = _esc(p["name"])
+        if p["status"] != "ok":
+            reason = _esc(p.get("error", "unknown error"), 160)
+            rows.append(
+                f'<tr style="background:#fef2f2;">'
+                f'<td style="padding:6px 10px;font-family:monospace;">{name}</td>'
+                f'<td colspan="5" style="padding:6px 10px;color:#b91c1c;">Failed: {reason}</td>'
+                f'</tr>'
+            )
+            continue
+        c = p.get("counts", {})
+        n = p.get("total_refs", 0)
+
+        def cell(value, color="#4b5563"):
+            if not value:
+                return f'<td style="padding:6px 10px;color:#9ca3af;text-align:right;">0</td>'
+            return (
+                f'<td style="padding:6px 10px;color:{color};'
+                f'font-weight:600;text-align:right;">{value}</td>'
+            )
+
+        rows.append(
+            f'<tr>'
+            f'<td style="padding:6px 10px;font-family:monospace;">{name}</td>'
+            f'<td style="padding:6px 10px;text-align:right;color:#6b7280;">{n}</td>'
+            f'{cell(c.get("FABRICATED", 0), "#b91c1c")}'
+            f'{cell(c.get("MISREPRESENTED", 0), "#b45309")}'
+            f'{cell(c.get("UNVERIFIABLE", 0), "#4b5563")}'
+            f'{cell(c.get("VALID", 0), "#15803d")}'
+            f'</tr>'
+        )
+
+    header = (
+        '<tr style="background:#f9fafb;font-size:12px;color:#6b7280;text-align:left;">'
+        '<th style="padding:6px 10px;">Paper</th>'
+        '<th style="padding:6px 10px;text-align:right;">Refs</th>'
+        '<th style="padding:6px 10px;text-align:right;">Fabr.</th>'
+        '<th style="padding:6px 10px;text-align:right;">Misrep.</th>'
+        '<th style="padding:6px 10px;text-align:right;">Unver.</th>'
+        '<th style="padding:6px 10px;text-align:right;">Valid</th>'
+        '</tr>'
+    )
+    return (
+        '<div style="margin-top:16px;">'
+        '<div class="cc-section-label">Per-paper rollup</div>'
+        f'<table style="width:100%;border-collapse:collapse;font-size:13px;">'
+        f'{header}{"".join(rows)}</table>'
+        '</div>'
+    )
+
+
+def _format_batch_per_paper(per_paper: list[dict], has_passages: bool) -> str:
+    """Expandable accordion with the full card list for each successful paper."""
+    chunks = []
+    for p in per_paper:
+        if p["status"] != "ok":
+            continue
+        paper_report = p["paper_report"]
+        comp_report = p["comp_report"]
+        parsed = p["parsed"]
+        if paper_report is None or parsed is None:
+            continue
+        cards = format_unified_cards(
+            paper_report, comp_report, parsed.references,
+            has_verification=True, has_passages=has_passages,
+        )
+        chunks.append(
+            f'<details style="margin-top:10px;">'
+            f'<summary style="font-size:14px;font-weight:600;cursor:pointer;'
+            f'padding:8px 12px;background:#f8fafc;border-radius:8px;">'
+            f'{_esc(p["name"])} &nbsp;'
+            f'<span style="font-weight:400;color:#6b7280;font-size:12px;">'
+            f'{p.get("total_refs", 0)} refs</span>'
+            f'</summary>'
+            f'<div style="padding:10px 4px;">{cards}</div>'
+            f'</details>'
+        )
+    if not chunks:
+        return ""
+    return (
+        '<div style="margin-top:16px;">'
+        '<div class="cc-section-label">Per-paper detail</div>'
+        + "".join(chunks) +
+        '</div>'
+    )
+
+
+def _write_batch_csv(per_paper: list[dict]) -> str:
+    """One row per (paper, verdict). Written to a temp file, returned for download."""
+    import csv as _csv
+    tmp = tempfile.NamedTemporaryFile(
+        suffix=".csv", prefix="checkcitation_batch_", delete=False, mode="w",
+        newline="", encoding="utf-8",
+    )
+    writer = _csv.writer(tmp)
+    writer.writerow([
+        "paper", "ref_id", "verdict", "action", "mode",
+        "matched_title", "matched_doi", "source", "explanation",
+    ])
+    for p in per_paper:
+        if p["status"] != "ok" or p["paper_report"] is None:
+            continue
+        name = p["name"]
+        for v in p["paper_report"].verdicts:
+            ex = v.existence
+            writer.writerow([
+                name, v.ref_id, v.verdict, v.action, v.mode,
+                (ex.matched_title or "") if ex else "",
+                (ex.matched_doi or "") if ex else "",
+                (ex.source or "") if ex else "",
+                v.explanation,
+            ])
+    tmp.close()
+    return tmp.name
+
+
+def _write_batch_json(per_paper: list[dict], mode: str, elapsed: float) -> str:
+    """Nested JSON of the whole batch."""
+    import json as _json
+    payload = {
+        "mode": mode,
+        "elapsed_seconds": round(elapsed, 2),
+        "papers": [],
+    }
+    for p in per_paper:
+        entry = {
+            "name": p["name"],
+            "status": p["status"],
+        }
+        if p["status"] == "ok":
+            entry["total_refs"] = p.get("total_refs", 0)
+            entry["counts"] = p.get("counts", {})
+            if p["paper_report"]:
+                entry["verification"] = p["paper_report"].model_dump(mode="json")
+            if p["comp_report"]:
+                entry["comprehension"] = p["comp_report"].model_dump(mode="json")
+        else:
+            entry["error"] = p.get("error", "unknown error")
+        payload["papers"].append(entry)
+
+    tmp = tempfile.NamedTemporaryFile(
+        suffix=".json", prefix="checkcitation_batch_", delete=False, mode="w",
+        encoding="utf-8",
+    )
+    tmp.write(_json.dumps(payload, indent=2, default=str))
+    tmp.close()
+    return tmp.name
+
+
+def _expand_zip_to_papers(zip_path: str) -> list[str]:
+    """Extract a .zip into a temp dir and return paths of valid paper files.
+
+    Only files with accepted extensions are returned. Size + magic-bytes
+    checks happen later in _validate_upload per file.
+    """
+    import zipfile
+    out_dir = tempfile.mkdtemp(prefix="checkcitation_batch_")
+    extracted: list[str] = []
+    with zipfile.ZipFile(zip_path, "r") as zf:
+        for info in zf.infolist():
+            if info.is_dir():
+                continue
+            # Defensive: reject absolute paths and traversal
+            safe_name = Path(info.filename).name
+            if not safe_name or Path(info.filename).is_absolute():
+                continue
+            suffix = Path(safe_name).suffix.lower()
+            if suffix not in ALLOWED_SUFFIXES:
+                continue
+            dest = Path(out_dir) / safe_name
+            with zf.open(info) as src, open(dest, "wb") as dst:
+                shutil.copyfileobj(src, dst)
+            extracted.append(str(dest))
+    return extracted
+
+
+def _collect_batch_inputs(files) -> list[str]:
+    """Normalize the batch file input — a list of individual files and/or zips —
+    into a flat list of paper paths ready to analyze."""
+    if not files:
+        return []
+    if not isinstance(files, list):
+        files = [files]
+    paper_paths: list[str] = []
+    for f in files:
+        p = f if isinstance(f, str) else getattr(f, "name", None)
+        if not p:
+            continue
+        if Path(p).suffix.lower() == ".zip":
+            paper_paths.extend(_expand_zip_to_papers(p))
+        else:
+            paper_paths.append(p)
+    return paper_paths
+
+
+def run_batch(files, check_existence, check_claims, retry_failed,
+              request: gr.Request = None, progress=gr.Progress()):
+    """Analyze multiple papers in one submission.
+
+    Rate-limit model (see DEPLOY.md):
+      - BATCH_MAX_PAPERS_PER_BATCH caps papers per submission
+      - HOURLY_IP_BATCH_LIMIT caps batches per IP per hour
+      - DAILY_ANALYSIS_LIMIT counts every paper toward the day
+    One failed paper does not kill the batch; errors are surfaced per-paper.
+    """
+    if not files:
+        raise gr.Error("Please upload at least one paper (or a .zip of papers).")
+    if not check_existence and not check_claims:
+        raise gr.Error("Select at least one analysis option.")
+
+    paper_paths = _collect_batch_inputs(files)
+    if not paper_paths:
+        raise gr.Error(
+            "No valid paper files found in the upload "
+            f"(accepted: {', '.join(sorted(ALLOWED_SUFFIXES))})."
+        )
+
+    _check_batch_rate_limit(len(paper_paths), request)
+
+    effective_mode = "agentic" if check_claims else "quick"
+
+    # Validate every file up front so we fail fast on a bad upload
+    for p in paper_paths:
+        _validate_upload(p, label="paper")
+
+    # Run each paper sequentially; the report cache already makes repeats free
+    per_paper: list[dict] = []
+    start = time.time()
+    total = len(paper_paths)
+
+    progress(0.02, desc=f"Starting batch of {total} papers...")
+
+    for idx, p in enumerate(paper_paths, start=1):
+        name = Path(p).name
+        progress(idx / (total + 1), desc=f"Paper {idx}/{total}: {name}")
+        try:
+            check_prerequisites(p, effective_mode)
+            paper_report, comp_report, parsed = run_unified(
+                p,
+                mode=effective_mode,
+                run_verification=check_existence,
+                run_claim_verification=check_claims,
+                run_comprehension=check_claims,
+                retry_failed=retry_failed,
+            )
+            counts = defaultdict(int)
+            if paper_report:
+                for v in paper_report.verdicts:
+                    counts[v.verdict] += 1
+            per_paper.append({
+                "name": name,
+                "path": p,
+                "status": "ok",
+                "paper_report": paper_report,
+                "comp_report": comp_report,
+                "parsed": parsed,
+                "counts": dict(counts),
+                "total_refs": len(parsed.references) if parsed else 0,
+            })
+        except BaseException as e:
+            logging.getLogger(__name__).warning(f"Batch: {name} failed: {e}")
+            per_paper.append({
+                "name": name,
+                "path": p,
+                "status": "error",
+                "error": str(e),
+            })
+
+    elapsed = time.time() - start
+    progress(0.97, desc="Building aggregate report...")
+
+    summary_html = _format_batch_summary(per_paper, elapsed, effective_mode)
+    rollup_html = _format_batch_rollup(per_paper)
+    per_paper_html = _format_batch_per_paper(per_paper, check_claims)
+
+    # CSV + JSON downloads
+    csv_path = _write_batch_csv(per_paper)
+    json_path = _write_batch_json(per_paper, effective_mode, elapsed)
+
+    progress(1.0, desc="Done")
+    return summary_html, rollup_html, per_paper_html, csv_path, json_path
 
 
 def run_parse(file):
@@ -1473,7 +1858,54 @@ def create_app() -> gr.Blocks:
                     ],
                 )
 
-            # ── Tab 2: Parse ───────────────────────────────────
+            # ── Tab 2: Batch ───────────────────────────────────
+            with gr.TabItem("Batch"):
+                gr.Markdown(
+                    f"**Upload multiple papers** (or a `.zip` of papers) to "
+                    f"analyze them in one go. Each paper goes through the same "
+                    f"pipeline and you get an aggregate report plus per-paper "
+                    f"breakdowns.\n\n"
+                    f"**Limits:** up to **{_BATCH_MAX_PAPERS} papers per batch**, "
+                    f"**{_HOURLY_IP_BATCH_LIMIT} batches per hour** per IP. "
+                    f"All configurable in `.env`."
+                )
+                with gr.Row(equal_height=False):
+                    with gr.Column(scale=3):
+                        batch_files = gr.File(
+                            label="Upload papers (.pdf / .tex / .bib / .txt) or a .zip",
+                            file_types=[".pdf", ".tex", ".bib", ".txt", ".zip"],
+                            file_count="multiple",
+                            type="filepath",
+                        )
+                    with gr.Column(scale=2):
+                        gr.HTML('<div class="cc-section-label">Analysis Options</div>')
+                        batch_chk_existence = gr.Checkbox(
+                            label="Existence & Metadata (Rule-based)",
+                            value=True,
+                            info="Fast, no LLM. Checks refs against scholarly databases.",
+                        )
+                        batch_chk_claims = gr.Checkbox(
+                            label="Claim Verification (Agentic)",
+                            value=False,
+                            info="LLM agents verify claims. Slower, costs OpenAI credits.",
+                        )
+                        batch_retry = gr.Checkbox(label="Retry failed references", value=False)
+                        batch_btn = gr.Button("Analyze batch", variant="primary", size="lg")
+
+                batch_summary = gr.HTML()
+                batch_rollup = gr.HTML()
+                batch_per_paper = gr.HTML()
+                with gr.Row():
+                    batch_csv = gr.File(label="Download CSV (one row per verdict)", interactive=False)
+                    batch_json = gr.File(label="Download JSON (full batch)", interactive=False)
+
+                batch_btn.click(
+                    fn=run_batch,
+                    inputs=[batch_files, batch_chk_existence, batch_chk_claims, batch_retry],
+                    outputs=[batch_summary, batch_rollup, batch_per_paper, batch_csv, batch_json],
+                )
+
+            # ── Tab 3: Parse ───────────────────────────────────
             with gr.TabItem("Parse"):
                 with gr.Row(equal_height=False):
                     with gr.Column(scale=3):
@@ -1499,7 +1931,7 @@ def create_app() -> gr.Blocks:
                     outputs=[parse_output],
                 )
 
-            # ── Tab 3: About ──────────────────────────────────
+            # ── Tab 4: About ──────────────────────────────────
             with gr.TabItem("About"):
                 gr.Markdown(ABOUT_MD)
 
