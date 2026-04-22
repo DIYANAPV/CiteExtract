@@ -1,69 +1,70 @@
 # CheckCitation Profiling Baseline
 
-_Generated 2026-04-22 08:16:42. Each scenario run once with `force_refresh=True` (report cache bypassed). APICache warms naturally across scenarios on the same paper._
+_Generated 2026-04-22 11:45:51. Each scenario run once with `force_refresh=True` (report cache bypassed). APICache warms naturally across scenarios on the same paper._
 
 ## Per-scenario timings (seconds)
 
 | Label | Paper | Mode | Refs | L1 Parse | L2 Exist | L3/L5 | L4 Comp | Total | LLM Cost |
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| P1-quick | paper1_watermark_llm.pdf | quick | 59 | 4.07 | 92.23 | 0.02 | 0.00 | 96.33 | $0.0004 |
-| P1-standard | paper1_watermark_llm.pdf | standard | 59 | 0.01 | 4.99 | 0.01 | 162.90 | 167.91 | $0.0045 |
-| P1-agentic | paper1_watermark_llm.pdf | agentic | 59 | 0.01 | 6.01 | 348.27 | 0.00 | 354.28 | $0.0004 |
-| clean-quick | clean_paper.tex | quick | 4 | 0.19 | 3.12 | 0.00 | 0.00 | 3.31 | $0.0000 |
-| hall-agentic | hallucinated_paper.tex | agentic | 4 | 0.09 | 4.41 | 27.71 | 0.00 | 32.22 | $0.0014 |
+| P1-quick | paper1_watermark_llm.pdf | quick | 59 | 1.23 | 38.70 | 0.01 | 0.00 | 39.94 | $0.0004 |
+| P1-standard | paper1_watermark_llm.pdf | standard | 59 | 0.00 | 6.58 | 0.01 | 104.96 | 111.56 | $0.0045 |
+| P1-agentic | paper1_watermark_llm.pdf | agentic | 59 | 0.02 | 6.66 | 131.18 | 0.00 | 137.86 | $0.0004 |
+| clean-quick | clean_paper.tex | quick | 4 | 0.25 | 3.12 | 0.00 | 0.00 | 3.38 | $0.0000 |
+| hall-agentic | hallucinated_paper.tex | agentic | 4 | 0.05 | 6.27 | 13.23 | 0.00 | 19.56 | $0.0014 |
 
 ## Agentic dispatch breakdown
 
 | Label | pre_retrieve | triage | meta_dispatch | claim_dispatch | both_dispatch |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| P1-agentic | 153.30 | 1.86 | 13.91 | 136.69 | 42.39 |
-| hall-agentic | 15.43 | 0.07 | 0.00 | 12.09 | 0.00 |
+| P1-agentic | 65.67 | 0.64 | 7.97 | 25.31 | 31.56 |
+| hall-agentic | 6.55 | 0.03 | 0.00 | 6.61 | 0.00 |
 
 ## Notes
 
 - L1 reflects spaCy/parser load + GROBID/LaTeX parsing (parse cache on disk).
 - L2 existence checks use `APICache` (SQLite, TTL in config). Repeat DOIs hit cache.
 - L3/L5 in quick mode is near-instant (rule-based classification).
-- L5 in agentic mode = triage + agent LLM calls (semaphore cap 5, see config).
+- L5 in agentic mode = triage + agent LLM calls (semaphore cap **15** after
+  Phase 2, raised from 5, see `config/config.yaml`).
 - `paper2_attention.pdf`: skipped (GROBID not running at profile time).
-- Cost extracted from `report.warnings`. Numbers appear materially lower than
-  back-of-envelope token math suggests — cost accounting may be under-reporting
-  (investigate in Phase 2 before setting real budget caps).
+- Cost extracted from `report.warnings`; appears to under-report actual spend
+  (investigate before relying on it for budget caps — Phase 4).
 
-## Findings — where time actually goes
+## Before / after — Phase 2 impact
 
-**Cold-cache baseline (P1-quick, 59 refs, 96s):**
-- L2 existence dominates (92s / 96s = 96% of wall time). DOI + Crossref +
-  OpenAlex + Semantic Scholar + PubMed cascade across 59 refs.
+| Scenario | Phase 1 baseline | After Phase 2 | Change |
+| --- | ---: | ---: | ---: |
+| P1-quick (59 refs) | 96.33s | 39.94s | **−59%** (mostly network/S2 variance) |
+| P1-standard | 167.91s | 111.56s | −34% (variance; no code change here) |
+| **P1-agentic** | **354.28s** | **137.86s** | **−61% (Phase 2 gains)** |
+| clean-quick | 3.31s | 3.38s | flat |
+| hall-agentic | 32.22s | 19.56s | −39% |
 
-**Warm-cache APICache effect:**
-- Same 59 refs, second run: L2 = 5s (was 92s). **~18× speedup from cache.**
-- Once a paper is seen, re-running in a different mode is almost free on L2.
+**Agentic dispatch breakdown (P1, 59 refs):**
 
-**Standard mode (P1-standard, 168s):**
-- L4 comprehension = 163s. Passage retrieval + per-citation claim verification
-  is the bottleneck, not L2 (warm here).
+| Stage | Baseline (conc=5) | After Phase 2 (conc=15 + parallel pre-retrieve) |
+| --- | ---: | ---: |
+| pre_retrieve | 153.30s | 65.67s (−57%) |
+| claim_dispatch | 136.69s | 25.31s (−81%) |
+| metadata_dispatch | 13.91s | 7.97s (−43%) |
+| both_dispatch | 42.39s | 31.56s (−26%) |
 
-**Agentic mode (P1-agentic, 354s):**
-- pre_retrieve: 153s (same passage retrieval as Standard L4 — duplicated work
-  between modes; unifying these in Phase 2 is an easy win).
-- triage: 1.9s (rule-based, negligible).
-- metadata_dispatch: 14s (concurrency 5).
-- claim_dispatch: 137s for 45 claim agents at concurrency 5
-  (~15s per agent × 9 batches).
-- both_dispatch: 42s (sequential metadata→claim per ref).
+The P1-standard and P1-quick drops are mostly network/S2 throttling variance
+(Phase 2 only touched agentic mode). The **real Phase 2 win is P1-agentic
+354s → 138s**, driven by two changes:
 
-## Phase 2 optimization priorities (from this baseline)
+1. `max_concurrent_agents` 5 → 15 — claim dispatch dropped 5×.
+2. `_pre_retrieve_passages` refactored to `asyncio.gather` with semaphore —
+   pre-retrieve dropped from 153s to 66s. Decompose LLM calls now run
+   concurrently across references instead of serially.
 
-1. **Raise `max_concurrent_agents` 5 → 15-20.** Claim dispatch is serialized
-   into ~9 batches; raising concurrency cuts wall time near-linearly until
-   OpenAI TPM/RPM rate limits bite.
-2. **Share passage-retrieval output between standard and agentic modes.**
-   Right now each mode redoes the ~150s retrieval pass independently.
-3. **Cache full-text retrieval per DOI on disk** (not just APICache metadata).
-   Fulltext fetches inside pre_retrieve / L4 are repeated across runs.
-4. **Cold-cache L2 is the dominant cost for new papers.** Consider warming
-   the cache from a shared corpus, or parallelizing the cross-database
-   cascade further.
-5. **Investigate cost under-reporting** before relying on `report.warnings`
-   for budget enforcement in production.
+## Remaining opportunities (Phase 3+ candidates)
+
+- **Standard mode's L4 comprehension** is not yet parallelized (~105s here).
+  Same trick as agentic pre-retrieve would help if standard mode becomes
+  the default for reviewers.
+- **Cold-cache L2** is still the worst-case experience for a fresh paper
+  (~40–90s depending on S2 throttling). Consider paid S2 API key to lift
+  the 1 RPS free-tier limit.
+- **Results cache** (Phase 1) already makes second runs ~instant — no
+  further work needed there.
