@@ -975,13 +975,38 @@ def format_parse_output(parsed) -> str:
 # Callbacks
 # ---------------------------------------------------------------------------
 
-# Simple daily rate limit to protect API keys on hosted demo
+# --- Rate limiting ---------------------------------------------------------
+# Two layers:
+#   1. Daily global cap  — protects the OpenAI bill as a whole
+#   2. Per-IP hourly cap — stops a single reviewer (or bot) burning through it
+# Both are in-memory, fine for a single-container deploy.
+
 _daily_analyses = defaultdict(int)  # date_str -> count
 _daily_lock = threading.Lock()
 _DAILY_LIMIT = int(os.environ.get("DAILY_ANALYSIS_LIMIT", "40"))
 
+_ip_requests: dict[str, list[float]] = defaultdict(list)  # ip -> [timestamps]
+_ip_lock = threading.Lock()
+_HOURLY_IP_LIMIT = int(os.environ.get("HOURLY_IP_LIMIT", "10"))
+_HOUR_SECONDS = 3600
 
-def _check_rate_limit() -> None:
+
+def _client_ip(request: "gr.Request") -> str:
+    """Best-effort client IP. Trusts X-Forwarded-For when running behind a proxy."""
+    if request is None:
+        return "unknown"
+    headers = getattr(request, "headers", {}) or {}
+    fwd = headers.get("x-forwarded-for") or headers.get("X-Forwarded-For")
+    if fwd:
+        return fwd.split(",")[0].strip()
+    client = getattr(request, "client", None)
+    if client and getattr(client, "host", None):
+        return client.host
+    return "unknown"
+
+
+def _check_rate_limit(request: Optional["gr.Request"] = None) -> None:
+    """Enforce both the daily global cap and the per-IP hourly cap."""
     today = time.strftime("%Y-%m-%d")
     with _daily_lock:
         if _daily_analyses[today] >= _DAILY_LIMIT:
@@ -994,6 +1019,27 @@ def _check_rate_limit() -> None:
         for k in list(_daily_analyses):
             if k != today:
                 del _daily_analyses[k]
+
+    ip = _client_ip(request)
+    now = time.time()
+    cutoff = now - _HOUR_SECONDS
+    with _ip_lock:
+        recent = [t for t in _ip_requests[ip] if t > cutoff]
+        if len(recent) >= _HOURLY_IP_LIMIT:
+            raise gr.Error(
+                f"Hourly limit reached for your IP ({_HOURLY_IP_LIMIT} analyses/hour). "
+                "Please try again later."
+            )
+        recent.append(now)
+        _ip_requests[ip] = recent
+        # Periodically drop empty/stale IP entries to keep memory bounded
+        if len(_ip_requests) > 1000:
+            for key, stamps in list(_ip_requests.items()):
+                live = [t for t in stamps if t > cutoff]
+                if live:
+                    _ip_requests[key] = live
+                else:
+                    del _ip_requests[key]
 
 
 # Maps timing-log STAGE names to (progress_fraction, user-facing message).
@@ -1017,10 +1063,10 @@ _STAGE_RE = re.compile(r"STAGE (\S+) seconds=")
 
 
 def run_analyze(file, ref_pdfs, check_existence, check_claims, retry_failed,
-                progress=gr.Progress()):
+                request: gr.Request = None, progress=gr.Progress()):
     if file is None:
         raise gr.Error("Please upload a file.")
-    _check_rate_limit()
+    _check_rate_limit(request)
     if not check_existence and not check_claims:
         raise gr.Error("Select at least one analysis option.")
 
