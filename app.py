@@ -11,6 +11,7 @@ Requires:
 import json
 import logging
 import os
+import re
 import shutil
 import tempfile
 import threading
@@ -952,7 +953,28 @@ def _check_rate_limit() -> None:
                 del _daily_analyses[k]
 
 
-def run_analyze(file, ref_pdfs, check_existence, check_claims, retry_failed):
+# Maps timing-log STAGE names to (progress_fraction, user-facing message).
+# Progress fractions are approximate — the pipeline does not know total time
+# upfront, so we pick values that step monotonically through typical runs.
+_STAGE_PROGRESS = {
+    "L1_parse":                   (0.10, "Parsed paper. Checking references..."),
+    "L1_parse_only":              (0.15, "Loading cached result..."),
+    "L2_existence":               (0.35, "References checked. Analyzing..."),
+    "L3_L5_quick":                (0.95, "Finalizing..."),
+    "agentic_pre_retrieve":       (0.55, "Retrieved cited paper passages. Triaging..."),
+    "agentic_triage":             (0.60, "Triaged. Running metadata agents..."),
+    "agentic_metadata_dispatch":  (0.72, "Metadata agents done. Running claim agents..."),
+    "agentic_claim_dispatch":     (0.88, "Claim agents done. Running combined agents..."),
+    "agentic_both_dispatch":      (0.94, "Agents done. Finalizing..."),
+    "L5_agentic":                 (0.95, "Agentic pass done. Finalizing..."),
+    "L4_comprehension":           (0.92, "Claim verification done. Finalizing..."),
+}
+
+_STAGE_RE = re.compile(r"STAGE (\S+) seconds=")
+
+
+def run_analyze(file, ref_pdfs, check_existence, check_claims, retry_failed,
+                progress=gr.Progress()):
     if file is None:
         raise gr.Error("Please upload a file.")
     _check_rate_limit()
@@ -967,21 +989,72 @@ def run_analyze(file, ref_pdfs, check_existence, check_claims, retry_failed):
 
     ref_dir = prepare_ref_pdfs_dir(ref_pdfs) if check_claims else None
 
+    progress(0.02, desc="Preparing...")
+
+    # Tap the timing logger so we can show stage-by-stage progress without
+    # threading a callback through the entire pipeline.
+    stage_events: list[str] = []
+    event_lock = threading.Lock()
+
+    class _StageCap(logging.Handler):
+        def emit(self, record: logging.LogRecord) -> None:
+            m = _STAGE_RE.search(record.getMessage())
+            if m:
+                with event_lock:
+                    stage_events.append(m.group(1))
+
+    timing_log = logging.getLogger("checkcitation.timing")
+    handler = _StageCap()
+    timing_log.addHandler(handler)
+
+    result_holder: dict = {}
+
+    def _worker():
+        try:
+            result_holder["value"] = run_unified(
+                file_path,
+                mode=effective_mode,
+                run_verification=check_existence,
+                run_claim_verification=check_claims,
+                run_comprehension=check_claims,
+                ref_pdfs_dir=ref_dir,
+                retry_failed=retry_failed,
+            )
+        except BaseException as e:
+            result_holder["error"] = e
+
+    start = time.time()
+    worker = threading.Thread(target=_worker, daemon=True)
+    worker.start()
+
     try:
-        start = time.time()
-        paper_report, comp_report, parsed = run_unified(
-            file_path,
-            mode=effective_mode,
-            run_verification=check_existence,
-            run_claim_verification=check_claims,
-            run_comprehension=check_claims,
-            ref_pdfs_dir=ref_dir,
-            retry_failed=retry_failed,
-        )
-        elapsed = time.time() - start
+        seen_stages: set[str] = set()
+        while worker.is_alive():
+            worker.join(timeout=0.4)
+            with event_lock:
+                current = list(stage_events)
+            for stage_name in current:
+                if stage_name in seen_stages:
+                    continue
+                seen_stages.add(stage_name)
+                if stage_name in _STAGE_PROGRESS:
+                    frac, desc = _STAGE_PROGRESS[stage_name]
+                    progress(frac, desc=desc)
     finally:
+        timing_log.removeHandler(handler)
         if ref_dir:
             shutil.rmtree(ref_dir, ignore_errors=True)
+
+    if "error" in result_holder:
+        err = result_holder["error"]
+        if isinstance(err, gr.Error):
+            raise err
+        raise gr.Error(f"Analysis failed: {err}")
+
+    paper_report, comp_report, parsed = result_holder["value"]
+    elapsed = time.time() - start
+
+    progress(0.97, desc="Rendering results...")
 
     # Dashboard (only if verification ran)
     dashboard_html = ""
@@ -1014,6 +1087,7 @@ def run_analyze(file, ref_pdfs, check_existence, check_claims, retry_failed):
     tmp.write(report_json)
     tmp.close()
 
+    progress(1.0, desc="Done")
     return dashboard_html, coverage_html, cards_html, report_json, tmp.name
 
 
