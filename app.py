@@ -1337,8 +1337,13 @@ def run_analyze(file, ref_pdfs, check_existence, check_claims, retry_failed,
     tmp.write(report_json)
     tmp.close()
 
+    bib_path = _write_problematic_bibtex(
+        paper_report, parsed.references if parsed else [],
+        source_label=Path(file_path).name,
+    )
+
     progress(1.0, desc="Done")
-    return dashboard_html, coverage_html, cards_html, report_json, tmp.name
+    return dashboard_html, coverage_html, cards_html, report_json, tmp.name, bib_path
 
 
 # ---------------------------------------------------------------------------
@@ -1480,6 +1485,128 @@ def _format_batch_per_paper(per_paper: list[dict], has_passages: bool) -> str:
         + "".join(chunks) +
         '</div>'
     )
+
+
+_PROBLEM_VERDICTS = {"FABRICATED", "MISREPRESENTED", "UNVERIFIABLE"}
+
+
+def _bibtex_escape(text: str) -> str:
+    """Minimal BibTeX value escaping: strip braces/newlines that would break the entry."""
+    return str(text).replace("{", "").replace("}", "").replace("\n", " ").strip()
+
+
+def _format_problem_bibtex_entry(v, ref) -> Optional[str]:
+    """Emit a single BibTeX entry for a problematic verdict.
+
+    The entry is built from the *original* reference fields (so the
+    user can locate it in their bibliography) plus a `note` summarizing
+    why it was flagged and what was found (if anything).
+    """
+    if v.verdict not in _PROBLEM_VERDICTS:
+        return None
+    if ref is None:
+        return None
+
+    # Prefer the original citation key from a .bib source; fall back to ref_id
+    key = v.ref_id
+    fields: list[tuple[str, str]] = []
+    if ref.title:
+        fields.append(("title", _bibtex_escape(ref.title)))
+    if ref.authors:
+        fields.append(("author", _bibtex_escape(" and ".join(ref.authors))))
+    if ref.year:
+        fields.append(("year", str(ref.year)))
+    if ref.venue:
+        # @misc is generic; callers can hand-edit entry type if they want
+        fields.append(("howpublished", _bibtex_escape(ref.venue)))
+    if ref.doi:
+        fields.append(("doi", _bibtex_escape(ref.doi)))
+    if ref.url:
+        fields.append(("url", _bibtex_escape(ref.url)))
+
+    # Build the audit note
+    note_parts = [f"CheckCitation verdict: {v.verdict}"]
+    if v.explanation:
+        note_parts.append(_bibtex_escape(v.explanation))
+    ex = v.existence
+    if ex:
+        if ex.status == "NOT_FOUND" and ex.databases_checked:
+            note_parts.append(
+                f"Not found in: {', '.join(ex.databases_checked)}"
+            )
+        elif ex.status == "FOUND" and ex.matched_title:
+            note_parts.append(
+                f"DB match: '{_bibtex_escape(ex.matched_title)[:120]}' "
+                f"via {ex.source or 'unknown'}"
+            )
+    fields.append(("note", " | ".join(note_parts)))
+
+    body = ",\n  ".join(f'{k} = {{{v}}}' for k, v in fields)
+    return f"@misc{{{key},\n  {body}\n}}"
+
+
+def _build_problematic_bibtex(paper_report, references, source_label: str = "") -> str:
+    """Concatenate all problematic entries into one .bib string."""
+    if paper_report is None:
+        return ""
+    ref_map = {r.ref_id: r for r in references}
+    entries = []
+    for v in paper_report.verdicts:
+        entry = _format_problem_bibtex_entry(v, ref_map.get(v.ref_id))
+        if entry:
+            entries.append(entry)
+    if not entries:
+        return ""
+    header_bits = [
+        "% CheckCitation — problematic references",
+        "% Exported: " + time.strftime("%Y-%m-%d %H:%M:%S"),
+    ]
+    if source_label:
+        header_bits.append(f"% Source: {source_label}")
+    header_bits.append(
+        f"% Entries: {len(entries)} "
+        "(FABRICATED, MISREPRESENTED, UNVERIFIABLE verdicts only)"
+    )
+    header_bits.append("% Each entry carries a `note = {...}` field with the audit trail.")
+    return "\n".join(header_bits) + "\n\n" + "\n\n".join(entries) + "\n"
+
+
+def _write_problematic_bibtex(
+    paper_report, references, source_label: str = "",
+) -> Optional[str]:
+    """Write problematic .bib to a tempfile and return its path, or None if no problems."""
+    bib = _build_problematic_bibtex(paper_report, references, source_label)
+    if not bib:
+        return None
+    tmp = tempfile.NamedTemporaryFile(
+        suffix=".bib", prefix="checkcitation_problems_", delete=False, mode="w",
+        encoding="utf-8",
+    )
+    tmp.write(bib)
+    tmp.close()
+    return tmp.name
+
+
+def _write_batch_problem_bibtex(per_paper: list[dict]) -> Optional[str]:
+    """Aggregate problematic refs across all successful papers into one .bib."""
+    chunks = []
+    for p in per_paper:
+        if p["status"] != "ok" or p["paper_report"] is None:
+            continue
+        bib = _build_problematic_bibtex(
+            p["paper_report"], p["parsed"].references, source_label=p["name"],
+        )
+        if bib:
+            chunks.append(bib)
+    if not chunks:
+        return None
+    tmp = tempfile.NamedTemporaryFile(
+        suffix=".bib", prefix="checkcitation_batch_problems_", delete=False, mode="w",
+        encoding="utf-8",
+    )
+    tmp.write("\n\n".join(chunks))
+    tmp.close()
+    return tmp.name
 
 
 def _write_batch_csv(per_paper: list[dict]) -> str:
@@ -1670,12 +1797,13 @@ def run_batch(files, check_existence, check_claims, retry_failed,
     rollup_html = _format_batch_rollup(per_paper)
     per_paper_html = _format_batch_per_paper(per_paper, check_claims)
 
-    # CSV + JSON downloads
+    # CSV + JSON downloads + problematic-refs BibTeX aggregate
     csv_path = _write_batch_csv(per_paper)
     json_path = _write_batch_json(per_paper, effective_mode, elapsed)
+    bib_path = _write_batch_problem_bibtex(per_paper)
 
     progress(1.0, desc="Done")
-    return summary_html, rollup_html, per_paper_html, csv_path, json_path
+    return summary_html, rollup_html, per_paper_html, csv_path, json_path, bib_path
 
 
 def run_parse(file):
@@ -1842,7 +1970,11 @@ def create_app() -> gr.Blocks:
 
                 with gr.Accordion("JSON Report", open=False):
                     analyze_json = gr.Code(language="json", label="Report JSON")
-                analyze_download = gr.File(label="Download Report", interactive=False)
+                with gr.Row():
+                    analyze_download = gr.File(label="Download JSON report", interactive=False)
+                    analyze_bib = gr.File(
+                        label="Download problematic refs (.bib)", interactive=False,
+                    )
 
                 # Single click handler — Gradio shows its own loading state
                 analyze_btn.click(
@@ -1854,7 +1986,7 @@ def create_app() -> gr.Blocks:
                     ],
                     outputs=[
                         analyze_dashboard, analyze_coverage, analyze_cards,
-                        analyze_json, analyze_download,
+                        analyze_json, analyze_download, analyze_bib,
                     ],
                 )
 
@@ -1898,11 +2030,17 @@ def create_app() -> gr.Blocks:
                 with gr.Row():
                     batch_csv = gr.File(label="Download CSV (one row per verdict)", interactive=False)
                     batch_json = gr.File(label="Download JSON (full batch)", interactive=False)
+                    batch_bib = gr.File(
+                        label="Download problematic refs (.bib)", interactive=False,
+                    )
 
                 batch_btn.click(
                     fn=run_batch,
                     inputs=[batch_files, batch_chk_existence, batch_chk_claims, batch_retry],
-                    outputs=[batch_summary, batch_rollup, batch_per_paper, batch_csv, batch_json],
+                    outputs=[
+                        batch_summary, batch_rollup, batch_per_paper,
+                        batch_csv, batch_json, batch_bib,
+                    ],
                 )
 
             # ── Tab 3: Parse ───────────────────────────────────
