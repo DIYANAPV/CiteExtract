@@ -1829,6 +1829,15 @@ CheckCitation analyzes a paper's reference list and in-text citations to detect:
 - **Fabricated citations** — references that don't exist in any scholarly database
 - **Misrepresented citations** — real papers cited but whose content contradicts the claims made
 
+## Supported input formats
+
+| Format | Notes |
+|--------|-------|
+| `.pdf` | Full analysis. Requires GROBID running. |
+| `.tex` | **Native LaTeX support** — references from companion `.bib`, citing contexts from the body. No GROBID needed. |
+| `.bib` | References only (no citing contexts). |
+| `.txt` | Best-effort parsing. |
+
 ---
 
 ## Analysis Options
@@ -1905,7 +1914,8 @@ def create_app() -> gr.Blocks:
             # ── Tab 1: Analyze ─────────────────────────────────
             with gr.TabItem("Analyze"):
                 gr.Markdown(
-                    "**Upload a paper → pick what to check → click Analyze.** "
+                    "**Upload a paper** — PDF, **LaTeX (`.tex`)**, BibTeX, or "
+                    "plain text — **pick what to check → click Analyze.**\n\n"
                     "Rule-based check is free and fast. Agentic check uses an LLM "
                     "to verify claims against cited paper text (slower, costs a few "
                     "cents per paper). Click **Try sample paper** below if you just "
@@ -1914,7 +1924,7 @@ def create_app() -> gr.Blocks:
                 with gr.Row(equal_height=False):
                     with gr.Column(scale=3):
                         analyze_file = gr.File(
-                            label="Upload Paper",
+                            label="Upload paper (.pdf, .tex, .bib, .txt)",
                             file_types=[".pdf", ".tex", ".bib", ".txt"],
                             type="filepath",
                         )
@@ -2048,7 +2058,7 @@ def create_app() -> gr.Blocks:
                 with gr.Row(equal_height=False):
                     with gr.Column(scale=3):
                         parse_file_input = gr.File(
-                            label="Upload Paper",
+                            label="Upload paper (.pdf, .tex, .bib, .txt)",
                             file_types=[".pdf", ".tex", ".bib", ".txt"],
                             type="filepath",
                         )
