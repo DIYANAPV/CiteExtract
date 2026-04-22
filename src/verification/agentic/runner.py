@@ -62,19 +62,10 @@ async def run_agentic_verification(
     Returns:
         (list of CitationVerdicts, total LLM cost in USD)
     """
-    from src.verification.agentic.claim_agent import (
-        ClaimAgent,
-        build_claim_user_message,
-    )
-    from src.verification.agentic.metadata_agent import (
-        MetadataAgent,
-        build_metadata_user_message,
-    )
+    from src.verification.agentic.claim_agent import ClaimAgent
+    from src.verification.agentic.metadata_agent import MetadataAgent
     from src.verification.agentic.verdict_merger import (
         fallback_to_quick,
-        merge_both_verdicts,
-        merge_claim_verdicts,
-        merge_metadata_verdict,
         resolve_clear_route,
     )
     from src.verification.triage import TriageRoute, triage_all
