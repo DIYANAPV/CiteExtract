@@ -46,7 +46,8 @@ async def run_agentic_verification(
     exist_map: dict[str, ExistenceResult],
     metadata_map: dict[str, MetadataResult],
     agentic_config: dict,
-) -> tuple[list[CitationVerdict], float]:
+    ref_pdfs_dir: Optional[str] = None,
+) -> tuple[list[CitationVerdict], float, dict[str, dict[str, list]], dict]:
     """Run agentic verification: rule-based triage + focused agents where needed.
 
     Clear-cut cases (exact matches, obvious fabrications) are resolved
@@ -58,9 +59,13 @@ async def run_agentic_verification(
         exist_map: Pre-computed L2 existence results (ref_id → ExistenceResult).
         metadata_map: Pre-computed L3 metadata results (ref_id → MetadataResult).
         agentic_config: Config from config.yaml 'agentic' section.
+        ref_pdfs_dir: Optional directory of user-uploaded reference PDFs.
 
     Returns:
-        (list of CitationVerdicts, total LLM cost in USD)
+        (verdicts, cost_usd, passages_by_ref, fulltext_by_ref) — callers that
+        also need a ComprehensionReport can feed the last two into
+        ``build_comprehension_from_passages`` instead of running the
+        comprehension pipeline a second time.
     """
     from src.verification.agentic.claim_agent import ClaimAgent
     from src.verification.agentic.metadata_agent import MetadataAgent
@@ -90,6 +95,7 @@ async def run_agentic_verification(
     with stage("agentic_pre_retrieve", refs=len(parsed.references)):
         passages_by_ref, fulltext_by_ref = await _pre_retrieve_passages(
             parsed, exist_map, citation_groups, agentic_config, cost_tracker,
+            ref_pdfs_dir=ref_pdfs_dir,
         )
 
     # --- Triage all references ---
@@ -133,7 +139,7 @@ async def run_agentic_verification(
     if agent_count == 0:
         ordered = [verdicts[ref.ref_id] for ref in parsed.references if ref.ref_id in verdicts]
         # Return whatever pre-retrieve already spent on decompose calls
-        return ordered, cost_tracker.estimated_cost_usd
+        return ordered, cost_tracker.estimated_cost_usd, passages_by_ref, fulltext_by_ref
 
     # --- Set up shared resources ---
     openai_client = AsyncOpenAI(api_key=api_key)
@@ -254,7 +260,7 @@ async def run_agentic_verification(
                 flags=["agentic_processing_error"],
                 existence=exist_map.get(ref.ref_id),
             ))
-    return ordered, cost_tracker.estimated_cost_usd
+    return ordered, cost_tracker.estimated_cost_usd, passages_by_ref, fulltext_by_ref
 
 
 # ---------------------------------------------------------------------------
@@ -520,6 +526,7 @@ async def _pre_retrieve_passages(
     citation_groups: dict[str, list[Citation]],
     config: dict,
     cost_tracker: Optional[CostTracker] = None,
+    ref_pdfs_dir: Optional[str] = None,
 ) -> tuple[dict[str, dict[str, list]], dict]:
     """Pre-retrieve passages for all FOUND refs with substantive citations.
 
@@ -527,6 +534,10 @@ async def _pre_retrieve_passages(
     model is configured, each citing sentence is decomposed into
     sub-claims (via one LLM call) and passages are retrieved for the
     full claim AND each sub-claim, then unioned + deduped.
+
+    If ``ref_pdfs_dir`` is given, user-uploaded reference PDFs in that
+    directory are matched to refs and used as the full-text source in
+    preference to the remote fetch.
 
     Returns:
         (passages_by_ref, fulltext_by_ref) where:
@@ -588,6 +599,16 @@ async def _pre_retrieve_passages(
     if not refs_needing_passages:
         return passages_by_ref, fulltext_by_ref
 
+    # Resolve user-uploaded reference PDFs once, so get_full_text can prefer
+    # them over the remote fetch for each matching ref.
+    user_pdf_map: dict[str, str] = {}
+    if ref_pdfs_dir:
+        try:
+            from src.pipeline import _scan_ref_pdfs
+            user_pdf_map = _scan_ref_pdfs(ref_pdfs_dir, parsed.references)
+        except Exception as e:
+            log.warning(f"pre_retrieve: scanning ref_pdfs_dir failed: {e}")
+
     max_concurrent = int(config.get("max_concurrent_agents", 15)) if config else 15
     log.info(
         f"Pre-retrieving passages for {len(refs_needing_passages)} references "
@@ -600,7 +621,8 @@ async def _pre_retrieve_passages(
     async def _process_ref(ref, exist, substantive, client):
         async with semaphore:
             try:
-                ft = await get_full_text(exist, client, cache)
+                user_pdf = user_pdf_map.get(ref.ref_id)
+                ft = await get_full_text(exist, client, cache, user_pdf_path=user_pdf)
                 text = ft.full_text or ft.abstract or ""
                 if not text.strip():
                     return ref.ref_id, ft, None

@@ -84,11 +84,16 @@ async def _run_agentic(
     parsed: ParsedPaper,
     exist_map: dict[str, ExistenceResult],
     file_path: str,
-) -> PaperReport:
+    ref_pdfs_dir: Optional[str] = None,
+) -> tuple[PaperReport, dict[str, dict[str, list]], dict]:
     """Run agentic verification: rule-based triage + focused agents.
 
     Uses shared L2 exist_map and L3 metadata. Clear-cut cases are resolved
     by rules. Ambiguous cases get dispatched to MetadataAgent / ClaimAgent.
+
+    Returns the ``PaperReport`` along with the already-retrieved passages and
+    fulltexts so the caller can synthesize a ``ComprehensionReport`` without
+    running the comprehension pipeline a second time.
     """
     from src.verification.agentic.runner import run_agentic_verification
 
@@ -102,8 +107,8 @@ async def _run_agentic(
     # L3: Metadata validation for FOUND refs
     metadata_map = _build_metadata_map(parsed.references, exist_map)
 
-    verdicts, llm_cost = await run_agentic_verification(
-        parsed, exist_map, metadata_map, agentic_cfg,
+    verdicts, llm_cost, passages_by_ref, fulltext_by_ref = await run_agentic_verification(
+        parsed, exist_map, metadata_map, agentic_cfg, ref_pdfs_dir=ref_pdfs_dir,
     )
 
     report = build_report(parsed, verdicts, "agentic", input_file=file_path)
@@ -120,7 +125,7 @@ async def _run_agentic(
             f"by rule-based triage (no LLM needed)."
         )
 
-    return report
+    return report, passages_by_ref, fulltext_by_ref
 
 
 
@@ -332,6 +337,73 @@ def _paper_metadata(exist: ExistenceResult) -> dict:
         "doi": exist.matched_doi,
         "source": exist.source,
     }
+
+
+def _build_comprehension_from_passages(
+    parsed: ParsedPaper,
+    exist_map: dict[str, ExistenceResult],
+    passages_by_ref: dict[str, dict[str, list]],
+    fulltext_by_ref: dict,
+    file_path: str,
+) -> "ComprehensionReport":
+    """Build a ComprehensionReport from data the agentic pipeline already has.
+
+    Agentic's ``_pre_retrieve_passages`` fetches full text, chunks it, and
+    retrieves passages for every substantive citing sentence. This function
+    repackages that data as a ComprehensionReport so the UI can render passages
+    without us re-running the comprehension pipeline (which would duplicate
+    every fetch + retrieval for a 2x cost on wall time and API calls).
+
+    Claim-level verdicts are intentionally left ``None`` here — in agentic
+    mode the claim judgment lives on the ``CitationVerdict`` (flags +
+    explanation) rather than on a per-sentence ClaimVerdict, and the UI
+    sources that from the verdict card, not from the comp_report.
+    """
+    from datetime import datetime, timezone
+    from src.models.comprehension import ComprehensionReport, ComprehensionResult
+    from src.verification.filters import is_substantive_citation
+
+    results: list[ComprehensionResult] = []
+    coverage = {"full_text": 0, "abstract_only": 0, "not_found": 0}
+
+    seen_refs: set[str] = set()
+
+    for cit in parsed.citations:
+        if not is_substantive_citation(cit):
+            continue
+        exist = exist_map.get(cit.ref_id)
+        ft = fulltext_by_ref.get(cit.ref_id)
+        passages = passages_by_ref.get(cit.ref_id, {}).get(cit.citing_sentence, [])
+
+        if cit.ref_id not in seen_refs:
+            seen_refs.add(cit.ref_id)
+            if ft and ft.full_text:
+                coverage["full_text"] += 1
+            elif ft and ft.abstract:
+                coverage["abstract_only"] += 1
+            else:
+                coverage["not_found"] += 1
+
+        results.append(ComprehensionResult(
+            ref_id=cit.ref_id,
+            citing_sentence=cit.citing_sentence,
+            context_before=cit.context_before or "",
+            context_after=cit.context_after or "",
+            paper_found=bool(exist and exist.status == "FOUND"),
+            full_text_available=bool(ft and ft.full_text),
+            full_text_source=ft.source if ft else None,
+            top_passages=passages,
+            claim_verdict=None,
+            paper_metadata=_paper_metadata(exist) if exist else {},
+        ))
+
+    return ComprehensionReport(
+        input_file=file_path,
+        timestamp=datetime.now(timezone.utc).isoformat(),
+        total_citations=len(results),
+        results=results,
+        coverage=coverage,
+    )
 
 
 def _scan_ref_pdfs(
@@ -669,16 +741,32 @@ async def run_unified_pipeline(
 
         # Agentic branch: triage + focused agents for ambiguous cases
         if mode == "agentic":
+            passages_by_ref: dict = {}
+            fulltext_by_ref: dict = {}
             if run_verification:
                 with stage("L5_agentic", refs=len(parsed.references)):
-                    paper_report = await _run_agentic(parsed, exist_map, file_path)
-            if run_comprehension:
-                with stage("L4_comprehension", refs=len(parsed.references),
-                           verify_claims=run_claim_verification):
-                    comp_report = await _run_comprehension_from_exist_map(
-                        parsed, exist_map, file_path, ref_pdfs_dir,
-                        verify_claims=run_claim_verification,
+                    paper_report, passages_by_ref, fulltext_by_ref = await _run_agentic(
+                        parsed, exist_map, file_path, ref_pdfs_dir=ref_pdfs_dir,
                     )
+            if run_comprehension:
+                # Agentic already retrieved passages + fulltexts during
+                # _pre_retrieve_passages. Repackage them as a ComprehensionReport
+                # instead of re-running the whole comprehension pipeline.
+                if run_verification:
+                    with stage("L4_from_agentic", refs=len(parsed.references)):
+                        comp_report = _build_comprehension_from_passages(
+                            parsed, exist_map,
+                            passages_by_ref, fulltext_by_ref, file_path,
+                        )
+                else:
+                    # Comprehension requested without agentic verification —
+                    # fall back to the full comprehension pipeline.
+                    with stage("L4_comprehension", refs=len(parsed.references),
+                               verify_claims=run_claim_verification):
+                        comp_report = await _run_comprehension_from_exist_map(
+                            parsed, exist_map, file_path, ref_pdfs_dir,
+                            verify_claims=run_claim_verification,
+                        )
             if use_cache and cache_key is not None:
                 report_cache.save(cache_key, paper_report, comp_report)
             return paper_report, comp_report, parsed
