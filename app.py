@@ -776,6 +776,124 @@ def format_unified_cards(
     return '<div style="color:#6b7280;text-align:center;padding:40px;">No results.</div>'
 
 
+# Human-readable explanations for the cryptic internal flags that land on a verdict.
+# Anything not in this map is shown with its raw code so the user at least sees it.
+_FLAG_EXPLANATIONS = {
+    "agentic_agent_used":            "LLM agent inspected the evidence for this reference",
+    "agent_fallback_to_quick":       "Agent failed; fell back to rule-based classification",
+    "agentic_processing_error":      "Unexpected error while running the agent",
+    "claim_contradicts":             "The cited paper contradicts what the citing sentence claims",
+    "claim_not_supported":           "The cited paper does not support the citing sentence",
+    "claim_neutral":                 "Evidence was insufficient to decide — not enough overlap",
+    "claim_verification_empty":      "No claim verdicts were returned",
+    "claim_verification_unavailable": "Claim verification could not run (no passages)",
+    "metadata_unverifiable_claims_skipped": "Metadata couldn't be decided — claims not checked",
+    "author_mismatch":               "Authors in the citation differ from the matched record",
+    "title_mismatch":                "Title differs from the matched record",
+    "year_mismatch":                 "Year differs from the matched record",
+    "venue_mismatch":                "Venue differs from the matched record",
+    "low_title_similarity":          "Title only loosely matches the database record",
+    "missing_existence_result":      "No existence check result was stored for this reference",
+    "retracted":                     "This paper has been retracted",
+    "preprint_upgraded_to_published": "Matched an arXiv preprint with a later publisher version",
+}
+
+
+def _format_databases_searched(ex) -> str:
+    """Pill list showing which scholarly databases were queried and which one matched."""
+    if not ex or not ex.databases_checked:
+        return ""
+    pills = []
+    hit_source = (ex.source or "").lower() if ex.status == "FOUND" else ""
+    for db in ex.databases_checked:
+        is_hit = db.lower() == hit_source
+        bg = "#dcfce7" if is_hit else "#f3f4f6"
+        fg = "#166534" if is_hit else "#4b5563"
+        icon = "&#x2713;" if is_hit else "&#x2022;"
+        pills.append(
+            f'<span style="display:inline-block;background:{bg};color:{fg};'
+            f'padding:2px 10px;border-radius:12px;font-size:12px;margin:2px 4px 2px 0;'
+            f'border:1px solid {bg};">{icon} {_esc(db)}</span>'
+        )
+    label = "Matched in" if hit_source else "Searched (no match)"
+    return (
+        f'<div style="margin-top:10px;">'
+        f'<div style="font-size:12px;color:#6b7280;margin-bottom:4px;">{label}:</div>'
+        f'<div>{" ".join(pills)}</div>'
+        f'</div>'
+    )
+
+
+def _format_matched_record(ex) -> str:
+    """Key-value block for the record that was actually found in a DB."""
+    if not ex or ex.status != "FOUND":
+        return ""
+    rows = []
+    if ex.matched_title:
+        rows.append(("Title", _esc(ex.matched_title)))
+    if ex.matched_authors:
+        rows.append(("Authors", _esc("; ".join(ex.matched_authors))))
+    if ex.matched_year:
+        rows.append(("Year", str(ex.matched_year)))
+    if ex.matched_venue:
+        rows.append(("Venue", _esc(ex.matched_venue)))
+    if ex.matched_doi:
+        rows.append(("DOI", f'<a href="https://doi.org/{_esc(ex.matched_doi)}" '
+                            f'target="_blank" rel="noopener">{_esc(ex.matched_doi)}</a>'))
+    if ex.title_similarity is not None:
+        rows.append(("Title similarity", f"{ex.title_similarity:.0%}"))
+    if ex.retraction_status:
+        rows.append(("Retracted", "Yes"))
+    if not rows:
+        return ""
+    rows_html = "".join(
+        f'<tr><td style="padding:3px 12px 3px 0;color:#6b7280;font-size:12px;white-space:nowrap;">'
+        f'{k}</td><td style="padding:3px 0;font-size:13px;">{val}</td></tr>'
+        for k, val in rows
+    )
+    return (
+        f'<div style="margin-top:12px;">'
+        f'<div style="font-size:12px;color:#6b7280;margin-bottom:4px;">Matched record:</div>'
+        f'<table style="width:100%;border-collapse:collapse;">{rows_html}</table>'
+        f'</div>'
+    )
+
+
+def _format_decision_path(flags: list[str]) -> str:
+    """Translate each flag to a plain-English bullet so users see *why* the verdict."""
+    if not flags:
+        return ""
+    items = []
+    for f in flags:
+        human = _FLAG_EXPLANATIONS.get(f, _esc(f))
+        items.append(
+            f'<li style="font-size:13px;color:#374151;margin:2px 0;">{human}</li>'
+        )
+    return (
+        f'<div style="margin-top:12px;">'
+        f'<div style="font-size:12px;color:#6b7280;margin-bottom:4px;">Decision path:</div>'
+        f'<ul style="margin:0;padding-left:18px;">{"".join(items)}</ul>'
+        f'</div>'
+    )
+
+
+def _format_evidence_panel(v) -> str:
+    """Collapsible 'Evidence trail' block showing DBs searched, matched record, decision path."""
+    dbs = _format_databases_searched(v.existence)
+    record = _format_matched_record(v.existence)
+    decision = _format_decision_path(v.flags)
+    if not any([dbs, record, decision]):
+        return ""
+    body = f'<div style="padding:4px 0 8px;">{dbs}{record}{decision}</div>'
+    return (
+        f'<details style="margin-top:10px;">'
+        f'<summary style="font-size:13px;color:#4b5563;cursor:pointer;'
+        f'font-weight:500;">&#x1F50D; Evidence trail</summary>'
+        f'{body}'
+        f'</details>'
+    )
+
+
 def _render_verdict_card(v, ref, passages_html: str = "") -> str:
     """Render a single reference card with verdict + optional passages."""
     st = VERDICT_STYLES.get(v.verdict, VERDICT_STYLES["VALID"])
@@ -825,13 +943,7 @@ def _render_verdict_card(v, ref, passages_html: str = "") -> str:
             {meta_table}
         </details>'''
 
-    flags_html = ""
-    if v.flags:
-        flag_items = " ".join(
-            f'<span style="display:inline-block;background:#f3f4f6;color:#6b7280;padding:1px 8px;border-radius:10px;font-size:11px;margin:2px;">{_esc(f)}</span>'
-            for f in v.flags
-        )
-        flags_html = f'<div style="margin-top:8px;">{flag_items}</div>'
+    evidence_panel = _format_evidence_panel(v)
 
     ref_id_attr = _esc(v.ref_id)
     review_row = f'''
@@ -861,8 +973,8 @@ def _render_verdict_card(v, ref, passages_html: str = "") -> str:
             {action_html}
             {explanation}
             {meta_section}
+            {evidence_panel}
             {passages_html}
-            {flags_html}
             {review_row}
         </div>
     </details>'''
