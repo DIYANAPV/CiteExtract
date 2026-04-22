@@ -124,7 +124,7 @@ def grobid() -> dict:
     section = _get_section("grobid")
     retry = section.get("retry", {})
     return {
-        "service_url": section.get("service_url", "http://localhost:8070"),
+        "service_url": os.environ.get("GROBID_SERVICE_URL", section.get("service_url", "http://localhost:8070")),
         "timeout": section.get("timeout", 120),
         "concurrency": section.get("concurrency", 4),
         "health_check_timeout": section.get("health_check_timeout", 5),
@@ -228,7 +228,7 @@ def agentic() -> Optional[dict]:
 
 
 def claim_verification() -> dict:
-    """Claim verification LLM configuration (Standard mode)."""
+    """Claim verification LLM configuration."""
     section = _get_section("claim_verification")
     return {
         "provider": "openai",
@@ -254,8 +254,6 @@ def comprehension() -> dict:
     section = _get_section("comprehension")
     return {
         "top_k": section.get("top_k", 3),
-        "chunk_max_chars": section.get("chunk_max_chars", 800),
-        "chunk_min_words": section.get("chunk_min_words", 10),
         "notice_enabled": section.get("notice_enabled", False),
         "dense_model": section.get("dense_model", "all-MiniLM-L6-v2"),
         "bm25_candidates": section.get("bm25_candidates", 10),

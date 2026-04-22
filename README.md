@@ -1,299 +1,234 @@
-# CheckCitation
+# CheckCite
 
-Open-source citation hallucination detection system. Give it a paper (PDF, LaTeX, BibTeX, or plain text), get a detailed report on every citation: fabricated or misrepresented.
+**Citation verification for scientific papers, with evidence.**
 
-## What it detects
+CheckCite takes a paper — PDF, LaTeX, BibTeX, or plain text — and returns,
+for every reference, one of four verdicts (`VALID`, `FABRICATED`,
+`MISREPRESENTED`, `UNVERIFIABLE`) together with the passage from the
+cited paper that supports or contradicts the citing sentence. It is
+designed to close two gaps in prior work: existence-focused tools do not
+check whether the cited paper actually supports the claim, and
+semantic-alignment tools assume the reference has already been resolved
+and retrieved. CheckCite does both in a single pass and returns the
+evidence a human would need to judge borderline cases.
 
-| Failure Mode | Description | How |
-|-------------|-------------|-----|
-| **Fabricated** | Citation doesn't exist in any scholarly database, has been retracted, or has incorrect metadata | Existence check + metadata validation |
-| **Misrepresented** | Real paper, but retrieved passages contradict the claim made about it | Full-text passage retrieval + LLM analysis |
+The semantic stage uses a novel **multi-query retrieval** method:
+citing sentences are decomposed into sub-claims, evidence is retrieved
+for each sub-claim, and the unioned passage set is scored against the
+full original claim. This reaches 84.89% accuracy on a 741-instance
+cross-domain benchmark, exceeding P3 (83.7%) and SemanticCite (83.4%).
+See the [paper](paper/main.tex) for the full story.
+
+---
 
 ## Quick start
 
 ```bash
 # 1. Clone and install
+git clone https://github.com/diyana-muhammed/checkcitation
 cd checkcitation
-python -m venv .venv
-source .venv/bin/activate
+python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 python -m spacy download en_core_web_sm
 
-# 2. Set up your environment
+# 2. Configure API keys
 cp .env.example .env
-# Edit .env and add your API keys (see "Configuration" below)
+# Edit .env — at minimum set OPENAI_API_KEY for semantic verification.
 
-# 3. For PDFs: start GROBID (one-time, stays running)
+# 3. For PDFs, start GROBID (one-time)
 docker run -d --name grobid -p 8070:8070 grobid/grobid:0.8.2-crf
 
-# 4. Verify a paper
-python -m src verify paper.pdf --quick
-python -m src verify refs.bib --quick
-python -m src verify paper.pdf --standard
-
-# 5. Or use the web UI
-python app.py    # opens at http://localhost:7860
-
-# 6. Check output
-ls data/output/    # JSON reports
+# 4. Try it
+python -m src verify paper.pdf --agentic   # full pipeline
+python app.py                                # or use the web UI at localhost:7860
 ```
 
-## Web UI
+## Docker
 
-Launch the browser-based interface:
-
-```bash
-python app.py
-```
-
-Opens at `http://localhost:7860` with an Analyze tab where you can:
-- Upload PDF/LaTeX/BibTeX/text files
-- Select analysis options: Existence & Metadata, Claim Verification
-- Choose mode: Standard (pipeline) or Agentic (smart triage + focused agents)
-- Upload reference PDFs for non-open-access papers
-- See color-coded results with metadata comparisons, passages, claim verdicts, and corrected citations
-
-## How to use (CLI)
+A ready-to-run image will be published to GHCR at
+`ghcr.io/diyana-muhammed/checkcitation:latest`. Build locally in the
+meantime:
 
 ```bash
-# Quick mode (free, no LLM) — checks if references exist + metadata matches
-python -m src verify /path/to/paper.pdf --quick
-
-# Standard mode (needs OPENAI_API_KEY) — retrieves passages + LLM claim verification
-python -m src verify /path/to/paper.pdf --standard
-
-# Agentic mode (needs OPENAI_API_KEY) — smart triage + focused agents for ambiguous cases
-python -m src verify /path/to/paper.pdf --agentic
-
-# Retry references that previously failed (clears NOT_FOUND cache)
-python -m src verify /path/to/paper.pdf --retry-failed
-
-# Human-readable table output (instead of JSON)
-python -m src verify /path/to/paper.pdf --format table
-
-# Parse only (no verification, just extract references)
-python -m src parse /path/to/paper.pdf
-
-# Comprehension mode — retrieve relevant passages from cited papers
-python -m src comprehend /path/to/paper.pdf
-
-# With user-provided PDFs for paywalled references
-python -m src comprehend /path/to/paper.pdf --ref-pdfs /path/to/reference-pdfs/
-```
-
-## Verification modes
-
-| Mode | What it checks | LLM cost | When to use |
-|------|---------------|----------|-------------|
-| **Quick** (`--quick`) | Existence + metadata, rule-based | Free | "Are my references real?" |
-| **Standard** (`--standard`) | Quick + passage retrieval + LLM claim verification | ~$0.01-0.05/paper | "Do the cited papers support my claims?" |
-| **Agentic** (`--agentic`) | Smart triage + focused agents for ambiguous cases | ~$0.05-0.10/paper | Best accuracy, handles edge cases |
-| **Comprehend** (`comprehend`) | Retrieve relevant passages from cited papers | Free | "What do my cited papers actually say?" |
-
-### Quick vs. Standard vs. Agentic
-
-**Quick** uses configurable similarity thresholds and a deterministic cascade through databases. Fast, cheap, transparent. Handles common edge cases automatically:
-- Truncated author lists (5 of 50 authors → detected as valid truncation, not mismatch)
-- Preprint-vs-publication differences (arXiv 2021 → CVPR 2022 → upgrades to published version via CrossRef)
-- Venue name variations (NeurIPS vs. "Advances in Neural Information Processing Systems")
-- Dead DOI detection (HTTP HEAD to doi.org — catches registered but unresolvable DOIs)
-- Author cross-validation (checks authors against a second database, flags suspects found in zero DBs)
-
-**Standard** adds claim verification: fetches full text of each cited paper, retrieves the most relevant passages using BM25+dense hybrid retrieval with FlashRank neural reranking, then asks an LLM to judge whether the citing sentence accurately represents the cited paper. Citation markers are stripped from retrieval queries for cleaner matching.
-
-**Agentic** uses the same shared L2+L3 pipeline as Quick, then applies smart triage: clear-cut cases (exact matches, obvious fabrications) are resolved by rules without any LLM calls. Only ambiguous references get dispatched to focused agents:
-- **MetadataAgent** — investigates metadata discrepancies with format-aware comparison
-- **ClaimAgent** — verifies claims against retrieved passages
-- This means most references are resolved for free; LLM costs only apply to the ~10-30% that need deeper investigation
-- VALID verdicts include corrected APA and BibTeX citations generated from database metadata
-
-## Input limits
-
-- **Max file size:** 50 MB
-- **Max references:** 500 per paper
-
-## Supported input formats
-
-| Format | What you get |
-|--------|-------------|
-| **.pdf** | Full analysis. Requires GROBID Docker (see below). All modes. |
-| **.tex** | References from companion .bib + citing contexts from body. All modes. |
-| **.bib** | References only. Quick mode forced (no citing context). |
-| **.txt** | Best-effort parsing. Quality depends on formatting. |
-
-## Configuration
-
-| File | What goes here | Committed to git? |
-|------|---------------|-------------------|
-| **`.env`** | API keys and user-specific settings (secrets) | No (in .gitignore) |
-| **`config/config.yaml`** | Application behavior (thresholds, timeouts, models) | Yes |
-
-### Setting up `.env`
-
-```bash
-cp .env.example .env
-```
-
-Then edit `.env`:
-
-```bash
-# Required for Standard and Agentic modes
-OPENAI_API_KEY=sk-your-key-here
-
-# Strongly recommended — increases Semantic Scholar rate limit from 1 to 10 req/s
-S2_API_KEY=your-key-here
-
-# Polite pool emails — higher API rate limits
-CROSSREF_MAILTO=your.email@university.edu
-OPENALEX_MAILTO=your.email@university.edu
-```
-
-**Quick mode works without any API keys.** But without `S2_API_KEY`, rate limits may cause real papers to be misclassified as FABRICATED.
-
-## PDF parsing
-
-PDF input requires GROBID running as a Docker container:
-
-```bash
-docker run -d --name grobid -p 8070:8070 grobid/grobid:0.8.2-crf
-curl http://localhost:8070/api/isalive    # Should return "true"
+docker compose up --build        # web UI at http://localhost:7860
 ```
 
 ## How it works
 
-### Pipeline (Quick/Standard modes)
+CheckCite processes each reference through three layers before producing
+a combined verdict.
 
 ```
-Input file (.bib / .tex / .pdf / .txt)
-    |
-    v
-L1: PARSE -- Extract references + citing contexts
-    |
-    v
-L2: EXISTENCE CHECK -- DOI->CrossRef, title->S2->OpenAlex->PubMed
-    |  + Web fallback: URL resolution + Wayback Machine
-    |  + Preprint upgrade: if DB returns arXiv but ref cites conference,
-    |    automatically tries CrossRef/OpenAlex for the published version
-    |  + Dead DOI detection (HTTP HEAD to doi.org)
-    |  + Author cross-validation (query second DB, flag suspect authors)
-    |
-    v
-L3: METADATA VALIDATION -- Field-by-field comparison
-    |  + Author truncation detection (subset check, not just Jaccard)
-    |  + Preprint-vs-publication venue detection (CLOSE_MATCH, not MISMATCH)
-    |
-    v
-CLAIM VERIFICATION (Standard mode only):
-    |  Strip citation markers from query -> chunk (512 chars, 50-char overlap)
-    |  -> BM25+dense retrieval -> RRF fusion -> FlashRank neural reranker -> top 3
-    |  -> LLM analysis (temperature 0.0 for deterministic output)
-    |
-    v
-L5: CLASSIFICATION -- Decision tree -> verdict per reference
-    |  + Corrected APA + BibTeX from database metadata for VALID verdicts
-    |
-    v
-L6: REPORT -- JSON with evidence trail + corrected citations
+Input: PDF / LaTeX / BibTeX / text
+    │
+    ▼
+L1 — Existence cascade  (deterministic, no LLM)
+    CrossRef (DOI authority) → Semantic Scholar → OpenAlex → PubMed
+    + arXiv-to-publication bridge, dead-DOI detection, author cross-validation
+    │  ┌── not found anywhere ──► FABRICATED
+    ▼
+L2 — Metadata validation (deterministic, no LLM)
+    Field-by-field fuzzy comparison: title, authors, venue, year
+    Chimera detection: title matches but author/venue/year wrong → flagged
+    │
+    ▼
+L3 — Semantic verification (2 LLM calls per reference)
+    Chunk cited paper (~512 chars) → decompose claim → retrieve per sub-claim
+    → union + dedupe → verify full claim against the unioned passage set
+    → SUPPORTED / NOT_SUPPORTED + evidence quote
+    │
+    ▼
+Combined per-reference verdict (+ evidence passages + flags)
 ```
 
-### Agentic pipeline
+The multi-query decomposition in L3 is the paper's main technical
+contribution; details in
+[`src/verification/multiquery.py`](src/verification/multiquery.py) and in
+Section 3.2 of the [paper](paper/main.tex).
 
-```
-Input file
-    |
-    v
-L1: PARSE (same as above)
-    |
-    v
-L2: EXISTENCE CHECK (shared with Quick/Standard)
-    |  + Dead DOI detection (HTTP HEAD to doi.org)
-    |  + Author cross-validation (query second DB, flag suspects)
-    |
-    v
-L3: METADATA VALIDATION (shared with Quick/Standard)
-    |
-    v
-TRIAGE -- classify each reference:
-    |  Clear-cut (exact match, obvious fabrication) → resolve by rules (no LLM)
-    |  Ambiguous → dispatch focused agent:
-    |
-    +-- MetadataAgent: investigates metadata discrepancies
-    |   (format-aware author comparison, word-level title diff)
-    +-- ClaimAgent: verifies claims against retrieved passages
-    |
-    v
-L6: REPORT -- JSON with evidence trail + corrected citations
+## Verification modes
+
+| Mode | What it checks | LLM cost | When to use |
+|------|----------------|----------|-------------|
+| `--quick` | L1 + L2 only, rule-based | Free | "Are my references real?" |
+| `--agentic` | L1 + L2 + multi-query L3 with triage (recommended) | ~$0.05/paper | Best accuracy on real papers |
+| `comprehend` | L1 + passage retrieval only, no LLM judgement | Free | "What do my cited papers actually say?" |
+
+## Web UI
+
+```bash
+python app.py      # http://localhost:7860
 ```
 
-### Caching
+Upload a PDF and see one card per reference with the verdict,
+bibliographic record, and the top evidence passage from the cited paper.
+Every card has an inline **Agree / Disagree / Need info** review row
+(FR9) so you can audit the tool's output; the top bar tracks review
+progress and lets you export your decisions as CSV.
 
-- **GROBID XML cache** (`data/cache/grobid_{hash}.xml`)
-- **ParsedPaper cache** (`data/cache/parsed_{hash}.json`)
-- **API response cache** (`data/cache/api_cache.db`) — SQLite, auto-expiring
+## Supported input formats
 
-Re-running the same paper is near-instant. To retry failed references: `--retry-failed`.
+| Format | Notes |
+|--------|-------|
+| `.pdf` | Full analysis. Requires GROBID Docker. |
+| `.tex` | References from companion `.bib` + citing contexts from body. |
+| `.bib` | References only; forces `--quick` mode (no citing context). |
+| `.txt` | Best-effort parsing. Quality depends on formatting. |
+
+Limits: 50 MB, 500 references per paper.
+
+## Configuration
+
+| File | Purpose | Committed? |
+|------|---------|-----------|
+| `.env` | API keys and user-specific secrets | No |
+| `config/config.yaml` | Pipeline knobs (thresholds, models, retrieval) | Yes |
+
+Minimum `.env`:
+
+```bash
+OPENAI_API_KEY=sk-...          # required for --agentic
+S2_API_KEY=...                  # optional but recommended (10× rate limit)
+CROSSREF_MAILTO=you@uni.edu     # optional polite-pool email
+OPENALEX_MAILTO=you@uni.edu     # optional polite-pool email
+```
+
+`--quick` mode works without any API key.
+
+## Reproducing the paper
+
+Every number reported in the paper can be regenerated from the
+benchmark JSONL with a single command:
+
+```bash
+bash experiment/ours/run_all_ablations.sh
+python paper/scripts/make_main_table.py
+```
+
+This runs the main CheckCite configuration plus four single-variable
+ablations (A1 single-query, A2 n_sub=3, A3 sub_top_k=2, A5 3-class
+verifier), writes one JSON per run under
+[`experiment/results/`](experiment/results/), and regenerates
+[`paper/tables/main_results.{csv,md,tex}`](paper/tables/) from those
+JSONs. Total runtime is approximately 5.5 hours on a single machine at
+12-way concurrency; total LLM cost is approximately USD 1.20 at
+published `gpt-4o-mini` pricing.
+
+All experimental code lives under [`experiment/`](experiment/) and
+imports the same primitives used in production (`src/`): there is one
+source of truth per component. See
+[`experiment/README.md`](experiment/README.md) for individual commands
+and [`paper/ablation_plan.md`](paper/ablation_plan.md) for the frozen
+reference configuration each ablation varies from.
+
+Baselines (P3, SemanticCite) are in
+[`experiment/baselines/`](experiment/baselines/) with their own runners;
+Benchmark B (741 citation instances from five sources) lives at
+[`experiment/baselines/benchmark_data/benchmark_enriched.jsonl`](experiment/baselines/benchmark_data/).
 
 ## Output
 
-Reports are saved to `data/output/`. Each citation gets:
-- A verdict (FABRICATED, MISREPRESENTED, VALID, or UNVERIFIABLE)
-- An explanation of why
+Verdicts are written to `data/output/` as JSON. Each reference gets:
+
+- A verdict (`FABRICATED`, `MISREPRESENTED`, `VALID`, or `UNVERIFIABLE`)
+- A natural-language explanation
 - Flags for human review
-- Evidence trail (databases checked, metadata comparison)
-- Retrieved passages with claim verdicts (Standard/Agentic modes)
-- Suggested action (remove citation, verify claim, or no action)
+- Evidence trail: databases checked, metadata comparison
+- Retrieved passages with their relevance scores (Agentic mode)
+- A suggested action (remove citation, verify claim, no action)
+- For `VALID` references in Agentic mode: corrected APA and BibTeX
+  generated from the matched database record.
 
 ## Project structure
 
 ```
 checkcitation/
-+-- app.py                        # Web UI (Gradio)
-+-- .env.example                  # Template for API keys
-+-- config/config.yaml            # Application settings
-+-- src/
-|   +-- config.py                 # Centralized config loader
-|   +-- pipeline.py               # Main orchestrator
-|   +-- __main__.py               # CLI entry point
-|   +-- parsers/                  # L1: BibTeX, LaTeX, text, GROBID (PDF)
-|   +-- citation/                 # Citation detection + context extraction + format detection
-|   +-- verification/
-|   |   +-- existence.py          # L2: Database cascade + web fallback + dead DOI + author cross-validation
-|   |   +-- metadata.py           # L3: Field validation
-|   |   +-- comprehension.py      # Passage retrieval (BM25 + dense + RRF + FlashRank reranker)
-|   |   +-- matching.py           # Fuzzy matching utilities (title, author, year, venue)
-|   |   +-- filters.py            # Citation filtering utilities
-|   |   +-- api_clients/          # CrossRef, S2, OpenAlex, PubMed, Unpaywall, LLM
-|   |   +-- agentic/              # Triage + focused agents (MetadataAgent, ClaimAgent)
-|   +-- classification/           # L5: Decision tree + corrected citation output
-|   +-- report/                   # L6: JSON generation
-|   +-- models/                   # Pydantic data models
-+-- scripts/                      # Benchmark and evaluation scripts
-+-- tests/                        # Unit + integration tests
-+-- data/
-|   +-- cache/                    # API response cache (auto-created)
-|   +-- output/                   # Generated reports (auto-created)
-+-- notes/                        # Design docs and research notes
-+-- requirements.txt
+├── app.py                        Web UI (Gradio)
+├── config/config.yaml            Pipeline settings
+├── src/                          Production code
+│   ├── pipeline.py               Main orchestrator
+│   ├── parsers/                  L1: BibTeX / LaTeX / text / GROBID
+│   ├── citation/                 Citation detection + context extraction
+│   ├── verification/
+│   │   ├── existence.py          L2 cascade: CrossRef → S2 → OpenAlex → PubMed
+│   │   ├── metadata.py           L3 field-level validation + chimera detection
+│   │   ├── multiquery.py         Decomposition + multi-query retrieval
+│   │   ├── comprehension.py      BM25 + dense + RRF + FlashRank
+│   │   ├── agentic/              Triage + MetadataAgent + ClaimAgent
+│   │   └── api_clients/          CrossRef, S2, OpenAlex, PubMed, Unpaywall, LLM
+│   ├── classification/           Final verdict decision tree
+│   └── models/                   Pydantic data models
+├── experiment/                   Paper experiments (imports from src/)
+│   ├── ours/                     Main runner + ablations
+│   ├── baselines/                P3 and SemanticCite for head-to-head
+│   └── results/                  JSON outputs
+├── paper/                        LaTeX sources, tables, figures
+└── tests/                        Unit + integration tests
 ```
 
 ## Running tests
 
 ```bash
 python -m pytest tests/ -v
-python -m pytest tests/ -v --ignore=tests/test_existence.py  # no network
+python -m pytest tests/ -v --ignore=tests/test_existence.py   # offline
 ```
 
-## Evaluation
+## Citing CheckCite
 
-### Benchmark A — Fabrication detection
+If you use CheckCite in research, please cite the paper:
 
-```bash
-python scripts/benchmark.py
+```bibtex
+@misc{checkcite2026,
+  title  = {CheckCite: Decomposed Retrieval and Holistic Verification for Citation Accuracy in Scientific Papers},
+  author = {Muhammed, Diyana and others},
+  year   = {2026},
+  note   = {TPDL 2026 submission}
+}
 ```
 
-### Retrieval evaluation
+A machine-readable `CITATION.cff` is included at the repo root for
+GitHub's citation widget.
 
-```bash
-python scripts/eval_retrieval.py   # BM25 vs Dense vs Hybrid
-python scripts/eval_rrf_k.py       # RRF k parameter sweep
-```
+## Licence
+
+Released under a permissive open-source licence; see `LICENSE`.

@@ -20,7 +20,7 @@ class PaperReport(BaseModel):
 
     input_file: str
     input_format: str
-    mode: str  # "quick", "standard", or "agentic"
+    mode: str  # "quick" (rule-based) or "agentic"
     timestamp: str
     total_references: int
     verdicts: list[CitationVerdict] = Field(default_factory=list)

@@ -165,11 +165,9 @@ def main() -> None:
     sp_verify.add_argument("file", help="Path to input file (.pdf, .tex, .bib, .txt)")
     mode_group = sp_verify.add_mutually_exclusive_group()
     mode_group.add_argument("--quick", dest="mode", action="store_const", const="quick",
-                            help="Quick mode: existence + metadata only (free, fast)")
-    mode_group.add_argument("--standard", dest="mode", action="store_const", const="standard",
-                            help="Standard mode: quick + passage retrieval + LLM claim verification")
+                            help="Quick (rule-based) mode: existence + metadata only (free, fast)")
     mode_group.add_argument("--agentic", dest="mode", action="store_const", const="agentic",
-                            help="Agentic mode: smart triage + focused agents for ambiguous cases")
+                            help="Agentic mode: LLM-driven triage + focused agents for ambiguous cases")
     sp_verify.add_argument("--retry-failed", dest="retry_failed", action="store_true",
                             help="Re-check references that were previously NOT_FOUND (clears failed cache entries)")
     sp_verify.add_argument("--format", dest="output_format", choices=["json", "table"],

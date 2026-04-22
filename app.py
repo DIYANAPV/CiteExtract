@@ -245,10 +245,10 @@ def check_prerequisites(file_path: str, mode: str) -> None:
                 "GROBID is not running. PDF parsing requires GROBID.\n"
                 "Run: docker run -d --name grobid -p 8070:8070 grobid/grobid:0.8.2-crf"
             )
-    if mode in ("standard", "agentic"):
+    if mode == "agentic":
         if not config.openai_api_key():
             raise gr.Error(
-                f"{mode.title()} mode requires an OpenAI API key.\n"
+                "Agentic mode requires an OpenAI API key.\n"
                 "Add OPENAI_API_KEY to your .env file."
             )
 

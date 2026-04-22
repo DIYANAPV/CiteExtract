@@ -1,10 +1,8 @@
 """Main pipeline orchestrator — wires L1 through L6.
 
-Quick mode:         L1 → L2 → L3 → L5 → L6  (existence + metadata, no LLM)
-Standard mode:      Quick + passage retrieval + LLM claim verification
-Agentic mode:       L1 → Agent(L2+L3+L5) → L6  (LLM agent with tool access)
-Hybrid mode:        L1 → L2 → L3 → Triage → focused agents only where needed
-Comprehension mode: L1 → L2 → fulltext → chunk → BM25 retrieve → report
+Quick mode (rule-based): L1 → L2 → L3 → L5 → L6 (existence + metadata, no LLM)
+Agentic mode:            L1 → L2 → L3 → Triage → focused agents where needed
+Comprehension mode:      L1 → L2 → fulltext → chunk → BM25 retrieve → report
 """
 
 import asyncio

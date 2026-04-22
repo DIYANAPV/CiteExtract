@@ -20,7 +20,7 @@ class CitationVerdict(BaseModel):
 
     ref_id: str
     verdict: str = Field(description="FABRICATED, MISREPRESENTED, VALID, UNVERIFIABLE")
-    mode: str = Field(description="'quick', 'standard', or 'agentic'")
+    mode: str = Field(description="'quick' (rule-based) or 'agentic'")
     action: str = Field(description="no_action, verify_claim, remove_citation")
     explanation: str = Field(description="Human-readable summary of why this verdict was given")
     flags: list[str] = Field(default_factory=list)
