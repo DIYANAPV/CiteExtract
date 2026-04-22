@@ -63,7 +63,7 @@ class TestResolveClearRoute:
     def test_clear_valid(self):
         v = resolve_clear_route(_triage(TriageRoute.CLEAR_VALID))
         assert v.verdict == "VALID"
-        assert v.mode == "hybrid"
+        assert v.mode == "agentic"
         assert v.action == "no_action"
 
     def test_clear_fabricated(self):
@@ -96,7 +96,7 @@ class TestMergeMetadata:
         t = _triage(TriageRoute.NEEDS_METADATA)
         v = merge_metadata_verdict(t, "VALID", "Title difference is cosmetic", [])
         assert v.verdict == "VALID"
-        assert v.mode == "hybrid"
+        assert v.mode == "agentic"
         assert "cosmetic" in v.explanation
 
     def test_fabricated_metadata(self):
@@ -105,7 +105,7 @@ class TestMergeMetadata:
         assert v.verdict == "FABRICATED"
         assert v.action == "remove_citation"
         assert "author_mismatch" in v.flags
-        assert "hybrid_agent_used" in v.flags
+        assert "agentic_agent_used" in v.flags
 
     def test_with_discrepancies(self):
         t = _triage(TriageRoute.NEEDS_METADATA)
@@ -143,8 +143,10 @@ class TestMergeClaims:
             ClaimVerdict(verdict="NEUTRAL", explanation="Tangential"),
         ]
         v = merge_claim_verdicts(t, claims)
-        assert v.verdict == "VALID"
-        assert "1 neutral" in v.explanation
+        # Any NEUTRAL means evidence is insufficient — policy: don't call it VALID.
+        assert v.verdict == "UNVERIFIABLE"
+        assert "claim_neutral" in v.flags
+        assert "neutral" in v.explanation
 
     def test_one_contradicts(self):
         t = _triage(TriageRoute.NEEDS_CLAIM)
@@ -170,8 +172,76 @@ class TestMergeClaims:
     def test_empty_claim_list(self):
         t = _triage(TriageRoute.NEEDS_CLAIM)
         v = merge_claim_verdicts(t, [])
-        assert v.verdict == "VALID"
+        # No claims returned means verification didn't actually happen.
+        assert v.verdict == "UNVERIFIABLE"
         assert "claim_verification_empty" in v.flags
+
+    # --- 2-class (SUPPORTED / NOT_SUPPORTED) scheme ---
+
+    def test_binary_all_supported(self):
+        t = _triage(TriageRoute.NEEDS_CLAIM)
+        claims = [
+            ClaimVerdict(verdict="SUPPORTED", explanation="Matches"),
+            ClaimVerdict(verdict="SUPPORTED", explanation="Matches 2"),
+        ]
+        v = merge_claim_verdicts(t, claims)
+        assert v.verdict == "VALID"
+        assert "binary scheme" in v.explanation
+
+    def test_binary_one_not_supported(self):
+        t = _triage(TriageRoute.NEEDS_CLAIM)
+        claims = [
+            ClaimVerdict(verdict="SUPPORTED", explanation="OK"),
+            ClaimVerdict(verdict="NOT_SUPPORTED", explanation="Paper doesn't say this"),
+        ]
+        v = merge_claim_verdicts(t, claims)
+        assert v.verdict == "MISREPRESENTED"
+        assert v.action == "verify_claim"
+        assert "claim_not_supported" in v.flags
+
+    def test_binary_all_not_supported(self):
+        t = _triage(TriageRoute.NEEDS_CLAIM)
+        claims = [
+            ClaimVerdict(verdict="NOT_SUPPORTED", explanation="not addressed"),
+            ClaimVerdict(verdict="NOT_SUPPORTED", explanation="contradicted"),
+        ]
+        v = merge_claim_verdicts(t, claims)
+        assert v.verdict == "MISREPRESENTED"
+        assert "2 citing sentence(s) are not supported" in v.explanation
+
+
+# ---------------------------------------------------------------------------
+# ClaimAgent prompt/schema selector
+# ---------------------------------------------------------------------------
+
+class TestClaimAgentConfig:
+
+    def test_schema_3class(self):
+        from src.verification.agentic.claim_agent import build_verdict_schema
+        schema = build_verdict_schema(3)
+        enum = schema["json_schema"]["schema"]["properties"]["verdicts"]["items"]["properties"]["verdict"]["enum"]
+        assert enum == ["SUPPORTS", "CONTRADICTS", "NEUTRAL"]
+
+    def test_schema_2class(self):
+        from src.verification.agentic.claim_agent import build_verdict_schema
+        schema = build_verdict_schema(2)
+        enum = schema["json_schema"]["schema"]["properties"]["verdicts"]["items"]["properties"]["verdict"]["enum"]
+        assert enum == ["SUPPORTED", "NOT_SUPPORTED"]
+
+    def test_schema_invalid_classes_raises(self):
+        from src.verification.agentic.claim_agent import build_verdict_schema
+        with pytest.raises(ValueError):
+            build_verdict_schema(4)
+
+    def test_prompt_3class_mentions_contradicts(self):
+        from src.verification.agentic.claim_agent import load_claim_prompt
+        assert "CONTRADICTS" in load_claim_prompt(3)
+
+    def test_prompt_2class_mentions_supported(self):
+        from src.verification.agentic.claim_agent import load_claim_prompt
+        p = load_claim_prompt(2)
+        assert "SUPPORTED" in p and "NOT_SUPPORTED" in p
+        assert "CONTRADICTS" not in p
 
 
 # ---------------------------------------------------------------------------
@@ -234,7 +304,8 @@ class TestMergeBoth:
             metadata_flags=[],
             claim_verdicts=None,
         )
-        assert v.verdict == "VALID"
+        assert v.verdict == "UNVERIFIABLE"
+        assert "claim_verification_unavailable" in v.flags
 
 
 # ---------------------------------------------------------------------------
@@ -248,7 +319,7 @@ class TestFallback:
         t = _triage(TriageRoute.NEEDS_METADATA, metadata=_meta())
         v = fallback_to_quick(t)
         assert v.verdict == "UNVERIFIABLE"
-        assert v.mode == "hybrid"
+        assert v.mode == "agentic"
         assert "agent_fallback_to_quick" in v.flags
         assert "Manual review" in v.explanation
 
