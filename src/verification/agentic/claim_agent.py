@@ -1,18 +1,22 @@
-"""Claim Agent — focused LLM agent for verifying citing sentence accuracy.
+"""Claim Agent — LLM agent for verifying citing sentence accuracy.
 
-Only invoked when the triage step identifies substantive citing claims.
+Invoked when the triage step identifies substantive citing claims.
 Receives pre-retrieved passages from the cited paper and judges whether
 the citing sentences accurately represent the source.
 
-Key improvement over the monolithic CitationAgent: **context-awareness**.
 The prompt adapts based on:
 - How many context sentences are available (1 vs 3-4)
 - Whether full text or only abstract was available
 - Whether passages were pre-retrieved or need retrieval via tool
+
+The verdict scheme is selectable via `verdict_classes` (2 or 3). Prompt
+files live in `prompts/claim_{2,3}class.txt` and the JSON schema for
+structured output is built to match.
 """
 
 import json
 import logging
+from pathlib import Path
 from typing import Any, Optional
 
 from openai import AsyncOpenAI
@@ -25,124 +29,90 @@ from src.verification.triage import ContextQuality
 log = logging.getLogger(__name__)
 
 
-# ---------------------------------------------------------------------------
-# System prompt (claim verification only)
-# ---------------------------------------------------------------------------
+_PROMPTS_DIR = Path(__file__).parent / "prompts"
 
-CLAIM_SYSTEM_PROMPT = """\
-Check whether a citing sentence accurately represents the cited paper.
-
-You receive the citation marker (e.g. `[15]`, `(Smith et al., 2020)`), \
-the cited paper's title, passages from it, and the citing sentence with \
-surrounding context.
-
-## First: figure out what THIS citation actually claims
-
-Sentences often cite multiple papers. Look at where the marker sits in \
-the sentence — it tells you what is attributed to this specific paper.
-
-"We used X (A et al.) and Y (B et al.) on dataset Z (C et al.)"
-→ A et al. is cited for X. B et al. for Y. C et al. for Z.
-   Do not verify the whole sentence against one paper.
-
-Common citation purposes:
-- Model/tool/dataset usage ("we used X [1]") — the paper just needs to \
-  describe X. The experiment is the current authors' work.
-- Method reference ("following [5]") — the paper needs to describe the \
-  method. If the sentence is vague about what was followed, pull more \
-  context from the current paper before judging.
-- Factual claim ("X showed 30% improvement [2]") — check the number.
-- Background ("several approaches exist [3,4]") — paper just needs to \
-  be relevant.
-
-## Then: decide if you need more information
-
-If the citing sentence is vague about what was actually done — "we \
-followed [5]", "we adapted [3]", "similar to [8]" — you may not have \
-enough context to judge. Use retrieve_current_paper_context to search \
-the current paper for what the authors actually did.
-
-Skip this step when the claim is self-contained — "we used BERT [1]" \
-or "accuracy was 95% [2]" need no extra context.
-
-## Finally: verdict
-
-- **SUPPORTS** — the sub-claim checks out against the passages. For \
-  model/tool citations, confirming the paper describes that model/tool \
-  is sufficient.
-- **CONTRADICTS** — the passages say something different from what the \
-  citing sentence attributes to this paper, or the sentence exaggerates \
-  or cherry-picks.
-- **NEUTRAL** — the passages do not clearly address the sub-claim. \
-  Normal for background citations.
-
-Ground your judgment in the passages and abstract only. Quote the \
-relevant text. Evaluate each citing context separately.
-
-## Tools
-- **retrieve_cited_paper_passages** — re-retrieve from the cited paper \
-  if pre-retrieved passages miss the sub-claim entirely.
-- **retrieve_current_paper_context** — search the current paper \
-  (the one containing the citation) for more detail about what the \
-  authors actually did. Use when the citing sentence alone is too vague."""
-
-
-# ---------------------------------------------------------------------------
-# Claim verdict JSON schema
-# ---------------------------------------------------------------------------
-
-CLAIM_VERDICT_SCHEMA: dict[str, Any] = {
-    "type": "json_schema",
-    "json_schema": {
-        "name": "claim_verdicts",
-        "strict": True,
-        "schema": {
-            "type": "object",
-            "properties": {
-                "verdicts": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "citing_sentence": {
-                                "type": "string",
-                                "description": "The citing sentence being evaluated.",
-                            },
-                            "citation_type": {
-                                "type": "string",
-                                "description": "Type of citation: model_usage, method_reference, factual_claim, theoretical, background, contrast.",
-                            },
-                            "sub_claim": {
-                                "type": "string",
-                                "description": "The specific sub-claim attributed to this reference (not the full sentence).",
-                            },
-                            "verdict": {
-                                "type": "string",
-                                "enum": ["SUPPORTS", "CONTRADICTS", "NEUTRAL"],
-                            },
-                            "explanation": {
-                                "type": "string",
-                                "description": "Reasoning for this verdict.",
-                            },
-                            "evidence_quote": {
-                                "type": "string",
-                                "description": "Most relevant quote from passages.",
-                            },
-                        },
-                        "required": [
-                            "citing_sentence", "citation_type", "sub_claim",
-                            "verdict", "explanation", "evidence_quote",
-                        ],
-                        "additionalProperties": False,
-                    },
-                    "description": "One verdict per citing sentence.",
-                },
-            },
-            "required": ["verdicts"],
-            "additionalProperties": False,
-        },
-    },
+# Valid verdict values per scheme.
+_VERDICT_VALUES: dict[int, list[str]] = {
+    3: ["SUPPORTS", "CONTRADICTS", "NEUTRAL"],
+    2: ["SUPPORTED", "NOT_SUPPORTED"],
 }
+
+# Default fallback verdict when the model can't decide or an error occurs.
+_DEFAULT_VERDICT: dict[int, str] = {
+    3: "NEUTRAL",
+    2: "NOT_SUPPORTED",
+}
+
+
+def load_claim_prompt(verdict_classes: int) -> str:
+    """Load the system prompt text for the chosen verdict scheme."""
+    if verdict_classes not in _VERDICT_VALUES:
+        raise ValueError(f"verdict_classes must be 2 or 3, got {verdict_classes}")
+    path = _PROMPTS_DIR / f"claim_{verdict_classes}class.txt"
+    return path.read_text(encoding="utf-8")
+
+
+def build_verdict_schema(verdict_classes: int) -> dict[str, Any]:
+    """Build the structured-output JSON schema for the chosen verdict scheme."""
+    if verdict_classes not in _VERDICT_VALUES:
+        raise ValueError(f"verdict_classes must be 2 or 3, got {verdict_classes}")
+    return {
+        "type": "json_schema",
+        "json_schema": {
+            "name": "claim_verdicts",
+            "strict": True,
+            "schema": {
+                "type": "object",
+                "properties": {
+                    "verdicts": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "citing_sentence": {
+                                    "type": "string",
+                                    "description": "The citing sentence being evaluated.",
+                                },
+                                "citation_type": {
+                                    "type": "string",
+                                    "enum": [
+                                        "model_usage", "method_reference",
+                                        "factual_claim", "theoretical",
+                                        "background", "contrast", "other",
+                                    ],
+                                    "description": "Type of citation being made.",
+                                },
+                                "sub_claim": {
+                                    "type": "string",
+                                    "description": "The specific sub-claim attributed to this reference (not the full sentence).",
+                                },
+                                "verdict": {
+                                    "type": "string",
+                                    "enum": _VERDICT_VALUES[verdict_classes],
+                                },
+                                "explanation": {
+                                    "type": "string",
+                                    "description": "Reasoning for this verdict.",
+                                },
+                                "evidence_quote": {
+                                    "type": "string",
+                                    "description": "Most relevant quote from passages.",
+                                },
+                            },
+                            "required": [
+                                "citing_sentence", "citation_type", "sub_claim",
+                                "verdict", "explanation", "evidence_quote",
+                            ],
+                            "additionalProperties": False,
+                        },
+                        "description": "One verdict per citing sentence.",
+                    },
+                },
+                "required": ["verdicts"],
+                "additionalProperties": False,
+            },
+        },
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -165,10 +135,9 @@ def _format_context_quality_note(quality: ContextQuality) -> str:
     notes = []
     if quality.total_sentences == 1:
         notes.append(
-            "NOTE: Only the citing sentence itself was available (it sits at "
-            "a paragraph boundary). No surrounding sentences could be "
-            "extracted. Be conservative — lean toward NEUTRAL when evidence "
-            "is ambiguous."
+            "NOTE: Only the citing sentence itself was available (no "
+            "surrounding sentences). Focus on what the sentence explicitly "
+            "claims about this specific paper."
         )
     else:
         if not quality.has_before:
@@ -222,10 +191,9 @@ def build_claim_user_message(
     # Source quality note
     if full_text_source == "abstract_only" or not full_text_available:
         parts.append(
-            "\n**IMPORTANT**: Only the paper's abstract was available "
-            "(full text is paywalled or unavailable). Specific method/result "
-            "claims cannot be fully verified against the abstract alone. "
-            "Lean toward NEUTRAL for detailed claims."
+            "\nNote: Only the paper's abstract was available "
+            "(full text is paywalled or unavailable). Base your "
+            "judgment on the abstract and any retrieved passages."
         )
     else:
         parts.append(f"\n*Full text available via: {full_text_source}*")
@@ -303,6 +271,7 @@ class ClaimAgent:
         max_tokens: int = 1024,
         timeout: int = 60,
         cost_tracker: Optional[CostTracker] = None,
+        verdict_classes: int = 3,
     ) -> None:
         self._client = openai_client
         self._tools = tool_executor
@@ -312,6 +281,10 @@ class ClaimAgent:
         self._max_tokens = max_tokens
         self._timeout = timeout
         self._cost_tracker = cost_tracker or CostTracker()
+        self._verdict_classes = verdict_classes
+        self._system_prompt = load_claim_prompt(verdict_classes)
+        self._verdict_schema = build_verdict_schema(verdict_classes)
+        self._default_verdict = _DEFAULT_VERDICT[verdict_classes]
 
     @property
     def cost_tracker(self) -> CostTracker:
@@ -333,12 +306,12 @@ class ClaimAgent:
         """
         self._expected_count = expected_count
         messages: list[dict] = [
-            {"role": "system", "content": CLAIM_SYSTEM_PROMPT},
+            {"role": "system", "content": self._system_prompt},
             {"role": "user", "content": user_message},
         ]
 
         # --- Tool-calling loop (usually 0 rounds — just judgment) ---
-        for round_num in range(self._max_tool_rounds):
+        for _round in range(self._max_tool_rounds):
             kwargs: dict[str, Any] = {
                 "model": self._model,
                 "messages": messages,
@@ -352,12 +325,25 @@ class ClaimAgent:
                 kwargs["tool_choice"] = "auto"
 
             response = await self._client.chat.completions.create(**kwargs)
+
+            # #9: Guard against empty choices
+            if not response.choices:
+                log.error("ClaimAgent: API returned empty choices")
+                break
+
             choice = response.choices[0]
 
             if response.usage:
                 self._cost_tracker.add(
                     response.usage.prompt_tokens,
                     response.usage.completion_tokens,
+                )
+
+            # #8: Log when response was truncated
+            if choice.finish_reason == "length":
+                log.warning(
+                    f"ClaimAgent: response truncated (finish_reason=length, "
+                    f"max_tokens={self._max_tokens})"
                 )
 
             if choice.finish_reason != "tool_calls" or not choice.message.tool_calls:
@@ -370,8 +356,14 @@ class ClaimAgent:
                 try:
                     fn_args = json.loads(tool_call.function.arguments)
                 except json.JSONDecodeError:
-                    log.warning(f"ClaimAgent: invalid JSON args for {fn_name}, using empty dict")
-                    fn_args = {}
+                    # #7: Skip the tool call instead of sending empty args
+                    log.warning(f"ClaimAgent: invalid JSON args for {fn_name}, skipping tool call")
+                    messages.append({
+                        "role": "tool",
+                        "tool_call_id": tool_call.id,
+                        "content": json.dumps({"error": f"Invalid arguments for {fn_name}"}),
+                    })
+                    continue
 
                 log.debug(f"ClaimAgent calling tool: {fn_name}({fn_args})")
                 result = await self._tools.execute(fn_name, fn_args)
@@ -382,7 +374,11 @@ class ClaimAgent:
                     "content": json.dumps(result, default=str),
                 })
         else:
-            log.warning(f"ClaimAgent hit max_tool_rounds ({self._max_tool_rounds})")
+            # Only a real concern when we actually allowed tool rounds and
+            # exhausted them. With max_tool_rounds=0 this branch fires on
+            # the trivial "0 iterations" case, which isn't noteworthy.
+            if self._max_tool_rounds > 0:
+                log.warning(f"ClaimAgent hit max_tool_rounds ({self._max_tool_rounds})")
 
         # --- Final structured verdict ---
         return await self._get_verdicts(messages)
@@ -392,7 +388,7 @@ class ClaimAgent:
         messages_copy = list(messages)
         messages_copy.append({
             "role": "user",
-            "content": "Provide your final claim verdicts now as JSON.",
+            "content": "Based on the evidence you reviewed above, provide your final verdicts as JSON. Include the most relevant quote for each verdict.",
         })
 
         try:
@@ -402,7 +398,7 @@ class ClaimAgent:
                 temperature=self._temperature,
                 max_tokens=self._max_tokens,
                 timeout=self._timeout,
-                response_format=CLAIM_VERDICT_SCHEMA,
+                response_format=self._verdict_schema,
             )
 
             if response.usage:
@@ -417,28 +413,17 @@ class ClaimAgent:
             verdicts = []
             for v in data.get("verdicts", []):
                 verdicts.append(ClaimVerdict(
-                    verdict=v.get("verdict", "NEUTRAL"),
+                    verdict=v.get("verdict", self._default_verdict),
                     explanation=v.get("explanation", ""),
                     evidence_quote=v.get("evidence_quote", ""),
                 ))
 
-            # Guard: LLM returned fewer verdicts than expected
             if not verdicts:
-                log.warning("ClaimAgent returned empty verdicts array")
-                verdicts = [
-                    ClaimVerdict(verdict="NEUTRAL", explanation="No verdict returned by agent.")
-                    for _ in range(max(1, self._expected_count))
-                ]
+                log.error("ClaimAgent returned empty verdicts array")
+                raise RuntimeError("ClaimAgent returned no verdicts")
+
             return verdicts
 
         except Exception as e:
             log.error(f"ClaimAgent verdict failed: {e}")
-            # Return one NEUTRAL verdict per expected citing context
-            return [
-                ClaimVerdict(
-                    verdict="NEUTRAL",
-                    explanation=f"Claim agent failed: {str(e)[:200]}",
-                    evidence_quote="",
-                )
-                for _ in range(max(1, self._expected_count))
-            ]
+            raise

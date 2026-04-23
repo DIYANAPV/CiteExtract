@@ -35,7 +35,11 @@ apis:
 
 rate_limits:
   crossref: [40, 1]                 # [max_rate, time_period_seconds]
-  semantic_scholar: [9, 1]
+  # S2 free-tier (even with API key) is 1 req/s shared across endpoints.
+  # Going higher triggers 429 + exponential backoff, which is slower than
+  # honoring the limit. Only raise this if you've been approved for a
+  # higher-throughput key by emailing api@semanticscholar.org.
+  semantic_scholar: [1, 1]
   openalex: [9, 1]
   pubmed: [2, 1]
   unpaywall: [10, 1]                # 100K/day, ~10/s is polite
@@ -81,7 +85,12 @@ agentic:
     max_tool_rounds: 5
     max_tokens: 2048
   claim_agent:
-    max_tool_rounds: 2
+    # 0 = skip the tool-calling phase entirely. Passages are already
+    # pre-retrieved and handed to the agent in the user message, so extra
+    # tool rounds cost an LLM call each without producing new evidence.
+    # Raise to 1+ only if you've seen the agent need more passages than
+    # pre_retrieve provided.
+    max_tool_rounds: 0
     max_tokens: 2048
     verdict_classes: 3              # 2 (SUPPORTED/NOT_SUPPORTED) or 3 (SUPPORTS/CONTRADICTS/NEUTRAL)
     enable_multiquery: true         # decompose claim + retrieve per sub-claim at pre-retrieval
