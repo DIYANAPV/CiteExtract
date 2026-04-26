@@ -3,13 +3,14 @@
 import pytest
 
 from src.verification.comprehension import (
+    RetrievalIndex,
+    build_retrieval_index,
     chunk_text,
+    reciprocal_rank_fusion,
     retrieve_passages_bm25,
     retrieve_passages_dense,
     retrieve_passages_hybrid,
-    reciprocal_rank_fusion,
-    _split_paragraphs,
-    _split_if_long,
+    retrieve_with_index,
 )
 from src.models.comprehension import Chunk, ScoredChunk
 
@@ -58,43 +59,6 @@ SAMPLE_SECTIONS = [
 
 
 # ---- Paragraph splitting ----
-
-class TestSplitParagraphs:
-    def test_double_newline(self):
-        text = "First paragraph.\n\nSecond paragraph.\n\nThird paragraph."
-        parts = _split_paragraphs(text)
-        assert len(parts) == 3
-
-    def test_extra_whitespace(self):
-        text = "First.\n  \n  Second.\n\n\n\nThird."
-        parts = _split_paragraphs(text)
-        assert len(parts) == 3
-
-    def test_single_newline_not_split(self):
-        text = "Line one.\nLine two still same paragraph."
-        parts = _split_paragraphs(text)
-        assert len(parts) == 1
-
-    def test_empty(self):
-        assert _split_paragraphs("") == []
-        assert _split_paragraphs("   ") == []
-
-
-class TestSplitIfLong:
-    def test_short_text_unchanged(self):
-        text = "This is short."
-        assert _split_if_long(text) == [text]
-
-    def test_long_text_splits(self):
-        # Build a 1200+ char text
-        sentences = [f"Sentence number {i} with some padding text to make it longer." for i in range(30)]
-        text = " ".join(sentences)
-        assert len(text) > 800
-        parts = _split_if_long(text)
-        assert len(parts) > 1
-        # All parts should be non-empty
-        assert all(p.strip() for p in parts)
-
 
 # ---- Chunking ----
 
@@ -287,3 +251,96 @@ class TestRetrieveHybrid:
         chunks = chunk_text(SAMPLE_PAPER_TEXT)
         results = retrieve_passages_hybrid("attention", chunks, top_k=2)
         assert len(results) <= 2
+
+
+# ---- RetrievalIndex parity ----
+
+# These tests prove that build_retrieval_index + retrieve_with_index returns
+# byte-identical results to the one-shot retrieve_passages_* functions for
+# every query. That parity is the safety guarantee for reusing one index
+# across many queries in the agentic hot path — without it, deduplicated
+# work could silently shift verdicts.
+
+PARITY_QUERIES = [
+    "attention mechanism for neural networks",
+    "BLEU score on English-to-German machine translation benchmark",
+    "transformer model architecture",
+    "recurrent networks sequential computation",
+    "weighted sum of values with compatibility function",
+]
+
+
+def _passage_keys(results):
+    """Identity tuple per result that is robust to harmless float jitter."""
+    return [
+        (
+            r.chunk.paragraph_index,
+            round(r.bm25_score, 6),
+            round(r.dense_score, 6) if r.dense_score is not None else None,
+            round(r.rrf_score, 6) if r.rrf_score is not None else None,
+        )
+        for r in results
+    ]
+
+
+class TestRetrievalIndexParity:
+    def test_bm25_only_index_matches_oneshot(self):
+        chunks = chunk_text(SAMPLE_PAPER_TEXT)
+        index = build_retrieval_index(chunks, model_name=None)
+        for query in PARITY_QUERIES:
+            from_index = retrieve_with_index(query, index, top_k=3)
+            from_oneshot = retrieve_passages_bm25(query, chunks, top_k=3)
+            assert _passage_keys(from_index) == _passage_keys(from_oneshot), (
+                f"BM25 parity failed for query: {query!r}"
+            )
+
+    def test_hybrid_index_matches_oneshot(self):
+        chunks = chunk_text(SAMPLE_PAPER_TEXT)
+        index = build_retrieval_index(chunks, model_name="all-MiniLM-L6-v2")
+        for query in PARITY_QUERIES:
+            from_index = retrieve_with_index(query, index, top_k=3)
+            from_oneshot = retrieve_passages_hybrid(
+                query, chunks, top_k=3, model_name="all-MiniLM-L6-v2",
+            )
+            assert _passage_keys(from_index) == _passage_keys(from_oneshot), (
+                f"Hybrid parity failed for query: {query!r}"
+            )
+
+    def test_index_reuse_is_idempotent(self):
+        # Same query twice against the same reused index returns identical
+        # results — guards against bm25s/sentence-transformers state bleed.
+        chunks = chunk_text(SAMPLE_PAPER_TEXT)
+        index = build_retrieval_index(chunks, model_name="all-MiniLM-L6-v2")
+        first = retrieve_with_index("attention", index, top_k=3)
+        second = retrieve_with_index("attention", index, top_k=3)
+        assert _passage_keys(first) == _passage_keys(second)
+
+    def test_empty_chunks(self):
+        index = build_retrieval_index([], model_name="all-MiniLM-L6-v2")
+        assert index.chunks == []
+        assert index.has_dense is False  # empty corpus skips encoding
+        assert retrieve_with_index("anything", index, top_k=3) == []
+
+    def test_has_dense_flag(self):
+        chunks = chunk_text(SAMPLE_PAPER_TEXT)
+        bm25_only = build_retrieval_index(chunks, model_name=None)
+        hybrid = build_retrieval_index(chunks, model_name="all-MiniLM-L6-v2")
+        assert bm25_only.has_dense is False
+        assert hybrid.has_dense is True
+
+    def test_bm25_only_index_returns_no_rrf_score(self):
+        # When the index has no dense embeddings, retrieve_with_index falls
+        # back to BM25 top_k (no RRF, no rerank). rrf_score must be None to
+        # match the shape of retrieve_passages_bm25.
+        chunks = chunk_text(SAMPLE_PAPER_TEXT)
+        index = build_retrieval_index(chunks, model_name=None)
+        results = retrieve_with_index("attention", index, top_k=3)
+        assert len(results) > 0
+        assert all(r.rrf_score is None for r in results)
+        assert all(r.dense_score is None for r in results)
+
+    def test_index_is_frozen(self):
+        chunks = chunk_text(SAMPLE_PAPER_TEXT)
+        index = build_retrieval_index(chunks, model_name=None)
+        with pytest.raises(Exception):  # FrozenInstanceError
+            index.chunks = []  # type: ignore[misc]

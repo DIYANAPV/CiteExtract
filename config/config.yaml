@@ -6,7 +6,12 @@
 grobid:
   service_url: "http://localhost:8070"
   timeout: 120
-  concurrency: 4                    # HTTP connection pool size to GROBID
+  concurrency: 4                    # HTTP connection pool size to GROBID (L1 parser)
+  # Cap on concurrent full-text PDF extractions during the agentic
+  # pre-retrieve stage. The GROBID image ships with an internal pool of
+  # ~10 threads; staying under that avoids queue buildup and timeouts.
+  # Tune down if you see GROBID 5xx in logs, up if you have a beefier box.
+  extract_concurrency: 8
   health_check_timeout: 5           # seconds to wait for /api/isalive
   docker_image: "grobid/grobid:0.8.2-crf"
   retry:
@@ -99,7 +104,6 @@ agentic:
       full_top_k: 3                 # passages retrieved for the full claim
       sub_top_k: 3                  # passages retrieved per sub-claim (before dedup)
   triage:
-    title_exact_threshold: 0.95    # above this = title match, no agent needed
     min_databases_for_fabricated: 2
 
 # Claim verification (Standard mode: passage retrieval + LLM analysis)
@@ -111,6 +115,11 @@ claim_verification:
 
 # LLM pricing (for cost tracking)
 llm:
+  # Hard cap on LLM spend per paper for the GROBID-fallback ref parser.
+  # Typical papers run ~$0.02; this guards against runaways from misconfigured
+  # models or pathological 500-reference review articles. Raise only if you've
+  # measured a legitimate workload exceeding it.
+  max_cost_per_paper: 0.50          # USD
   pricing:
     input_cost_per_million: 0.15    # USD per 1M input tokens
     output_cost_per_million: 0.60   # USD per 1M output tokens

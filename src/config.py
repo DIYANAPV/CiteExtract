@@ -123,10 +123,14 @@ def grobid() -> dict:
     """GROBID service configuration."""
     section = _get_section("grobid")
     retry = section.get("retry", {})
+    concurrency = section.get("concurrency", 4)
     return {
         "service_url": os.environ.get("GROBID_SERVICE_URL", section.get("service_url", "http://localhost:8070")),
         "timeout": section.get("timeout", 120),
-        "concurrency": section.get("concurrency", 4),
+        "concurrency": concurrency,
+        # Default to the L1 pool size when unset so deployments without
+        # the new key keep their prior behavior.
+        "extract_concurrency": section.get("extract_concurrency", concurrency),
         "health_check_timeout": section.get("health_check_timeout", 5),
         "docker_image": section.get("docker_image", "grobid/grobid:0.8.2-crf"),
         "retry_max_attempts": retry.get("max_attempts", 3),
@@ -163,7 +167,11 @@ def rate_limits() -> dict[str, tuple[int, int]]:
     section = _get_section("rate_limits")
     defaults = {
         "crossref": (40, 1),
-        "semantic_scholar": (9, 1),
+        # S2 free-tier (with or without API key) is 1 req/s. Going higher
+        # trips 429 + exponential backoff which is slower than honouring the
+        # cap. Match config.yaml's documented value so a missing config file
+        # doesn't silently produce 429-storms.
+        "semantic_scholar": (1, 1),
         "openalex": (9, 1),
         "pubmed": (2, 1),
     }
@@ -214,6 +222,7 @@ def cache() -> dict:
         "ttl_abstract": section.get("ttl_abstract", 30 * 86400),
         "ttl_retraction": section.get("ttl_retraction", 7 * 86400),
         "ttl_not_found": section.get("ttl_not_found", 7 * 86400),
+        "ttl_fulltext": section.get("ttl_fulltext", 7 * 86400),
     }
 
 

@@ -11,11 +11,22 @@ SemanticCite (Haan 2025)):
 
 Dense model is lazy-loaded on first call to avoid startup cost when
 only BM25 is needed (e.g. --quick mode).
+
+Two retrieval entry points are exposed:
+
+- ``retrieve_passages_bm25 / _dense / _hybrid`` — one-shot calls that build
+  the index internally. Convenient for ad-hoc lookups (agent tools, tests,
+  the non-agentic comprehension fallback).
+- ``build_retrieval_index`` + ``retrieve_with_index`` — split the work so a
+  single document's index can be reused across many queries. Used in the
+  agentic hot path where one cited paper is queried by every citing
+  sentence and every multi-query sub-claim.
 """
 
 import functools
 import logging
 import re
+from dataclasses import dataclass, field
 from typing import Optional
 
 import bm25s
@@ -206,7 +217,162 @@ def _add_overlap(pieces: list[str], overlap: int = _CHUNK_OVERLAP) -> list[str]:
 
 
 # ---------------------------------------------------------------------------
-# BM25 retrieval (Phase A)
+# Reusable retrieval index
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class RetrievalIndex:
+    """Pre-built BM25 + (optional) dense state for one document.
+
+    Build once per document, query many times. Reusing the index across
+    citing sentences and sub-claims for the same cited paper avoids
+    re-tokenizing the BM25 corpus and re-encoding it for the dense model
+    on every query.
+
+    Treat the underscore-prefixed fields as private — call
+    ``retrieve_with_index`` instead of touching them directly.
+    """
+
+    chunks: list[Chunk]
+    _bm25: Optional[bm25s.BM25] = None
+    _model_name: Optional[str] = None
+    _corpus_emb: Optional[np.ndarray] = field(default=None, repr=False)
+
+    @property
+    def has_dense(self) -> bool:
+        return self._corpus_emb is not None
+
+
+def build_retrieval_index(
+    chunks: list[Chunk],
+    model_name: Optional[str] = None,
+) -> RetrievalIndex:
+    """Tokenize + index chunks once for repeated retrieval.
+
+    When ``model_name`` is supplied, the corpus is also pre-encoded so
+    dense queries don't pay the encoding cost on every call. Pass
+    ``model_name=None`` for BM25-only.
+    """
+    if not chunks:
+        return RetrievalIndex(chunks=[], _model_name=model_name)
+
+    corpus = [c.text for c in chunks]
+
+    corpus_tokens = bm25s.tokenize(corpus, show_progress=False)
+    bm25 = bm25s.BM25()
+    bm25.index(corpus_tokens, show_progress=False)
+
+    corpus_emb: Optional[np.ndarray] = None
+    if model_name:
+        model = _get_dense_model(model_name)
+        corpus_emb = model.encode(
+            corpus, normalize_embeddings=True, show_progress_bar=False,
+        )
+
+    return RetrievalIndex(
+        chunks=chunks,
+        _bm25=bm25,
+        _model_name=model_name,
+        _corpus_emb=corpus_emb,
+    )
+
+
+def _bm25_top_k(query: str, index: RetrievalIndex, top_k: int) -> list[ScoredChunk]:
+    """BM25 retrieval against a pre-built index."""
+    if not index.chunks or index._bm25 is None:
+        return []
+    query_tokens = bm25s.tokenize([query], show_progress=False)
+    k = min(top_k, len(index.chunks))
+    results, scores = index._bm25.retrieve(query_tokens, k=k)
+    scored: list[ScoredChunk] = []
+    for i in range(results.shape[1]):
+        idx = int(results[0, i])
+        score = float(scores[0, i])
+        if score <= 0:
+            continue
+        scored.append(ScoredChunk(chunk=index.chunks[idx], bm25_score=score))
+    return scored
+
+
+def _dense_top_k(query: str, index: RetrievalIndex, top_k: int) -> list[ScoredChunk]:
+    """Dense retrieval against a pre-built index."""
+    if not index.chunks or index._corpus_emb is None or index._model_name is None:
+        return []
+    model = _get_dense_model(index._model_name)
+    query_emb = model.encode([query], normalize_embeddings=True)
+    similarities = (query_emb @ index._corpus_emb.T)[0]
+    k = min(top_k, len(index.chunks))
+    top_indices = np.argsort(similarities)[::-1][:k]
+    scored: list[ScoredChunk] = []
+    for idx in top_indices:
+        sim = float(similarities[idx])
+        if sim <= 0:
+            continue
+        scored.append(ScoredChunk(
+            chunk=index.chunks[idx], bm25_score=0.0, dense_score=sim,
+        ))
+    return scored
+
+
+def retrieve_with_index(
+    query: str,
+    index: RetrievalIndex,
+    *,
+    top_k: int = 3,
+    bm25_candidates: int = 10,
+    dense_candidates: int = 10,
+    rrf_k: int = 60,
+) -> list[ScoredChunk]:
+    """Hybrid (BM25 + dense + RRF + optional FlashRank) against a pre-built index.
+
+    When the index has no dense embeddings, falls back to BM25-only and
+    returns ScoredChunk objects with ``rrf_score=None`` — matching the
+    shape returned by ``retrieve_passages_bm25`` so callers can treat
+    both paths interchangeably.
+    """
+    if not index.chunks:
+        return []
+
+    bm25_results = _bm25_top_k(query, index, top_k=bm25_candidates)
+
+    if not index.has_dense:
+        # BM25-only: just take the top_k. No RRF, no rerank — matches the
+        # shape of the legacy retrieve_passages_bm25 path.
+        return bm25_results[:top_k]
+
+    dense_results = _dense_top_k(query, index, top_k=dense_candidates)
+
+    chunk_idx_map: dict[int, int] = {
+        c.paragraph_index: i for i, c in enumerate(index.chunks)
+    }
+    bm25_ranking = [
+        (chunk_idx_map[r.chunk.paragraph_index], r.bm25_score) for r in bm25_results
+    ]
+    dense_ranking = [
+        (chunk_idx_map[r.chunk.paragraph_index], r.dense_score or 0.0)
+        for r in dense_results
+    ]
+    bm25_scores = {idx: score for idx, score in bm25_ranking}
+    dense_scores = {idx: score for idx, score in dense_ranking}
+
+    merged = reciprocal_rank_fusion([bm25_ranking, dense_ranking], k=rrf_k)
+    reranked = _rerank_with_flashrank(query, merged[:15], index.chunks, top_k=top_k)
+    final = reranked if reranked is not None else merged[:top_k]
+
+    scored: list[ScoredChunk] = []
+    for doc_idx, score in final:
+        scored.append(ScoredChunk(
+            chunk=index.chunks[doc_idx],
+            bm25_score=bm25_scores.get(doc_idx, 0.0),
+            dense_score=dense_scores.get(doc_idx),
+            rrf_score=score,
+        ))
+    return scored
+
+
+# ---------------------------------------------------------------------------
+# BM25 retrieval (Phase A) — one-shot wrappers
 # ---------------------------------------------------------------------------
 
 
@@ -215,44 +381,20 @@ def retrieve_passages_bm25(
     chunks: list[Chunk],
     top_k: int = 3,
 ) -> list[ScoredChunk]:
-    """Retrieve the most relevant chunks for a citing sentence using BM25.
+    """One-shot BM25 retrieval (builds an index per call).
+
+    Convenience wrapper around ``build_retrieval_index`` +
+    ``_bm25_top_k``. Use ``build_retrieval_index`` directly if you'll
+    issue more than one query against the same chunks.
 
     Uses bm25s (fast sparse retrieval) following the approach from
     Citation Integrity (Sarol et al. 2024) who showed BM25 is a strong
     baseline for citance-to-passage matching.
-
-    Args:
-        query: The citing sentence (the claim to match against).
-        chunks: List of Chunk objects from chunk_text().
-        top_k: Number of top passages to return.
-
-    Returns:
-        List of ScoredChunk sorted by descending BM25 score.
     """
     if not chunks:
         return []
-
-    corpus = [c.text for c in chunks]
-
-    # bm25s tokenize + index
-    corpus_tokens = bm25s.tokenize(corpus, show_progress=False)
-    retriever = bm25s.BM25()
-    retriever.index(corpus_tokens, show_progress=False)
-
-    # Query
-    query_tokens = bm25s.tokenize([query], show_progress=False)
-    k = min(top_k, len(chunks))
-    results, scores = retriever.retrieve(query_tokens, k=k)
-
-    scored: list[ScoredChunk] = []
-    for i in range(results.shape[1]):
-        idx = int(results[0, i])
-        score = float(scores[0, i])
-        if score <= 0:
-            continue
-        scored.append(ScoredChunk(chunk=chunks[idx], bm25_score=score))
-
-    return scored
+    index = build_retrieval_index(chunks, model_name=None)
+    return _bm25_top_k(query, index, top_k=top_k)
 
 
 # ---------------------------------------------------------------------------
@@ -280,49 +422,19 @@ def retrieve_passages_dense(
     top_k: int = 10,
     model_name: str = "all-MiniLM-L6-v2",
 ) -> list[ScoredChunk]:
-    """Retrieve relevant chunks using dense embeddings + cosine similarity.
+    """One-shot dense retrieval (builds an index per call).
+
+    Convenience wrapper around ``build_retrieval_index`` +
+    ``_dense_top_k``. Use ``build_retrieval_index`` directly if you'll
+    issue more than one query against the same chunks.
 
     Follows SemanticCite's approach of embedding query + chunks with
     sentence-transformers, but without the ChromaDB/LangChain overhead.
-
-    Args:
-        query: The citing sentence.
-        chunks: Chunks from chunk_text().
-        top_k: Number of top passages to return.
-        model_name: HuggingFace model name for sentence-transformers.
-
-    Returns:
-        List of ScoredChunk sorted by descending cosine similarity.
     """
     if not chunks:
         return []
-
-    model = _get_dense_model(model_name)
-    corpus = [c.text for c in chunks]
-
-    # Encode query and corpus
-    query_emb = model.encode([query], normalize_embeddings=True)
-    corpus_emb = model.encode(corpus, normalize_embeddings=True, show_progress_bar=False)
-
-    # Cosine similarity (embeddings are normalized, so dot product = cosine)
-    similarities = (query_emb @ corpus_emb.T)[0]
-
-    # Top-k indices
-    k = min(top_k, len(chunks))
-    top_indices = np.argsort(similarities)[::-1][:k]
-
-    scored: list[ScoredChunk] = []
-    for idx in top_indices:
-        sim = float(similarities[idx])
-        if sim <= 0:
-            continue
-        scored.append(ScoredChunk(
-            chunk=chunks[idx],
-            bm25_score=0.0,
-            dense_score=sim,
-        ))
-
-    return scored
+    index = build_retrieval_index(chunks, model_name=model_name)
+    return _dense_top_k(query, index, top_k=top_k)
 
 
 # ---------------------------------------------------------------------------
@@ -441,65 +553,25 @@ def retrieve_passages_hybrid(
     dense_candidates: int = 10,
     rrf_k: int = 60,
 ) -> list[ScoredChunk]:
-    """Hybrid BM25 + dense retrieval with RRF fusion and neural reranking.
+    """One-shot hybrid retrieval (builds an index per call).
+
+    Convenience wrapper around ``build_retrieval_index`` +
+    ``retrieve_with_index``. Use those directly when issuing more than
+    one query against the same chunks.
 
     Pipeline: BM25(10) + Dense(10) → RRF merge → FlashRank rerank → top k.
     Falls back to RRF-only if FlashRank is not installed.
-
-    Args:
-        query: The citing sentence.
-        chunks: Chunks from chunk_text().
-        top_k: Number of final passages to return.
-        model_name: Dense embedding model name.
-        bm25_candidates: How many BM25 candidates to feed into RRF.
-        dense_candidates: How many dense candidates to feed into RRF.
-        rrf_k: RRF constant (default 60).
-
-    Returns:
-        List of ScoredChunk with bm25_score, dense_score, and rrf_score.
     """
     if not chunks:
         return []
-
-    # Run both retrievers
-    bm25_results = retrieve_passages_bm25(query, chunks, top_k=bm25_candidates)
-    dense_results = retrieve_passages_dense(query, chunks, top_k=dense_candidates, model_name=model_name)
-
-    # Build index maps: chunk paragraph_index -> position in chunks list
-    chunk_idx_map: dict[int, int] = {}
-    for i, c in enumerate(chunks):
-        chunk_idx_map[c.paragraph_index] = i
-
-    # Convert to (chunk_list_index, score) rankings
-    bm25_ranking = [(chunk_idx_map[r.chunk.paragraph_index], r.bm25_score) for r in bm25_results]
-    dense_ranking = [(chunk_idx_map[r.chunk.paragraph_index], r.dense_score or 0.0) for r in dense_results]
-
-    # Score lookup maps
-    bm25_scores = {idx: score for idx, score in bm25_ranking}
-    dense_scores = {idx: score for idx, score in dense_ranking}
-
-    # Fuse
-    merged = reciprocal_rank_fusion([bm25_ranking, dense_ranking], k=rrf_k)
-
-    # Neural reranking: take top 15 from RRF, rerank with FlashRank cross-encoder.
-    # Falls back to RRF order if FlashRank is not installed.
-    reranked = _rerank_with_flashrank(query, merged[:15], chunks, top_k=top_k)
-    if reranked is not None:
-        final = reranked
-    else:
-        final = merged[:top_k]
-
-    # Build output
-    scored: list[ScoredChunk] = []
-    for doc_idx, score in final:
-        scored.append(ScoredChunk(
-            chunk=chunks[doc_idx],
-            bm25_score=bm25_scores.get(doc_idx, 0.0),
-            dense_score=dense_scores.get(doc_idx),
-            rrf_score=score,
-        ))
-
-    return scored
+    index = build_retrieval_index(chunks, model_name=model_name)
+    return retrieve_with_index(
+        query, index,
+        top_k=top_k,
+        bm25_candidates=bm25_candidates,
+        dense_candidates=dense_candidates,
+        rrf_k=rrf_k,
+    )
 
 
 # ---------------------------------------------------------------------------

@@ -175,6 +175,111 @@ class TestFullTextCache:
 class TestPdfExtraction:
     def test_returns_not_found_when_grobid_unavailable(self):
         """Without GROBID running, should return not_found, not crash."""
-        result = _extract_from_pdf("/nonexistent/path.pdf", source="user_pdf")
+        from src.verification.api_clients import fulltext as ft_module
+        ft_module._reset_grobid_state_for_tests()
+        with patch(
+            "src.verification.api_clients.fulltext.requests.get",
+            side_effect=ConnectionError("GROBID offline for this test"),
+        ):
+            result = _run(_extract_from_pdf("/nonexistent/path.pdf", source="user_pdf"))
+        ft_module._reset_grobid_state_for_tests()
         assert result.source == "not_found"
         assert result.full_text is None
+
+
+# ---- Async GROBID concurrency guarantees ----
+#
+# These tests pin the two pieces of concurrency behavior we rely on in the
+# agentic pre-retrieve hot path:
+#   1. The bounded semaphore actually parallelizes extractions instead of
+#      serializing them through a sync `requests.post` on the event loop.
+#   2. The availability probe runs exactly once even when many async tasks
+#      hit it simultaneously.
+
+class TestGrobidConcurrency:
+    def test_extract_runs_in_parallel_up_to_semaphore(self):
+        """8 extractions, semaphore=4, each sleeping 0.3s.
+
+        If serialized: ~2.4s. If fully parallel: ~0.3s. With cap=4: ~0.6s.
+        We assert the cap-bounded window so a regression to serial work
+        (the bug that motivated this change) fails the test loudly.
+        """
+        from src.verification.api_clients import fulltext as ft_module
+        import time
+
+        ft_module._reset_grobid_state_for_tests()
+
+        sleep_s = 0.3
+        n_calls = 8
+        cap = 4
+
+        # Mark GROBID available so _ensure_grobid_available short-circuits.
+        ft_module._grobid_available = True
+        # Force a fresh semaphore at the test cap.
+        ft_module._grobid_extract_semaphore = asyncio.Semaphore(cap)
+
+        def _fake_extract(_pdf_path):
+            time.sleep(sleep_s)
+            return ("body text", [{"name": "S", "text": "body text"}])
+
+        with patch(
+            "src.verification.api_clients.fulltext._extract_via_grobid",
+            side_effect=_fake_extract,
+        ):
+            async def _all():
+                return await asyncio.gather(*[
+                    _extract_from_pdf(f"/tmp/fake_{i}.pdf", source="user_pdf")
+                    for i in range(n_calls)
+                ])
+
+            t0 = time.perf_counter()
+            results = _run(_all())
+            elapsed = time.perf_counter() - t0
+
+        ft_module._reset_grobid_state_for_tests()
+
+        assert len(results) == n_calls
+        assert all(r.source == "user_pdf" and r.full_text for r in results)
+
+        # Lower bound: even at full concurrency, n_calls/cap batches × sleep_s
+        # is the floor. Allow 30% slack for scheduler overhead.
+        min_expected = (n_calls / cap) * sleep_s * 0.7
+        # Upper bound: must beat fully-serial wall time by a wide margin.
+        max_expected = (n_calls / cap) * sleep_s * 2.0
+        assert min_expected <= elapsed <= max_expected, (
+            f"elapsed={elapsed:.3f}s outside expected range "
+            f"[{min_expected:.3f}, {max_expected:.3f}] for cap={cap}"
+        )
+
+    def test_availability_probe_runs_once_under_concurrency(self):
+        """10 concurrent first-callers must trigger the health probe once."""
+        from src.verification.api_clients import fulltext as ft_module
+
+        ft_module._reset_grobid_state_for_tests()
+
+        call_count = 0
+
+        def _fake_health(*_args, **_kwargs):
+            nonlocal call_count
+            call_count += 1
+            response = MagicMock()
+            response.status_code = 200
+            return response
+
+        with patch(
+            "src.verification.api_clients.fulltext.requests.get",
+            side_effect=_fake_health,
+        ):
+            async def _race():
+                return await asyncio.gather(*[
+                    ft_module._ensure_grobid_available() for _ in range(10)
+                ])
+
+            results = _run(_race())
+
+        ft_module._reset_grobid_state_for_tests()
+
+        assert all(results), "all callers should see GROBID as available"
+        assert call_count == 1, (
+            f"health probe ran {call_count} times — lock is not serializing first-callers"
+        )

@@ -21,7 +21,7 @@ from src import config as app_config
 
 from src.classification.classifier import CitationVerdict
 from src.models.citation import Citation
-from src.models.comprehension import ScoredChunk
+from src.models.comprehension import ClaimVerdict, Chunk, FullTextResult, ScoredChunk
 from src.models.parsed_paper import ParsedPaper
 from src.models.verdict import ExistenceResult
 from src.verification.api_clients.llm_client import CostTracker
@@ -31,6 +31,22 @@ from src.verification.metadata import MetadataResult
 from src.verification.agentic.tools import ToolExecutor
 
 log = logging.getLogger(__name__)
+
+
+# ---------------------------------------------------------------------------
+# Shape aliases for the data that flows through the agentic pipeline
+# ---------------------------------------------------------------------------
+# Output of fetch_and_chunk_for_refs / input to _pre_retrieve_passages.
+# The list of chunks may be empty when the paper has neither full text nor
+# abstract — the FullTextResult still carries source/error info.
+PrefetchedChunks = dict[str, tuple[FullTextResult, list[Chunk]]]
+
+# Output of _pre_retrieve_passages. Outer key is ref_id; inner key is the
+# literal citing sentence (used verbatim as a lookup key by the claim agent).
+PassagesByRef = dict[str, dict[str, list[ScoredChunk]]]
+
+# Map from ref_id to the FullTextResult that was fetched for that reference.
+FullTextByRef = dict[str, FullTextResult]
 
 
 def _group_citations_by_ref(citations: list[Citation]) -> dict[str, list[Citation]]:
@@ -47,7 +63,9 @@ async def run_agentic_verification(
     metadata_map: dict[str, MetadataResult],
     agentic_config: dict,
     ref_pdfs_dir: Optional[str] = None,
-) -> tuple[list[CitationVerdict], float, dict[str, dict[str, list]], dict]:
+    prefetched_chunks: Optional[PrefetchedChunks] = None,
+    cache: Optional[APICache] = None,
+) -> tuple[list[CitationVerdict], float, PassagesByRef, FullTextByRef]:
     """Run agentic verification: rule-based triage + focused agents where needed.
 
     Clear-cut cases (exact matches, obvious fabrications) are resolved
@@ -60,6 +78,9 @@ async def run_agentic_verification(
         metadata_map: Pre-computed L3 metadata results (ref_id → MetadataResult).
         agentic_config: Config from config.yaml 'agentic' section.
         ref_pdfs_dir: Optional directory of user-uploaded reference PDFs.
+        prefetched_chunks: Optional {ref_id: (FullTextResult, list[Chunk])}
+            produced by ``fetch_and_chunk_for_refs`` called in parallel
+            with L3. Skips the inline fetch when provided.
 
     Returns:
         (verdicts, cost_usd, passages_by_ref, fulltext_by_ref) — callers that
@@ -91,11 +112,20 @@ async def run_agentic_verification(
     # are counted even when triage clears every reference.
     cost_tracker = CostTracker()
 
+    # Cache ownership: caller may supply a shared APICache so fetches done
+    # here (pre-retrieve, ToolExecutor) reuse entries across pipeline phases.
+    # When not supplied, we own a scoped cache and close it before returning.
+    owns_cache = cache is None
+    if cache is None:
+        cache = APICache()
+
     # --- Pre-retrieve passages for FOUND refs with substantive citations ---
     with stage("agentic_pre_retrieve", refs=len(parsed.references)):
         passages_by_ref, fulltext_by_ref = await _pre_retrieve_passages(
             parsed, exist_map, citation_groups, agentic_config, cost_tracker,
             ref_pdfs_dir=ref_pdfs_dir,
+            prefetched_chunks=prefetched_chunks,
+            cache=cache,
         )
 
     # --- Triage all references ---
@@ -137,14 +167,15 @@ async def run_agentic_verification(
 
     # --- Skip agents if nothing needs them ---
     if agent_count == 0:
+        if owns_cache:
+            await cache.close()
         ordered = [verdicts[ref.ref_id] for ref in parsed.references if ref.ref_id in verdicts]
         # Return whatever pre-retrieve already spent on decompose calls
         return ordered, cost_tracker.estimated_cost_usd, passages_by_ref, fulltext_by_ref
 
     # --- Set up shared resources ---
     openai_client = AsyncOpenAI(api_key=api_key)
-    cache = APICache()
-    max_concurrent = agentic_config.get("max_concurrent_agents", 5)
+    max_concurrent = agentic_config.get("max_concurrent_agents", 15)
     semaphore = asyncio.Semaphore(max_concurrent)
 
     meta_cfg = agentic_config.get("metadata_agent", {})
@@ -242,7 +273,8 @@ async def run_agentic_verification(
                 else:
                     verdicts[ref_id] = result
 
-    await cache.close()
+    if owns_cache:
+        await cache.close()
 
     # --- Return in original reference order (every ref must have a verdict) ---
     ordered = []
@@ -270,46 +302,10 @@ async def run_agentic_verification(
 
 async def _dispatch_metadata(tr, meta_agent, parsed) -> CitationVerdict:
     """Run metadata agent for a single triage result."""
-    from src.verification.agentic.metadata_agent import build_metadata_user_message
-    from src.verification.agentic.verdict_merger import (
-        fallback_to_quick,
-        merge_metadata_verdict,
-    )
-    from src.verification.title_comparison import compare_titles
-    from src.verification.author_comparison import compare_authors
+    from src.verification.agentic.verdict_merger import merge_metadata_verdict
 
     ref = next(r for r in parsed.references if r.ref_id == tr.ref_id)
-    exist = tr.existence
-
-    # Pre-compute comparison results for the agent
-    title_comp = None
-    if ref.title and exist and exist.matched_title:
-        title_comp = compare_titles(ref.title, exist.matched_title).to_dict()
-
-    author_comp = None
-    if ref.authors and exist and exist.matched_authors:
-        author_comp = compare_authors(
-            ref.authors, exist.matched_authors, ref.citation_format,
-        ).to_dict()
-
-    user_msg = build_metadata_user_message(
-        ref_title=ref.title,
-        ref_authors=ref.authors,
-        ref_year=ref.year,
-        ref_venue=ref.venue,
-        ref_doi=ref.doi,
-        ref_raw_text=ref.raw_text,
-        citation_format=ref.citation_format,
-        db_title=exist.matched_title if exist else None,
-        db_authors=exist.matched_authors if exist else [],
-        db_year=exist.matched_year if exist else None,
-        db_venue=exist.matched_venue if exist else None,
-        db_doi=exist.matched_doi if exist else None,
-        db_source=exist.source if exist else None,
-        title_comparison=title_comp,
-        author_comparison=author_comp,
-        triage_reason=tr.triage_reason,
-    )
+    user_msg = _build_metadata_msg(tr, ref, tr.existence)
 
     result = await meta_agent.investigate(user_msg)
     agent_verdict = result.get("verdict", "UNVERIFIABLE")
@@ -332,7 +328,7 @@ async def _dispatch_metadata(tr, meta_agent, parsed) -> CitationVerdict:
     )
 
 
-def _build_citing_contexts(tr, ref=None) -> list[dict]:
+def _build_citing_contexts(tr) -> list[dict]:
     """Build citing context dicts from a triage result (shared by claim and both dispatchers)."""
     citing_contexts = []
     for cit in tr.substantive_citations:
@@ -361,6 +357,30 @@ def _build_citing_contexts(tr, ref=None) -> list[dict]:
     return citing_contexts
 
 
+def _align_claim_verdicts(
+    tr, claim_verdicts: Optional[list[ClaimVerdict]],
+) -> dict[str, ClaimVerdict]:
+    """Map each substantive citing sentence to its corresponding ClaimVerdict.
+
+    The claim agent is asked for ``expected_count=len(substantive_citations)``
+    verdicts in submission order, so we align by position. If the agent
+    returns a different length we still align what we can but log a warning
+    so the mismatch is visible in production.
+    """
+    if not claim_verdicts:
+        return {}
+    citations = tr.substantive_citations
+    if len(claim_verdicts) != len(citations):
+        log.warning(
+            f"claim verdict count mismatch for {tr.ref_id}: "
+            f"{len(claim_verdicts)} verdicts, {len(citations)} citations"
+        )
+    return {
+        cit.citing_sentence: cv
+        for cit, cv in zip(citations, claim_verdicts)
+    }
+
+
 def _build_claim_msg(tr, ref, exist) -> str:
     """Build claim agent user message from triage result."""
     from src.verification.agentic.claim_agent import build_claim_user_message
@@ -376,28 +396,20 @@ def _build_claim_msg(tr, ref, exist) -> str:
     )
 
 
-async def _dispatch_claim(tr, claim_agent, parsed) -> CitationVerdict:
-    """Run claim agent for a single triage result."""
-    from src.verification.agentic.verdict_merger import merge_claim_verdicts
+def _build_metadata_msg(tr, ref, exist) -> str:
+    """Build metadata agent user message from triage result.
 
-    ref = next(r for r in parsed.references if r.ref_id == tr.ref_id)
-    user_msg = _build_claim_msg(tr, ref, tr.existence)
-    n_contexts = len(tr.substantive_citations)
-    claim_verdicts = await claim_agent.verify_claims(user_msg, expected_count=n_contexts)
-    return merge_claim_verdicts(triage=tr, claim_verdicts=claim_verdicts)
-
-
-async def _dispatch_both(tr, meta_agent, claim_agent, parsed) -> CitationVerdict:
-    """Run metadata agent first, then claim agent if metadata is OK."""
+    Intentionally re-runs ``compare_titles`` and ``compare_authors`` even
+    though L3 already computed similarity scores on the stored
+    FieldComparisons. The agent-facing output is richer — word-level title
+    diffs and author-truncation analysis — and those richer structures are
+    not carried on FieldComparison. Re-running them is cheap (pure Python,
+    no I/O) and keeps the agent prompt self-contained.
+    """
     from src.verification.agentic.metadata_agent import build_metadata_user_message
-    from src.verification.agentic.verdict_merger import merge_both_verdicts
-    from src.verification.title_comparison import compare_titles
     from src.verification.author_comparison import compare_authors
+    from src.verification.title_comparison import compare_titles
 
-    ref = next(r for r in parsed.references if r.ref_id == tr.ref_id)
-    exist = tr.existence
-
-    # --- Step 1: Metadata agent ---
     title_comp = None
     if ref.title and exist and exist.matched_title:
         title_comp = compare_titles(ref.title, exist.matched_title).to_dict()
@@ -408,7 +420,7 @@ async def _dispatch_both(tr, meta_agent, claim_agent, parsed) -> CitationVerdict
             ref.authors, exist.matched_authors, ref.citation_format,
         ).to_dict()
 
-    meta_msg = build_metadata_user_message(
+    return build_metadata_user_message(
         ref_title=ref.title,
         ref_authors=ref.authors,
         ref_year=ref.year,
@@ -427,41 +439,97 @@ async def _dispatch_both(tr, meta_agent, claim_agent, parsed) -> CitationVerdict
         triage_reason=tr.triage_reason,
     )
 
-    meta_result = await meta_agent.investigate(meta_msg)
+
+async def _dispatch_claim(tr, claim_agent, parsed) -> CitationVerdict:
+    """Run claim agent for a single triage result."""
+    from src.verification.agentic.verdict_merger import merge_claim_verdicts
+
+    ref = next(r for r in parsed.references if r.ref_id == tr.ref_id)
+    user_msg = _build_claim_msg(tr, ref, tr.existence)
+    n_contexts = len(tr.substantive_citations)
+    claim_verdicts = await claim_agent.verify_claims(user_msg, expected_count=n_contexts)
+    verdict = merge_claim_verdicts(triage=tr, claim_verdicts=claim_verdicts)
+    verdict.per_sentence_claim_verdicts = _align_claim_verdicts(tr, claim_verdicts)
+    return verdict
+
+
+async def _dispatch_both(tr, meta_agent, claim_agent, parsed) -> CitationVerdict:
+    """Run metadata and claim agents concurrently, then merge both dimensions.
+
+    No short-circuit: claim verification runs even when metadata comes back
+    FABRICATED. The paper was found by L2, so its text is still available
+    and the citing sentence can still be checked against it. The two
+    verdicts are carried side-by-side on the returned CitationVerdict.
+
+    Exception handling: the two agents run under ``return_exceptions=True``
+    so a failure in one does not cancel the other. A meta failure is
+    re-raised so the outer ``_run_both`` wrapper falls back; a claim failure
+    is captured into ``claim_error`` and surfaced as a ``claim_agent_error``
+    flag on the merged verdict (distinguishing it from "claim not
+    applicable", where claim_verdicts is legitimately None).
+    """
+    from src.verification.agentic.verdict_merger import merge_both_verdicts
+
+    ref = next(r for r in parsed.references if r.ref_id == tr.ref_id)
+    exist = tr.existence
+
+    meta_msg = _build_metadata_msg(tr, ref, exist)
+
+    async def _run_meta():
+        return await meta_agent.investigate(meta_msg)
+
+    async def _run_claim():
+        if not tr.substantive_citations:
+            return None
+        user_msg = _build_claim_msg(tr, ref, exist)
+        n_contexts = len(tr.substantive_citations)
+        return await claim_agent.verify_claims(user_msg, expected_count=n_contexts)
+
+    # Fire both agents concurrently without sibling cancellation on failure.
+    meta_raw, claim_raw = await asyncio.gather(
+        _run_meta(), _run_claim(), return_exceptions=True,
+    )
+
+    # Meta failure: preserve existing behavior — re-raise so the outer
+    # _run_both wrapper catches it and calls fallback_to_quick for this ref.
+    if isinstance(meta_raw, BaseException):
+        raise meta_raw
+    meta_result = meta_raw
+
+    # Claim failure: keep the metadata dimension and record the crash so
+    # the merger can surface a claim_agent_error flag.
+    claim_error: Optional[str] = None
+    claim_verdicts: Optional[list] = None
+    if isinstance(claim_raw, BaseException):
+        log.warning(f"Claim agent failed for NEEDS_BOTH ref {tr.ref_id}: {claim_raw}")
+        claim_error = str(claim_raw)[:200]
+    else:
+        claim_verdicts = claim_raw
+
     meta_verdict = meta_result.get("verdict", "UNVERIFIABLE")
 
-    # Google Scholar re-investigation for non-VALID verdicts
+    # Google Scholar re-investigation for non-VALID metadata verdicts. This
+    # only affects the metadata dimension; the already-computed claim
+    # verdict is preserved.
     if meta_verdict != "VALID" and ref.title and app_config.serpapi_key():
-        gs_result = await _google_scholar_reinvestigate(
-            ref, meta_agent, meta_result, tr,
+        gs_verdict = await _google_scholar_reinvestigate_meta(
+            ref, meta_agent, meta_result,
         )
-        if gs_result is not None:
-            # Google Scholar changed the verdict — check if now VALID
-            if gs_result.verdict == "VALID":
-                meta_verdict = "VALID"
-                # Continue to claim verification below
-            else:
-                return gs_result
+        if gs_verdict is not None:
+            meta_result = gs_verdict
+            meta_verdict = meta_result.get("verdict", meta_verdict)
 
-    # --- Step 2: Claim agent (only if metadata OK) ---
-    claim_verdicts = None
-    if meta_verdict == "VALID" and tr.substantive_citations:
-        try:
-            user_msg = _build_claim_msg(tr, ref, exist)
-            n_contexts = len(tr.substantive_citations)
-            claim_verdicts = await claim_agent.verify_claims(user_msg, expected_count=n_contexts)
-        except Exception as e:
-            log.warning(f"Claim agent failed for NEEDS_BOTH ref {tr.ref_id}: {e}")
-            claim_verdicts = None
-
-    return merge_both_verdicts(
+    verdict = merge_both_verdicts(
         triage=tr,
         metadata_verdict=meta_verdict,
         metadata_explanation=meta_result.get("explanation", ""),
         metadata_flags=meta_result.get("flags", []),
         field_discrepancies=meta_result.get("field_discrepancies", []),
         claim_verdicts=claim_verdicts,
+        claim_error=claim_error,
     )
+    verdict.per_sentence_claim_verdicts = _align_claim_verdicts(tr, claim_verdicts)
+    return verdict
 
 
 # ---------------------------------------------------------------------------
@@ -515,9 +583,153 @@ async def _google_scholar_reinvestigate(
     )
 
 
+async def _google_scholar_reinvestigate_meta(
+    ref, meta_agent, first_result: dict,
+) -> Optional[dict]:
+    """Second-chance Google Scholar investigation — dict form for NEEDS_BOTH.
+
+    Returns an updated metadata agent result dict (same schema as
+    ``meta_agent.investigate``) with a ``google_scholar_reinvestigated``
+    flag appended, or ``None`` if the verdict did not change. Keeps the
+    metadata dimension isolated so claim results can be merged separately.
+    """
+    first_verdict = first_result.get("verdict", "UNVERIFIABLE")
+    first_explanation = first_result.get("explanation", "")
+
+    followup = (
+        f"Your initial verdict was {first_verdict}: {first_explanation}\n\n"
+        f"Before finalizing, search Google Scholar for this paper using "
+        f"search_google_scholar(\"{ref.title}\"). Google Scholar often "
+        f"shows the version people actually cite (e.g. arXiv preprint "
+        f"vs published journal version).\n\n"
+        f"Compare what Google Scholar returns against the reference metadata. "
+        f"Then give your final verdict — the same or different from before."
+    )
+
+    try:
+        result = await meta_agent.investigate_followup(followup)
+    except Exception as e:
+        log.warning(f"Google Scholar meta reinvestigation failed for {ref.ref_id}: {e}")
+        return None
+
+    new_verdict = result.get("verdict", first_verdict)
+    if new_verdict == first_verdict:
+        return None
+
+    enriched = dict(result)
+    enriched["flags"] = list(result.get("flags", [])) + ["google_scholar_reinvestigated"]
+    return enriched
+
+
 # ---------------------------------------------------------------------------
 # Passage pre-retrieval (deterministic, no LLM)
 # ---------------------------------------------------------------------------
+
+
+def _identify_refs_needing_passages(
+    parsed: ParsedPaper,
+    exist_map: dict[str, ExistenceResult],
+    citation_groups: dict[str, list[Citation]],
+) -> list[tuple]:
+    """Return [(ref, existence, substantive_citations)] for FOUND refs w/ claims."""
+    from src.verification.filters import is_substantive_citation
+
+    selected: list[tuple] = []
+    for ref in parsed.references:
+        exist = exist_map.get(ref.ref_id)
+        if not exist or exist.status != "FOUND":
+            continue
+        citations = citation_groups.get(ref.ref_id, [])
+        substantive = [c for c in citations if is_substantive_citation(c)]
+        if not substantive:
+            continue
+        selected.append((ref, exist, substantive))
+    return selected
+
+
+async def fetch_and_chunk_for_refs(
+    parsed: ParsedPaper,
+    exist_map: dict[str, ExistenceResult],
+    citation_groups: dict[str, list[Citation]],
+    max_concurrent: int = 15,
+    ref_pdfs_dir: Optional[str] = None,
+    cache: Optional[APICache] = None,
+) -> PrefetchedChunks:
+    """Fetch full text and chunk it for every FOUND ref that has substantive
+    citations. Public so the pipeline can launch this in parallel with L3
+    metadata validation — the slow I/O is the waterfall fetch (S2 OA,
+    Unpaywall, arXiv), not chunking.
+
+    When ``cache`` is supplied, the caller owns its lifecycle. Otherwise a
+    scoped cache is created and closed inside this function.
+
+    Returns:
+        {ref_id: (FullTextResult, list[Chunk])}
+        — chunks may be empty if the paper has neither full text nor abstract.
+    """
+    from src.verification.api_clients.fulltext import get_full_text
+    from src.verification.comprehension import chunk_text
+
+    refs_needing = _identify_refs_needing_passages(parsed, exist_map, citation_groups)
+    if not refs_needing:
+        return {}
+
+    user_pdf_map: dict[str, str] = {}
+    if ref_pdfs_dir:
+        try:
+            from src.pipeline import _scan_ref_pdfs
+            user_pdf_map = _scan_ref_pdfs(ref_pdfs_dir, parsed.references)
+        except Exception as e:
+            log.warning(f"fetch_and_chunk: scanning ref_pdfs_dir failed: {e}")
+
+    owns_cache = cache is None
+    if cache is None:
+        cache = APICache()
+    semaphore = asyncio.Semaphore(max_concurrent)
+
+    async def _one(ref, exist, client):
+        async with semaphore:
+            try:
+                user_pdf = user_pdf_map.get(ref.ref_id)
+                ft = await get_full_text(exist, client, cache, user_pdf_path=user_pdf)
+                text = ft.full_text or ft.abstract or ""
+                if not text.strip():
+                    return ref.ref_id, ft, []
+                sections = ft.sections if ft.sections else None
+                chunks = chunk_text(text, sections=sections)
+                return ref.ref_id, ft, chunks
+            except (httpx.RequestError, httpx.HTTPError, OSError, ValueError) as e:
+                # Expected failures: network hiccups, malformed PDFs, GROBID
+                # XML parse errors. Anything else is a real bug — let it
+                # bubble up to asyncio.gather(return_exceptions=True), which
+                # logs it as a task exception instead of silently swallowing.
+                log.warning(f"Fetch/chunk failed for {ref.ref_id}: {e}")
+                return ref.ref_id, None, []
+
+    # max_workers bounds how many fetch tasks are in flight at once, not the
+    # actual throughput: per-API rate limiters (e.g. Semantic Scholar at 1
+    # req/s) further serialize calls to the same source, so real wall-clock
+    # throughput is min(max_workers, sum of per-source rate-limit budgets).
+    log.info(f"fetch_and_chunk: {len(refs_needing)} refs, max_workers={max_concurrent}")
+    try:
+        async with httpx.AsyncClient(follow_redirects=True) as client:
+            results = await asyncio.gather(
+                *[_one(ref, exist, client) for ref, exist, _ in refs_needing],
+                return_exceptions=True,
+            )
+    finally:
+        if owns_cache:
+            await cache.close()
+
+    out: PrefetchedChunks = {}
+    for result in results:
+        if isinstance(result, Exception):
+            log.warning(f"fetch_and_chunk task raised: {result}")
+            continue
+        ref_id, ft, chunks = result
+        if ft is not None:
+            out[ref_id] = (ft, chunks)
+    return out
 
 
 async def _pre_retrieve_passages(
@@ -527,34 +739,37 @@ async def _pre_retrieve_passages(
     config: dict,
     cost_tracker: Optional[CostTracker] = None,
     ref_pdfs_dir: Optional[str] = None,
-) -> tuple[dict[str, dict[str, list]], dict]:
+    prefetched_chunks: Optional[PrefetchedChunks] = None,
+    cache: Optional[APICache] = None,
+) -> tuple[PassagesByRef, FullTextByRef]:
     """Pre-retrieve passages for all FOUND refs with substantive citations.
 
-    When `agentic.claim_agent.enable_multiquery` is true and a dense
+    When ``prefetched_chunks`` is provided (``{ref_id: (FullTextResult,
+    list[Chunk])}``), the fetch+chunk stage is skipped — the slow I/O has
+    already been done in parallel with L3 by the caller. Otherwise the
+    function fetches and chunks inline for backwards compatibility.
+
+    When ``agentic.claim_agent.enable_multiquery`` is true and a dense
     model is configured, each citing sentence is decomposed into
     sub-claims (via one LLM call) and passages are retrieved for the
     full claim AND each sub-claim, then unioned + deduped.
-
-    If ``ref_pdfs_dir`` is given, user-uploaded reference PDFs in that
-    directory are matched to refs and used as the full-text source in
-    preference to the remote fetch.
 
     Returns:
         (passages_by_ref, fulltext_by_ref) where:
         - passages_by_ref: {ref_id: {citing_sentence: [ScoredChunk]}}
         - fulltext_by_ref: {ref_id: FullTextResult}
     """
+    import time
+
     from src import config as app_cfg
     from src.models.comprehension import FullTextResult
-    from src.verification.api_clients.fulltext import get_full_text
+    from src.utils.timing import stage
     from src.verification.api_clients.llm_client import create_llm_client
     from src.verification.comprehension import (
+        build_retrieval_index,
         build_retrieval_query,
-        chunk_text,
-        retrieve_passages_bm25,
-        retrieve_passages_hybrid,
+        retrieve_with_index,
     )
-    from src.verification.filters import is_substantive_citation
     from src.verification.multiquery import decompose, multi_query_retrieve
 
     comp_cfg = app_cfg.comprehension()
@@ -568,9 +783,6 @@ async def _pre_retrieve_passages(
     mq_full_top_k = int(mq_cfg.get("full_top_k", 3))
     mq_sub_top_k = int(mq_cfg.get("sub_top_k", 3))
 
-    # Lazy-init the decomposition LLM client only if multi-query is enabled.
-    # Share the caller's CostTracker so decompose calls count toward the
-    # agentic total (otherwise they silently escape the budget).
     mq_llm = None
     if multiquery_enabled:
         try:
@@ -581,57 +793,74 @@ async def _pre_retrieve_passages(
             log.warning(f"multi-query decomposition disabled — LLM client init failed: {e}")
             multiquery_enabled = False
 
-    passages_by_ref: dict[str, dict[str, list]] = {}
-    fulltext_by_ref: dict[str, FullTextResult] = {}
+    passages_by_ref: PassagesByRef = {}
+    fulltext_by_ref: FullTextByRef = {}
 
-    # Identify refs that need passage retrieval
-    refs_needing_passages = []
-    for ref in parsed.references:
-        exist = exist_map.get(ref.ref_id)
-        if not exist or exist.status != "FOUND":
-            continue
-        citations = citation_groups.get(ref.ref_id, [])
-        substantive = [c for c in citations if is_substantive_citation(c)]
-        if not substantive:
-            continue
-        refs_needing_passages.append((ref, exist, substantive))
-
-    if not refs_needing_passages:
+    refs_needing = _identify_refs_needing_passages(parsed, exist_map, citation_groups)
+    if not refs_needing:
         return passages_by_ref, fulltext_by_ref
 
-    # Resolve user-uploaded reference PDFs once, so get_full_text can prefer
-    # them over the remote fetch for each matching ref.
-    user_pdf_map: dict[str, str] = {}
-    if ref_pdfs_dir:
-        try:
-            from src.pipeline import _scan_ref_pdfs
-            user_pdf_map = _scan_ref_pdfs(ref_pdfs_dir, parsed.references)
-        except Exception as e:
-            log.warning(f"pre_retrieve: scanning ref_pdfs_dir failed: {e}")
-
     max_concurrent = int(config.get("max_concurrent_agents", 15)) if config else 15
+
+    # Fetch+chunk either inline or take the pre-fetched data handed in by
+    # the pipeline (which launched the fetch in parallel with L3). The
+    # inline path is wrapped in its own STAGE so we can see how much of
+    # the outer agentic_pre_retrieve block was network-bound work vs.
+    # in-memory retrieval.
+    if prefetched_chunks is None:
+        with stage("pre_retrieve.fetch_chunk", refs=len(refs_needing)):
+            prefetched_chunks = await fetch_and_chunk_for_refs(
+                parsed, exist_map, citation_groups,
+                max_concurrent=max_concurrent,
+                ref_pdfs_dir=ref_pdfs_dir,
+                cache=cache,
+            )
+    else:
+        log.info(
+            f"pre_retrieve: using {len(prefetched_chunks)} pre-fetched "
+            f"fulltexts (fetch ran in parallel with L3)"
+        )
+
     log.info(
-        f"Pre-retrieving passages for {len(refs_needing_passages)} references "
+        f"Pre-retrieving passages for {len(refs_needing)} references "
         f"(multiquery={multiquery_enabled}, concurrency={max_concurrent})"
     )
 
-    cache = APICache()
     semaphore = asyncio.Semaphore(max_concurrent)
 
-    async def _process_ref(ref, exist, substantive, client):
+    bm25_candidates = comp_cfg.get("bm25_candidates", 10)
+    dense_candidates = comp_cfg.get("dense_candidates", 10)
+    rrf_k = comp_cfg.get("rrf_k", 60)
+
+    # Aggregated CPU cost across refs (wall-clock would understate the work
+    # because retrieval runs concurrently). These counters give us the real
+    # tuning signal: how much time goes into building indexes vs running
+    # queries against them.
+    index_build_total = 0.0
+    retrieve_total = 0.0
+
+    async def _retrieve_one(ref, substantive):
+        nonlocal index_build_total, retrieve_total
+        prefetched = prefetched_chunks.get(ref.ref_id)
+        if prefetched is None:
+            return ref.ref_id, None, None
+        ft, chunks = prefetched
+        if not chunks:
+            return ref.ref_id, ft, None
+
         async with semaphore:
             try:
-                user_pdf = user_pdf_map.get(ref.ref_id)
-                ft = await get_full_text(exist, client, cache, user_pdf_path=user_pdf)
-                text = ft.full_text or ft.abstract or ""
-                if not text.strip():
-                    return ref.ref_id, ft, None
+                # Build the index ONCE per ref. Every citing sentence (and
+                # every multi-query sub-claim) for this ref reuses it, so
+                # we tokenize for BM25 and encode for the dense model only
+                # once instead of once per query.
+                t_index_start = time.perf_counter()
+                index = build_retrieval_index(
+                    chunks, model_name=dense_model if dense_model else None,
+                )
+                ref_index_secs = time.perf_counter() - t_index_start
 
-                sections = ft.sections if ft.sections else None
-                chunks = chunk_text(text, sections=sections)
-                if not chunks:
-                    return ref.ref_id, ft, None
-
+                t_retrieve_start = time.perf_counter()
                 ref_passages: dict[str, list] = {}
                 for cit in substantive:
                     query = build_retrieval_query(
@@ -645,42 +874,45 @@ async def _pre_retrieve_passages(
                         scored = multi_query_retrieve(
                             full_claim=query,
                             sub_claims=sub_claims,
-                            chunks=chunks,
-                            model_name=dense_model,
-                            bm25_candidates=comp_cfg.get("bm25_candidates", 10),
-                            dense_candidates=comp_cfg.get("dense_candidates", 10),
-                            rrf_k=comp_cfg.get("rrf_k", 60),
+                            index=index,
+                            bm25_candidates=bm25_candidates,
+                            dense_candidates=dense_candidates,
+                            rrf_k=rrf_k,
                             full_top_k=mq_full_top_k,
                             sub_top_k=mq_sub_top_k,
                         )
-                    elif dense_model:
-                        scored = retrieve_passages_hybrid(
-                            query, chunks, top_k=top_k,
-                            model_name=dense_model,
-                            bm25_candidates=comp_cfg.get("bm25_candidates", 10),
-                            dense_candidates=comp_cfg.get("dense_candidates", 10),
-                            rrf_k=comp_cfg.get("rrf_k", 60),
-                        )
                     else:
-                        scored = retrieve_passages_bm25(query, chunks, top_k=top_k)
+                        scored = retrieve_with_index(
+                            query, index,
+                            top_k=top_k,
+                            bm25_candidates=bm25_candidates,
+                            dense_candidates=dense_candidates,
+                            rrf_k=rrf_k,
+                        )
                     ref_passages[cit.citing_sentence] = scored
+                ref_retrieve_secs = time.perf_counter() - t_retrieve_start
+
+                index_build_total += ref_index_secs
+                retrieve_total += ref_retrieve_secs
+                log.debug(
+                    "pre_retrieve.ref ref_id=%s chunks=%d citations=%d "
+                    "index=%.3fs retrieve=%.3fs",
+                    ref.ref_id, len(chunks), len(substantive),
+                    ref_index_secs, ref_retrieve_secs,
+                )
 
                 return ref.ref_id, ft, ref_passages
+            except (ValueError, KeyError, RuntimeError) as e:
+                log.warning(f"Passage retrieval failed for {ref.ref_id}: {e}")
+                return ref.ref_id, ft, None
 
-            except Exception as e:
-                log.warning(f"Passage pre-retrieval failed for {ref.ref_id}: {e}")
-                return ref.ref_id, None, None
-
-    async with httpx.AsyncClient(follow_redirects=True) as client:
-        tasks = [
-            _process_ref(ref, exist, substantive, client)
-            for ref, exist, substantive in refs_needing_passages
-        ]
+    with stage("pre_retrieve.retrieve_block", refs=len(refs_needing)):
+        tasks = [_retrieve_one(ref, substantive) for ref, _, substantive in refs_needing]
         results = await asyncio.gather(*tasks, return_exceptions=True)
 
     for result in results:
         if isinstance(result, Exception):
-            log.warning(f"Passage pre-retrieval task raised: {result}")
+            log.warning(f"Passage retrieval task raised: {result}")
             continue
         ref_id, ft, ref_passages = result
         if ft is not None:
@@ -688,5 +920,18 @@ async def _pre_retrieve_passages(
         if ref_passages is not None:
             passages_by_ref[ref_id] = ref_passages
 
-    await cache.close()
+    # Emit summed CPU cost across refs through the same logger that
+    # stage() uses, so the post-run profile shows in-loop work alongside
+    # wall-clock blocks. Wall-clock alone understates the retrieval cost
+    # because work runs concurrently across refs.
+    timing_log = logging.getLogger("checkcitation.timing")
+    timing_log.info(
+        "STAGE pre_retrieve.index_build_total seconds=%.3f refs=%d",
+        index_build_total, len(refs_needing),
+    )
+    timing_log.info(
+        "STAGE pre_retrieve.retrieve_total seconds=%.3f refs=%d",
+        retrieve_total, len(refs_needing),
+    )
+
     return passages_by_ref, fulltext_by_ref

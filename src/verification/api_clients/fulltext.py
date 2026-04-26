@@ -28,6 +28,7 @@ from src import config
 from src.models.comprehension import FullTextResult
 from src.models.verdict import ExistenceResult
 from src.verification.api_clients.rate_limiter import fetch_with_retry
+from src.verification.url_safety import is_safe_external_url
 from src.verification.cache import APICache
 
 log = logging.getLogger(__name__)
@@ -43,13 +44,49 @@ _PDF_MAX_RETRIES = 2
 _PDF_BASE_DELAY = 2.0
 _PDF_RETRYABLE_STATUS = {429, 500, 502, 503, 504}
 
-# GROBID availability flag (checked once per import / pipeline run)
+# GROBID availability flag (checked once per process — guarded by _grobid_check_lock).
 _grobid_available: Optional[bool] = None
+
+# Lazily-created on first use because asyncio.Semaphore / asyncio.Lock
+# can only be constructed inside a running event loop.
+_grobid_extract_semaphore: Optional[asyncio.Semaphore] = None
+_grobid_check_lock: Optional[asyncio.Lock] = None
 
 
 def _user_agent() -> str:
     email = config.openalex_mailto()
     return _UA.format(email=email)
+
+
+def _get_extract_semaphore() -> asyncio.Semaphore:
+    """Return the bounded semaphore capping concurrent GROBID extractions.
+
+    The GROBID image ships with an internal worker pool (~10 threads).
+    Capping our in-flight extractions at ``grobid.extract_concurrency``
+    matches the container's capacity and prevents queue buildup that
+    would otherwise surface as request timeouts.
+    """
+    global _grobid_extract_semaphore
+    if _grobid_extract_semaphore is None:
+        cfg = config.grobid()
+        n = int(cfg.get("extract_concurrency", cfg.get("concurrency", 4)))
+        _grobid_extract_semaphore = asyncio.Semaphore(n)
+    return _grobid_extract_semaphore
+
+
+def _get_check_lock() -> asyncio.Lock:
+    global _grobid_check_lock
+    if _grobid_check_lock is None:
+        _grobid_check_lock = asyncio.Lock()
+    return _grobid_check_lock
+
+
+def _reset_grobid_state_for_tests() -> None:
+    """Clear cached GROBID state so tests can re-probe with a clean slate."""
+    global _grobid_available, _grobid_extract_semaphore, _grobid_check_lock
+    _grobid_available = None
+    _grobid_extract_semaphore = None
+    _grobid_check_lock = None
 
 
 # ---------------------------------------------------------------------------
@@ -86,7 +123,7 @@ async def get_full_text(
 
     # 1. User-uploaded PDF (highest quality, no API call)
     if user_pdf_path and Path(user_pdf_path).exists():
-        result = _extract_from_pdf(user_pdf_path, source="user_pdf")
+        result = await _extract_from_pdf(user_pdf_path, source="user_pdf")
         if result.full_text:
             await _cache_fulltext(cache, ref_id, result)
             return result
@@ -249,7 +286,17 @@ async def _download_and_extract(
     """Download a PDF from a URL and extract text via GROBID.
 
     Retries on connection errors and 5xx/429 with exponential backoff.
+
+    SSRF guard: ``pdf_url`` may originate from third-party metadata
+    sources (Unpaywall, Semantic Scholar) which we don't fully trust to
+    return only public URLs. Reject anything pointing at private /
+    loopback / link-local / cloud-metadata addresses up front, and
+    re-check the resolved URL after redirect-following.
     """
+    if not await asyncio.to_thread(is_safe_external_url, pdf_url):
+        log.warning(f"PDF URL rejected as unsafe (private/non-http): {pdf_url}")
+        return None
+
     tmp_path: Optional[str] = None
     last_error: Optional[Exception] = None
 
@@ -261,6 +308,14 @@ async def _download_and_extract(
                 timeout=30,
                 follow_redirects=True,
             )
+
+            # Redirects could land on a private IP — reject the response.
+            if not is_safe_external_url(str(resp.url)):
+                log.warning(
+                    f"PDF download redirected to unsafe URL "
+                    f"(initial={pdf_url}, final={resp.url})"
+                )
+                return None
 
             if resp.status_code in _PDF_RETRYABLE_STATUS and attempt < _PDF_MAX_RETRIES:
                 delay = _PDF_BASE_DELAY * (2 ** attempt)
@@ -285,7 +340,7 @@ async def _download_and_extract(
                 f.write(resp.content)
                 tmp_path = f.name
 
-            return _extract_from_pdf(tmp_path, source=source)
+            return await _extract_from_pdf(tmp_path, source=source)
 
         except httpx.RequestError as e:
             last_error = e
@@ -299,8 +354,11 @@ async def _download_and_extract(
                 continue
             log.debug(f"PDF download/extract failed for {pdf_url}: {e}")
             return None
-        except Exception as e:
-            log.debug(f"PDF download/extract failed for {pdf_url}: {e}")
+        except (httpx.HTTPError, OSError, ValueError) as e:
+            log.warning(
+                f"PDF download/extract failed for {pdf_url}: "
+                f"{type(e).__name__}: {e}"
+            )
             return None
         finally:
             if tmp_path:
@@ -311,40 +369,60 @@ async def _download_and_extract(
     return None
 
 
-def _check_grobid_once() -> bool:
-    """Check GROBID availability once and cache the result for this process."""
+async def _ensure_grobid_available() -> bool:
+    """Probe GROBID once per process; cache the result.
+
+    Concurrent first-callers serialize through ``_grobid_check_lock`` so
+    the health probe runs exactly once even when many extraction tasks
+    fire off in parallel. Subsequent calls return the cached flag without
+    acquiring the lock.
+    """
     global _grobid_available
     if _grobid_available is not None:
         return _grobid_available
 
-    cfg = config.grobid()
-    try:
-        health = requests.get(
-            f"{cfg['service_url']}/api/isalive",
-            timeout=cfg["health_check_timeout"],
-        )
-        _grobid_available = health.status_code == 200
-    except Exception:
-        _grobid_available = False
+    async with _get_check_lock():
+        if _grobid_available is not None:
+            return _grobid_available
 
-    if not _grobid_available:
-        log.warning(
-            "GROBID is not available — cannot extract text from PDFs. "
-            "Start GROBID with: docker run -d --name grobid -p 8070:8070 grobid/grobid:0.8.2-crf"
-        )
-    return _grobid_available
+        cfg = config.grobid()
+        try:
+            health = await asyncio.to_thread(
+                requests.get,
+                f"{cfg['service_url']}/api/isalive",
+                timeout=cfg["health_check_timeout"],
+            )
+            _grobid_available = health.status_code == 200
+        except (requests.RequestException, OSError):
+            _grobid_available = False
+
+        if not _grobid_available:
+            log.error(
+                "GROBID is NOT running — PDF text extraction will fail. "
+                "Start GROBID with: docker run -d --name grobid -p 8070:8070 grobid/grobid:0.8.2-crf"
+            )
+        return _grobid_available
 
 
-def _extract_from_pdf(pdf_path: str, source: str) -> FullTextResult:
+async def _extract_from_pdf(pdf_path: str, source: str) -> FullTextResult:
     """Extract text from a local PDF file using GROBID.
 
-    GROBID must be running as a Docker container. If it's not available,
-    returns not_found with a warning — the user should start GROBID.
+    GROBID's HTTP call + XML parse is a sync block (``requests`` doesn't
+    yield), so we offload it to a worker thread via ``asyncio.to_thread``
+    and gate concurrency with ``_get_extract_semaphore`` to match
+    GROBID's internal pool. Without that, every async caller would line
+    up single-file at the blocking ``requests.post`` regardless of how
+    many tasks ``asyncio.gather`` fanned out.
+
+    Returns ``not_found`` if GROBID isn't reachable or returns no text;
+    callers treat that as "no full text available" without crashing.
     """
-    if not _check_grobid_once():
+    if not await _ensure_grobid_available():
         return FullTextResult(source="not_found")
 
-    text, sections = _extract_via_grobid(pdf_path)
+    async with _get_extract_semaphore():
+        text, sections = await asyncio.to_thread(_extract_via_grobid, pdf_path)
+
     if text:
         return FullTextResult(
             source=source,
@@ -359,8 +437,10 @@ def _extract_from_pdf(pdf_path: str, source: str) -> FullTextResult:
 def _extract_via_grobid(pdf_path: str) -> tuple[Optional[str], list[dict]]:
     """Extract structured text via GROBID. Returns (full_text, sections).
 
-    Reuses the GROBID service already running for L1 parsing.
-    Caller must check _check_grobid_once() before calling this.
+    Synchronous on purpose — invoked from ``_extract_from_pdf`` through
+    ``asyncio.to_thread`` so the blocking ``requests`` call doesn't stall
+    the event loop. Reuses the GROBID service already running for L1
+    parsing. Caller must check ``_ensure_grobid_available()`` first.
     """
     from defusedxml.ElementTree import fromstring as safe_fromstring
 
@@ -447,7 +527,14 @@ def _extract_via_grobid(pdf_path: str) -> tuple[Optional[str], list[dict]]:
 async def _cache_fulltext(cache: APICache, ref_id: str, result: FullTextResult) -> None:
     """Cache a FullTextResult. Truncates full_text to avoid bloating the cache."""
     data = result.model_dump()
-    # Cap cached text at 200K chars (~50 pages) to keep SQLite healthy
+    # Reject text over 200K chars (~50 pages) — likely a dissertation or
+    # corrupted extraction. Log error so the caller knows.
     if data.get("full_text") and len(data["full_text"]) > 200_000:
-        data["full_text"] = data["full_text"][:200_000]
+        char_count = len(data["full_text"])
+        log.error(
+            f"Full text for {ref_id} exceeds 200K chars ({char_count} chars). "
+            f"Skipping — likely a dissertation or corrupted extraction."
+        )
+        data["full_text"] = None
+        data["source"] = "not_found"
     await cache.set(f"fulltext:{ref_id}", data, TTL_FULLTEXT)
