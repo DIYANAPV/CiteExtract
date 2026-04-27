@@ -912,28 +912,62 @@ async def _pre_retrieve_passages(
             return ref.ref_id, ft, None
 
         async with semaphore:
+            # Index build is the only per-ref cost we can't recover from —
+            # if the dense model fails to load or BM25 tokenization throws,
+            # nothing we do per-citation will succeed either. Catch broadly
+            # here and bail for this ref. ``OSError`` covers model-cache /
+            # disk issues from sentence-transformers.
             try:
-                # Build the index ONCE per ref. Every citing sentence (and
-                # every multi-query sub-claim) for this ref reuses it, so
-                # we tokenize for BM25 and encode for the dense model only
-                # once instead of once per query.
                 t_index_start = time.perf_counter()
                 index = build_retrieval_index(
                     chunks, model_name=dense_model if dense_model else None,
                 )
                 ref_index_secs = time.perf_counter() - t_index_start
+            except (ValueError, KeyError, RuntimeError, OSError) as e:
+                log.warning(
+                    f"Index build failed for {ref.ref_id}: "
+                    f"{type(e).__name__}: {e}"
+                )
+                return ref.ref_id, ft, None
 
-                t_retrieve_start = time.perf_counter()
-                ref_passages: dict[str, list] = {}
-                for cit in substantive:
-                    query = build_retrieval_query(
-                        cit.citing_sentence, cit.context_before, cit.context_after,
-                        markers=[cit.marker] if cit.marker else None,
-                    )
+            t_retrieve_start = time.perf_counter()
+            ref_passages: dict[str, list] = {}
+
+            # Per-citation try/except: a single bad citation (transient
+            # OpenAI failure on multi-query decompose, BM25 hiccup) used to
+            # throw away passages for *every* citation on this reference
+            # because the wrapper try caught the exception at the outer
+            # level. Now each citation is isolated — one citation failing
+            # records ``[]`` for that key but the rest still return their
+            # top-k passages.
+            for cit in substantive:
+                query = build_retrieval_query(
+                    cit.citing_sentence, cit.context_before, cit.context_after,
+                    markers=[cit.marker] if cit.marker else None,
+                )
+                try:
+                    sub_claims: list[str] = []
                     if multiquery_enabled and mq_llm is not None:
-                        sub_claims = await decompose(
-                            cit.citing_sentence, mq_llm, n=mq_n_sub,
-                        )
+                        # ``decompose`` calls OpenAI. Network / API errors
+                        # here are not fatal — fall back to single-query
+                        # retrieval rather than dropping the citation.
+                        # Catch BaseException so timeouts (asyncio.Timeout,
+                        # which inherits from BaseException in 3.11+) are
+                        # also recovered.
+                        try:
+                            sub_claims = await decompose(
+                                cit.citing_sentence, mq_llm, n=mq_n_sub,
+                            )
+                        except (asyncio.CancelledError, KeyboardInterrupt):
+                            raise
+                        except BaseException as decompose_err:
+                            log.debug(
+                                f"multi-query decompose failed for {ref.ref_id}: "
+                                f"{type(decompose_err).__name__}: {decompose_err}; "
+                                "falling back to single-query retrieval."
+                            )
+                            sub_claims = []
+                    if sub_claims:
                         scored = multi_query_retrieve(
                             full_claim=query,
                             sub_claims=sub_claims,
@@ -955,21 +989,25 @@ async def _pre_retrieve_passages(
                             rerank_pool=rerank_pool,
                         )
                     ref_passages[cit.citing_sentence] = scored
-                ref_retrieve_secs = time.perf_counter() - t_retrieve_start
+                except (ValueError, KeyError, RuntimeError) as e:
+                    log.warning(
+                        f"Retrieval for citation in {ref.ref_id} failed "
+                        f"({type(e).__name__}: {e}); recording empty passages "
+                        "for this citation only."
+                    )
+                    ref_passages[cit.citing_sentence] = []
 
-                index_build_total += ref_index_secs
-                retrieve_total += ref_retrieve_secs
-                log.debug(
-                    "pre_retrieve.ref ref_id=%s chunks=%d citations=%d "
-                    "index=%.3fs retrieve=%.3fs",
-                    ref.ref_id, len(chunks), len(substantive),
-                    ref_index_secs, ref_retrieve_secs,
-                )
+            ref_retrieve_secs = time.perf_counter() - t_retrieve_start
+            index_build_total += ref_index_secs
+            retrieve_total += ref_retrieve_secs
+            log.debug(
+                "pre_retrieve.ref ref_id=%s chunks=%d citations=%d "
+                "index=%.3fs retrieve=%.3fs",
+                ref.ref_id, len(chunks), len(substantive),
+                ref_index_secs, ref_retrieve_secs,
+            )
 
-                return ref.ref_id, ft, ref_passages
-            except (ValueError, KeyError, RuntimeError) as e:
-                log.warning(f"Passage retrieval failed for {ref.ref_id}: {e}")
-                return ref.ref_id, ft, None
+            return ref.ref_id, ft, ref_passages
 
     with stage("pre_retrieve.retrieve_block", refs=len(refs_needing)):
         tasks = [_retrieve_one(ref, substantive) for ref, _, substantive in refs_needing]

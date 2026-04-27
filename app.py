@@ -2580,6 +2580,20 @@ def _try_annotate_pdf(
             "Annotated PDF skipped: no citation markers could be located on any page.",
             tone="warn",
         )
+
+    # Partial-success path: surface a quiet warning when too many markers
+    # could not be placed on the PDF, so the user knows the file they're
+    # downloading is missing comment boxes for some citations rather than
+    # discovering it by visual inspection. Detail goes to the server log
+    # (annotate_pdf already emits a per-counter info line).
+    total_cits = len(parsed.citations) if parsed else 0
+    if total_cits and stats.annotated < total_cits * 0.8:
+        missing = total_cits - stats.annotated
+        return out_tmp.name, status(
+            f"Annotated {stats.annotated}/{total_cits} citation markers; "
+            f"{missing} could not be placed on the PDF (see server logs for breakdown).",
+            tone="warn",
+        )
     return out_tmp.name, ""
 
 

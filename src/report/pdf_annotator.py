@@ -16,7 +16,14 @@ import logging
 import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
+
+if TYPE_CHECKING:
+    # Type-only import — fitz is loaded lazily inside ``annotate_pdf`` and
+    # ``_draw_highlight_with_note``. Importing here lets type checkers
+    # resolve ``fitz.Rect`` annotations without paying the import cost
+    # (or failing the import) at module load time.
+    import fitz
 
 log = logging.getLogger(__name__)
 
@@ -60,10 +67,19 @@ def color_for_verdict(metadata_verdict: str, claim_verdict: str | None = None) -
 
 @dataclass
 class AnnotationStats:
-    """Return payload from annotate_pdf: how the run went."""
+    """Return payload from annotate_pdf: how the run went.
+
+    Each ``skipped_*`` counter names a distinct failure mode so callers can
+    distinguish "GROBID handed us a marker the PDF text-layer doesn't
+    contain" (``skipped_not_found``) from "two citations resolved to the
+    same on-page rect and only the first got the icon"
+    (``skipped_collision``) — they have different fixes.
+    """
     annotated: int = 0                 # successfully highlighted + noted
     skipped_no_marker: int = 0         # citation had no marker text
     skipped_not_found: int = 0         # marker text not locatable on any page
+    skipped_collision: int = 0         # marker found, but every rect already used by an earlier citation
+    skipped_no_verdict: int = 0        # cit.ref_id has no entry in PaperReport.verdicts
     pages: int = 0
 
 
@@ -128,7 +144,17 @@ def annotate_pdf(
         for cit in citations:
             verdict = verdicts_by_ref.get(cit.ref_id)
             if verdict is None:
-                continue  # no verdict for this ref — shouldn't happen, but skip safely
+                # Orphan citation — typically a GROBID bibr target that didn't
+                # resolve to a kept reference, or a ref_id that got remapped
+                # by reference deduplication without the citation being
+                # updated. Count it so the UI can warn instead of silently
+                # losing this marker on the annotated PDF.
+                stats.skipped_no_verdict += 1
+                log.debug(
+                    f"Skipping citation with no verdict: ref_id={cit.ref_id!r} "
+                    f"marker={cit.marker!r}"
+                )
+                continue
             color = color_for_verdict(
                 verdict.verdict,
                 getattr(verdict, "claim_verdict", None),
@@ -139,9 +165,12 @@ def annotate_pdf(
                 stats.skipped_no_marker += 1
                 continue
 
-            target = _find_citation_target(doc, cit, marker, used_positions)
+            target, reason = _find_citation_target(doc, cit, marker, used_positions)
             if target is None:
-                stats.skipped_not_found += 1
+                if reason == "all_collided":
+                    stats.skipped_collision += 1
+                else:
+                    stats.skipped_not_found += 1
                 continue
 
             page_idx, rect = target
@@ -161,6 +190,8 @@ def annotate_pdf(
     log.info(
         f"PDF annotated: {stats.annotated} markers highlighted, "
         f"{stats.skipped_not_found} not locatable, "
+        f"{stats.skipped_collision} location collisions, "
+        f"{stats.skipped_no_verdict} without verdicts, "
         f"{stats.skipped_no_marker} without marker text"
     )
     return stats
@@ -168,9 +199,20 @@ def annotate_pdf(
 
 def _find_citation_target(
     doc, cit, marker: str, used_positions: set[tuple[int, int, int]],
-) -> Optional[tuple[int, "fitz.Rect"]]:
-    """Return ``(page_index, rect)`` for the best place to annotate this
-    citation, or ``None`` if the marker cannot be located.
+) -> tuple[Optional[tuple[int, fitz.Rect]], str]:
+    """Locate the best on-page rect to annotate this citation.
+
+    Returns ``(target, reason)`` where:
+      - ``target`` is ``(page_index, rect)`` on success, ``None`` on failure.
+      - ``reason`` is one of:
+          * ``"found"``        — caller should annotate ``target``.
+          * ``"all_collided"`` — the marker text exists in the PDF but every
+            occurrence was already claimed by an earlier citation in this
+            run. Signals a multi-target marker that needs the Phase 2 group
+            merge, not a search miss.
+          * ``"not_in_text"``  — the marker string never matched any page.
+            Typically means the GROBID bibr text and the rendered glyphs
+            disagree (line wrap, comma variant, partial wrap).
 
     Strategy (in order, each skipping positions already annotated):
       1. Locate the citing sentence on some page; pick the marker rect closest
@@ -179,6 +221,9 @@ def _find_citation_target(
          the document.
     """
     sentence_prefix = _safe_sentence_prefix(cit.citing_sentence)
+    # Tracks "did search_for(marker) ever return >0 rects on any page". Lets
+    # the caller distinguish the two failure modes when we return None.
+    any_marker_match = False
 
     # Strategy 1: sentence-first — find the page holding this citing sentence
     if sentence_prefix:
@@ -189,6 +234,7 @@ def _find_citation_target(
             marker_rects = page.search_for(marker)
             if not marker_rects:
                 continue
+            any_marker_match = True
             s0 = sentence_rects[0]
             for rect in sorted(
                 marker_rects,
@@ -196,16 +242,19 @@ def _find_citation_target(
             ):
                 key = (page_idx, int(rect.x0), int(rect.y0))
                 if key not in used_positions:
-                    return page_idx, rect
+                    return (page_idx, rect), "found"
 
     # Strategy 2: first unused occurrence anywhere in the document
     for page_idx, page in enumerate(doc):
-        for rect in page.search_for(marker):
+        marker_rects = page.search_for(marker)
+        if marker_rects:
+            any_marker_match = True
+        for rect in marker_rects:
             key = (page_idx, int(rect.x0), int(rect.y0))
             if key not in used_positions:
-                return page_idx, rect
+                return (page_idx, rect), "found"
 
-    return None
+    return None, ("all_collided" if any_marker_match else "not_in_text")
 
 
 def _safe_sentence_prefix(sentence: Optional[str], length: int = 40) -> str:
@@ -294,7 +343,7 @@ def _draw_highlight_with_note(page, rect, verdict, ref, comp, cit, color) -> Non
             if not text:
                 continue
             head = f"[{i}] {section}" if section else f"[{i}]"
-            passage_lines.append(f"{head}\n{_truncate(text, 400)}")
+            passage_lines.append(f"{head}\n{_truncate(text, 700)}")
 
     parts = [title_line]
     if byline:
@@ -302,13 +351,13 @@ def _draw_highlight_with_note(page, rect, verdict, ref, comp, cit, color) -> Non
     if claim_opinion:
         parts.append("")
         parts.append("Claim agent's opinion:")
-        parts.append(_truncate(claim_opinion, 700))
+        parts.append(_truncate(claim_opinion, 1200))
         if claim_quote:
-            parts.append(f'  > "{_truncate(claim_quote, 300)}"')
+            parts.append(f'  > "{_truncate(claim_quote, 500)}"')
     if abstract:
         parts.append("")
         parts.append("Cited paper abstract:")
-        parts.append(_truncate(abstract, 800))
+        parts.append(_truncate(abstract, 2000))
     if passage_lines:
         parts.append("")
         parts.append("Retrieved passages:")
@@ -316,11 +365,11 @@ def _draw_highlight_with_note(page, rect, verdict, ref, comp, cit, color) -> Non
             parts.append(pl)
     body = "\n".join(parts)
 
-    # Cap so PDF reader popup widgets don't choke. Most desktop viewers
-    # render up to ~3000 chars cleanly; web viewers truncate harder, but we
-    # can't help that.
-    if len(body) > 2400:
-        body = body[:2397].rstrip() + "..."
+    # Cap so PDF reader popup widgets don't choke. Modern desktop viewers
+    # (Acrobat, Preview, Foxit, Okular) render 5000+ chars without issue.
+    # Web viewers like PDF.js truncate harder, but we can't help that.
+    if len(body) > 5000:
+        body = body[:4997].rstrip() + "..."
 
     # Push the icon clear of the marker rect so clicks land on the icon,
     # not the underlying citation hyperlink. ~14pt right + 4pt up keeps it

@@ -56,6 +56,106 @@ async def search_by_title(
     return _parse_response(resp.text, title)
 
 
+async def search_by_authors_year(
+    authors: list[str],
+    year: Optional[int],
+    title_hint: str,
+    client: httpx.AsyncClient,
+) -> Optional[dict]:
+    """Last-resort arXiv search by author surnames + year, with title verification.
+
+    Closes a real-world gap: papers whose arXiv title was renamed across
+    versions (e.g. ``2505.14376`` was uploaded as "AutoRev: Automatic Peer
+    Review System…" in v1, renamed to "Graph-Guided Passage Retrieval…" in
+    v3). The arXiv search API only returns the latest title, so a strict
+    title-similarity check fails — but the authors and year are stable.
+
+    Verification is layered to keep precision:
+
+    - Need at least **two** distinct reference author surnames before we
+      try this — single-author matches on a common surname are too risky.
+    - Year must be within **one** of the reference year (or unknown
+      either side) to handle preprint→publication shift.
+    - Author **containment** (fraction of reference authors found on the
+      candidate) must be ≥ 0.6 — i.e. most of the user's listed authors
+      genuinely appear on the paper.
+    - A relaxed ``title_hint`` similarity floor of 0.30 catches the case
+      where the title was renamed entirely (e.g. AutoRev → Graph-Guided…)
+      but still rejects unrelated papers that happen to share authors.
+
+    Returns the matched record (with ``title_evolved=True`` flag) or
+    ``None`` when nothing meets the bar.
+    """
+    from src.verification.matching import _author_tokens, author_containment
+
+    surnames = sorted(_author_tokens(authors))
+    if len(surnames) < 2:
+        # Single-author searches on common surnames are noisy and
+        # frequently false-positive on arXiv. Skip rather than risk
+        # returning the wrong paper.
+        return None
+
+    # Search for the two most distinctive (alphabetically first, which
+    # roughly correlates with token rarity for non-Western names) surnames
+    # — pairing two surnames almost always uniquely identifies the paper.
+    au_query = f"au:{surnames[0]} AND au:{surnames[1]}"
+
+    try:
+        resp = await fetch_with_retry(
+            client, "arxiv", "GET",
+            BASE_URL,
+            params={
+                "search_query": au_query,
+                "start": 0,
+                "max_results": 10,
+            },
+            timeout=15,
+        )
+        resp.raise_for_status()
+    except (httpx.HTTPStatusError, httpx.RequestError):
+        return None
+
+    # Parse all entries, then post-filter by year + author overlap +
+    # title-hint similarity. ``_parse_response`` enforces a strict title
+    # threshold — we need the broader entry list, so iterate manually.
+    try:
+        root = _safe_fromstring(resp.text)
+    except ElementTree.ParseError:
+        return None
+
+    entries = root.findall("atom:entry", _NS)
+    if not entries:
+        return None
+
+    best: Optional[tuple[float, dict]] = None
+    for entry in entries:
+        paper = _parse_entry(entry)
+        if not paper:
+            continue
+        # Year filter: tolerate ±1 year for preprint vs publication date
+        if year is not None and paper.get("year") is not None:
+            if abs(year - paper["year"]) > 1:
+                continue
+        # Author containment: most of user's listed authors must appear
+        overlap = author_containment(authors, paper.get("authors", []))
+        if overlap < 0.6:
+            continue
+        # Title hint: relaxed floor — a renamed paper still shouldn't
+        # share zero token-level overlap with the user's title.
+        sim = title_similarity(title_hint, paper["title"])
+        if sim < 0.30:
+            continue
+        # Score by author overlap + title sim — pick the strongest
+        # candidate among entries that pass all filters.
+        score = overlap + sim * 0.5
+        if best is None or score > best[0]:
+            paper["title_similarity"] = sim
+            paper["title_evolved"] = True
+            best = (score, paper)
+
+    return best[1] if best else None
+
+
 def _parse_response(xml_text: str, query_title: str) -> Optional[dict]:
     """Parse arXiv Atom XML response and find best title match."""
     try:

@@ -282,6 +282,41 @@ async def _check_existence_cascade(
                 await _cache_result(cache, reference.ref_id, result, _cache_key(reference))
                 return result
 
+    # --- Step 5a: arXiv author + year fallback (renamed papers) ---
+    # Recovers papers whose arXiv title evolved across versions while the
+    # author set stayed stable. Concrete case: ``2505.14376`` was uploaded
+    # as "AutoRev: Automatic Peer Review System for Academic Research
+    # Papers" (v1) and later renamed to "Graph-Guided Passage Retrieval
+    # for Author-Centric Structured Feedback" (v3). The strict title
+    # search above can't match the user's reference against a wholly
+    # different current title, but author surnames + year still uniquely
+    # identify the paper. Gated on having the title (we still hint with
+    # it for verification) and ≥2 reference authors.
+    if (
+        reference.title
+        and reference.authors
+        and len({a for a in reference.authors if a and a.strip()}) >= 2
+    ):
+        ax_record = await arxiv.search_by_authors_year(
+            reference.authors, reference.year, reference.title, client,
+        )
+        if ax_record:
+            all_flags.append(
+                "title_evolved: matched arXiv via authors+year — "
+                "the paper's title appears to have been renamed across "
+                "versions on arXiv"
+            )
+            matched, sim, flags = is_title_match(
+                reference.title, ax_record["title"], threshold=0.0,
+            )
+            all_flags.extend(flags)
+            result = _build_found(
+                reference, ax_record, "arxiv", ax_record.get("title_similarity", sim),
+                databases_checked, all_flags,
+            )
+            await _cache_result(cache, reference.ref_id, result, _cache_key(reference))
+            return result
+
     # --- Step 5b: OpenReview (experimental, flag-gated) ---
     # Closes the structural gap for tech reports that have no DOI and no
     # arXiv ID — LeCun's "A Path Towards Autonomous Machine Intelligence"

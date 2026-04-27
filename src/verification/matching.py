@@ -249,6 +249,27 @@ def author_similarity(ref_authors: list[str], db_authors: list[str]) -> float:
     return len(intersection) / len(union)
 
 
+def author_containment(ref_authors: list[str], db_authors: list[str]) -> float:
+    """Fraction of *reference* author surnames that appear in the DB record.
+
+    Less symmetric than :func:`author_similarity`. Used by the title-evolved
+    arXiv rescue path: we want a high score when every author the user
+    listed shows up in the candidate, regardless of how many additional
+    authors the candidate has. (arXiv records often add late-stage
+    co-authors not in the user's bibliography copy.)
+
+    Returns 0.0 - 1.0; 0 when either side is empty after consortium /
+    corporate-author filtering.
+    """
+    if not ref_authors or not db_authors:
+        return 0.0
+    ref_tokens = _author_tokens(ref_authors)
+    db_tokens = _author_tokens(db_authors)
+    if not ref_tokens or not db_tokens:
+        return 0.0
+    return len(ref_tokens & db_tokens) / len(ref_tokens)
+
+
 def is_author_truncation(ref_authors: list[str], db_authors: list[str]) -> bool:
     """Detect if the reference author list is a truncated subset of the DB list.
 
