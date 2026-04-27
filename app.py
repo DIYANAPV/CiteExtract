@@ -233,13 +233,14 @@ gradio-app > main,
 }
 .cc-feature-icon {
     display: inline-flex; align-items: center; justify-content: center;
-    width: 36px; height: 36px;
-    border-radius: 8px;
-    background: var(--accent-soft);
     color: var(--accent);
     margin-bottom: 14px;
 }
-.cc-feature-icon svg { width: 20px; height: 20px; }
+.cc-feature-icon svg { width: 32px; height: 32px; }
+/* Duotone fill: a low-opacity wash of the same colour as the stroke,
+   placed on a copy of the silhouette path. Phosphor-style depth without
+   sacrificing the monochrome / academic register. */
+.cc-feature-icon svg .duo-fill { opacity: 0.20; }
 .cc-feature-step {
     position: absolute; top: 18px; right: 20px;
     font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
@@ -1207,9 +1208,16 @@ def check_prerequisites(file_path: str, mode: str) -> None:
 # File helpers
 # ---------------------------------------------------------------------------
 
-MAX_UPLOAD_BYTES = 10 * 1024 * 1024  # 10 MB hard cap per file
+MAX_UPLOAD_BYTES = 20 * 1024 * 1024  # 20 MB per file — aligns with router/api caps
 PDF_MAGIC = b"%PDF-"
 ALLOWED_SUFFIXES = {".pdf", ".tex", ".bib", ".txt"}
+
+# Hard cap on the .zip itself for batch uploads. Generous enough to hold a
+# full batch of 20 MB papers (~30) without surprises, while still stopping a
+# truly oversized upload before any extraction work begins. Zip-bomb safety
+# is provided by the per-entry uncompressed cap inside ``_expand_zip_to_papers``;
+# this constant only guards the on-disk size of the zip itself.
+_BATCH_ZIP_MAX_BYTES = 500 * 1024 * 1024  # 500 MB
 
 
 def _validate_upload(file_path: str, label: str = "file") -> None:
@@ -1248,16 +1256,39 @@ def _validate_upload(file_path: str, label: str = "file") -> None:
             )
 
 
+def _unique_dest(dest_dir: Path, name: str) -> Path:
+    """Return a path inside ``dest_dir`` that doesn't yet exist.
+
+    Two uploads can share a basename (e.g. both temp-uploaded as ``paper.pdf``
+    by Gradio from different sources, or two ZIP entries at different paths
+    that share a leaf). The naive ``dest_dir / name`` would silently
+    overwrite the first copy on the second write — pipeline then sees
+    fewer reference PDFs than the user uploaded. Disambiguating with
+    ``_1``, ``_2`` suffixes preserves all uploads.
+    """
+    candidate = dest_dir / name
+    if not candidate.exists():
+        return candidate
+    stem = Path(name).stem
+    suffix = Path(name).suffix
+    i = 1
+    while True:
+        candidate = dest_dir / f"{stem}_{i}{suffix}"
+        if not candidate.exists():
+            return candidate
+        i += 1
+
+
 def prepare_ref_pdfs_dir(pdf_paths: Optional[list[str]]) -> Optional[str]:
     if not pdf_paths:
         return None
     for p in pdf_paths:
         _validate_upload(p, label="reference PDF")
-    tmp_dir = tempfile.mkdtemp(prefix="checkcitation_refs_")
+    tmp_dir = Path(tempfile.mkdtemp(prefix="checkcitation_refs_"))
     for p in pdf_paths:
         src = Path(p)
-        shutil.copy2(str(src), str(Path(tmp_dir) / src.name))
-    return tmp_dir
+        shutil.copy2(str(src), str(_unique_dest(tmp_dir, src.name)))
+    return str(tmp_dir)
 
 
 # ---------------------------------------------------------------------------
@@ -1930,9 +1961,14 @@ def _check_monthly_budget() -> None:
 
 
 def _check_rate_limit(request: Optional["gr.Request"] = None) -> None:
-    """Enforce the daily global cap and the per-IP hourly single-paper cap."""
+    """Enforce the daily global cap and the per-IP hourly single-paper cap.
+
+    Order matters: the per-IP check runs *before* ``_reserve_daily_papers``
+    so a hourly-cap rejection doesn't burn a slot from the global daily
+    quota. (The earlier ordering let a single bad client drain everyone
+    else's quota by repeatedly tripping its own hourly limit.)
+    """
     _check_monthly_budget()
-    _reserve_daily_papers(1)
 
     ip = _client_ip(request)
     now = time.time()
@@ -1944,6 +1980,12 @@ def _check_rate_limit(request: Optional["gr.Request"] = None) -> None:
                 f"Hourly limit reached for your IP ({_HOURLY_IP_LIMIT} single analyses/hour). "
                 "Please try again later."
             )
+        # Reserve the daily slot only after the per-IP check passes.
+        # ``_reserve_daily_papers`` raises gr.Error on global cap; in that
+        # case we haven't yet appended ``now`` to ``recent``, so the
+        # per-IP record stays clean too.
+        _reserve_daily_papers(1)
+
         recent.append(now)
         _ip_requests[ip] = recent
         # Periodically drop empty/stale IP entries to keep memory bounded
@@ -2150,11 +2192,27 @@ def run_analyze(file, ref_pdfs, check_existence, check_claims, retry_failed,
 
     # Tap the timing logger so we can show stage-by-stage progress without
     # threading a callback through the entire pipeline.
+    #
+    # ``_StageCap`` is filtered by the worker thread's ident so concurrent
+    # ``run_analyze`` calls don't cross-contaminate. Without that filter,
+    # both runs' handlers would receive both pipelines' events via the
+    # process-wide ``checkcitation.timing`` logger and one user's progress
+    # display would tick from the other user's pipeline stages.
     stage_events: list[str] = []
     event_lock = threading.Lock()
 
     class _StageCap(logging.Handler):
+        def __init__(self) -> None:
+            super().__init__()
+            # Set after ``worker.start()`` once we know the thread's ident.
+            # Any events that arrive before that are ignored — the worker
+            # hasn't started doing pipeline work yet, so they can only be
+            # noise from concurrent runs.
+            self.allowed_thread: Optional[int] = None
+
         def emit(self, record: logging.LogRecord) -> None:
+            if self.allowed_thread is None or record.thread != self.allowed_thread:
+                return
             m = _STAGE_RE.search(record.getMessage())
             if m:
                 with event_lock:
@@ -2183,6 +2241,7 @@ def run_analyze(file, ref_pdfs, check_existence, check_claims, retry_failed,
     start = time.time()
     worker = threading.Thread(target=_worker, daemon=True)
     worker.start()
+    handler.allowed_thread = worker.ident
 
     try:
         last_yield = 0.0
@@ -2211,7 +2270,18 @@ def run_analyze(file, ref_pdfs, check_existence, check_claims, retry_failed,
     finally:
         timing_log.removeHandler(handler)
         if ref_dir:
-            shutil.rmtree(ref_dir, ignore_errors=True)
+            # Only delete ``ref_dir`` once the worker is fully done with it.
+            # If the user cancelled the run (Gradio closed the generator
+            # mid-yield) the worker thread may still be reading reference
+            # PDFs; ``rmtree`` while it reads would surface as opaque
+            # "file not found" errors deep in the pipeline. Leave the dir
+            # to OS tempdir cleanup in that case — it's a few MB at worst.
+            if worker.is_alive():
+                logging.getLogger(__name__).debug(
+                    "Skipping ref_dir cleanup; worker still alive: %s", ref_dir,
+                )
+            else:
+                shutil.rmtree(ref_dir, ignore_errors=True)
 
     if "error" in result_holder:
         # Clear the in-flight progress card before raising. Without this,
@@ -2705,30 +2775,70 @@ def _write_batch_json(per_paper: list[dict], mode: str, elapsed: float) -> str:
 def _expand_zip_to_papers(zip_path: str) -> list[str]:
     """Extract a .zip into a temp dir and return paths of valid paper files.
 
-    Only files with accepted extensions are returned. Size + magic-bytes
-    checks happen later in _validate_upload per file.
+    Defenses applied here, in order:
+
+    1. **ZIP file size cap** — refuse uploads above ``_BATCH_ZIP_MAX_BYTES``
+       up front so an oversized archive never opens.
+    2. **Path traversal** — ``Path(info.filename).name`` flattens absolute
+       paths and ``..`` segments to a leaf basename, neutralising
+       ``../../etc/passwd``-style entries.
+    3. **Filename collision** — ``_unique_dest`` adds numeric suffixes so a
+       ZIP with ``a/paper.pdf`` and ``b/paper.pdf`` keeps both copies
+       instead of silently overwriting one.
+    4. **Per-entry zip-bomb cap** — each entry is streamed through a hard
+       ``MAX_UPLOAD_BYTES`` ceiling on uncompressed bytes. Going over
+       aborts the whole extraction and removes the temp dir, so a
+       small-compressed-to-huge-uncompressed entry can't fill the disk.
+
+    Magic-bytes / suffix-vs-content checks still happen per file via
+    ``_validate_upload`` after extraction returns.
     """
     import zipfile
-    out_dir = tempfile.mkdtemp(prefix="checkcitation_batch_")
+
+    zip_size = Path(zip_path).stat().st_size
+    if zip_size > _BATCH_ZIP_MAX_BYTES:
+        raise gr.Error(
+            f"ZIP archive is {zip_size / 1024 / 1024:.0f} MB "
+            f"(limit is {_BATCH_ZIP_MAX_BYTES // 1024 // 1024} MB)."
+        )
+
+    out_dir = Path(tempfile.mkdtemp(prefix="checkcitation_batch_"))
     extracted: list[str] = []
-    with zipfile.ZipFile(zip_path, "r") as zf:
-        for info in zf.infolist():
-            if info.is_dir():
-                continue
-            # `Path(info.filename).name` neutralises absolute paths and
-            # ".." traversal segments — a malicious "../../etc/passwd"
-            # collapses to "passwd". We still reject empty / "." / ".."
-            # results, which can occur for entries like "foo/" or "../".
-            safe_name = Path(info.filename).name
-            if not safe_name or safe_name in (".", ".."):
-                continue
-            suffix = Path(safe_name).suffix.lower()
-            if suffix not in ALLOWED_SUFFIXES:
-                continue
-            dest = Path(out_dir) / safe_name
-            with zf.open(info) as src, open(dest, "wb") as dst:
-                shutil.copyfileobj(src, dst)
-            extracted.append(str(dest))
+    try:
+        with zipfile.ZipFile(zip_path, "r") as zf:
+            for info in zf.infolist():
+                if info.is_dir():
+                    continue
+                safe_name = Path(info.filename).name
+                if not safe_name or safe_name in (".", ".."):
+                    continue
+                suffix = Path(safe_name).suffix.lower()
+                if suffix not in ALLOWED_SUFFIXES:
+                    continue
+                dest = _unique_dest(out_dir, safe_name)
+                # Stream-extract with a per-entry uncompressed ceiling so a
+                # zip-bomb (small compressed → many GB uncompressed) can't
+                # exhaust /tmp before _validate_upload fires per file.
+                bytes_written = 0
+                with zf.open(info) as src, open(dest, "wb") as dst:
+                    while True:
+                        chunk = src.read(64 * 1024)
+                        if not chunk:
+                            break
+                        bytes_written += len(chunk)
+                        if bytes_written > MAX_UPLOAD_BYTES:
+                            raise gr.Error(
+                                f"ZIP entry '{safe_name}' exceeds "
+                                f"{MAX_UPLOAD_BYTES // 1024 // 1024} MB "
+                                "(possible zip bomb)."
+                            )
+                        dst.write(chunk)
+                extracted.append(str(dest))
+    except BaseException:
+        # Aborted extraction — remove the partially-populated temp dir so a
+        # rejected ZIP doesn't accumulate on disk run-over-run.
+        shutil.rmtree(out_dir, ignore_errors=True)
+        raise
     return extracted
 
 
@@ -3004,7 +3114,10 @@ def create_app() -> gr.Blocks:
             <div class="cc-features">
                 <div class="cc-feature">
                     <div class="cc-feature-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <!-- Duotone: filled silhouette (low-opacity wash) under the stroked outline -->
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path class="duo-fill" fill="currentColor" stroke="none" d="M6 2h8l6 6v6h-3.5a3.5 3.5 0 1 0-2.5 5.95V22H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/>
+                            <circle class="duo-fill" fill="currentColor" stroke="none" cx="16.5" cy="16.5" r="3"/>
                             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h7"/>
                             <path d="M14 2v6h6"/>
                             <circle cx="16.5" cy="16.5" r="3"/>
@@ -3017,7 +3130,8 @@ def create_app() -> gr.Blocks:
                 </div>
                 <div class="cc-feature">
                     <div class="cc-feature-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <rect class="duo-fill" fill="currentColor" stroke="none" x="3" y="4" width="18" height="16" rx="2"/>
                             <rect x="3" y="4" width="18" height="16" rx="2"/>
                             <path d="M7.2 9.2l.6.6 1.4-1.4"/>
                             <path d="M12 9h5"/>
@@ -3031,9 +3145,13 @@ def create_app() -> gr.Blocks:
                 </div>
                 <div class="cc-feature">
                     <div class="cc-feature-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M7 7c-2 0-3.5 1.5-3.5 3.5S5 14 7 14c0 2-1.5 3.5-3.5 3.5"/>
-                            <path d="M17 7c-2 0-3.5 1.5-3.5 3.5S15 14 17 14c0 2-1.5 3.5-3.5 3.5"/>
+                        <!-- Comment bubble with three dots: the universal "passage / discussion" mark -->
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path class="duo-fill" fill="currentColor" stroke="none" d="M5 4h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-7l-4 4v-4H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/>
+                            <path d="M5 4h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-7l-4 4v-4H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/>
+                            <circle cx="8" cy="10.5" r="1" fill="currentColor"/>
+                            <circle cx="12" cy="10.5" r="1" fill="currentColor"/>
+                            <circle cx="16" cy="10.5" r="1" fill="currentColor"/>
                         </svg>
                     </div>
                     <div class="cc-feature-step">STEP 3</div>
