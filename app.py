@@ -2013,6 +2013,26 @@ PIPELINE_STAGES_DEF: list[tuple[str, str, callable]] = [
         lambda existence, claims: claims),
 ]
 
+# When the triage routes a reference to NEEDS_BOTH (metadata ambiguous AND
+# claim verification needed), the runner emits a single ``agentic_both_dispatch``
+# stage event instead of the separate metadata/claim ones. Map it here so the
+# UI's two-stage display still animates correctly — without this, the metadata
+# and claim spinners hang for the entire dispatch (the actual work happens
+# under an untracked stage name) and the UI looks frozen.
+_STAGE_ALIASES: dict[str, tuple[str, ...]] = {
+    "agentic_both_dispatch": ("agentic_metadata_dispatch", "agentic_claim_dispatch"),
+    # When only Claim Verification is selected (Existence unchecked), the
+    # pipeline takes the comprehension-only path which emits a single
+    # ``L4_comprehension`` event instead of the per-step agentic events.
+    # Map it onto all three UI stages so the progress display doesn't hang
+    # on retrieve/metadata/claim spinners that will never tick on this path.
+    "L4_comprehension": (
+        "agentic_pre_retrieve",
+        "agentic_metadata_dispatch",
+        "agentic_claim_dispatch",
+    ),
+}
+
 # Final-step pseudo stage — set when the pipeline returns and we're rendering
 # results, so the UI shows a "Finalize" tick rather than the last agent step
 # spinning forever.
@@ -2077,9 +2097,11 @@ def run_analyze(file, ref_pdfs, check_existence, check_claims, retry_failed,
                 request: gr.Request = None):
     """Generator: yields the analyze tab outputs as the pipeline progresses.
 
-    Each yield emits an 8-tuple matching the click handler's `outputs` list.
-    During the run, only the cards slot changes — it carries the live
-    pipeline-stage card. Final yield delivers the full results."""
+    Each yield emits an 11-tuple matching the click handler's ``outputs``
+    list (dashboard, coverage, cards, json, download, bib, annotated_pdf,
+    annotated_status, json_acc, dl_row, retry_row). During the run only
+    the cards slot changes — it carries the live pipeline-stage card.
+    Final yield delivers the full results."""
     if file is None:
         raise gr.Error("Please upload a file.")
     _check_rate_limit(request)
@@ -2164,18 +2186,22 @@ def run_analyze(file, ref_pdfs, check_existence, check_claims, retry_failed,
 
     try:
         last_yield = 0.0
+        applicable_ids = {sid for sid, _ in applicable}
         while worker.is_alive():
             worker.join(timeout=0.4)
             with event_lock:
                 current = list(stage_events)
             new_seen = False
             for stage_name in current:
-                if stage_name in seen_stages or stage_name not in {
-                    sid for sid, _ in applicable
-                }:
-                    continue
-                seen_stages.add(stage_name)
-                new_seen = True
+                # Expand stage aliases (e.g. agentic_both_dispatch ticks both
+                # the metadata and claim UI stages) so the progress display
+                # doesn't hang on stages whose underlying work has finished.
+                expanded = _STAGE_ALIASES.get(stage_name, (stage_name,))
+                for ui_id in expanded:
+                    if ui_id in seen_stages or ui_id not in applicable_ids:
+                        continue
+                    seen_stages.add(ui_id)
+                    new_seen = True
             now = time.time()
             # Yield on every stage flip (instant feedback) and otherwise once a
             # second so the elapsed counter still advances during long stages.
@@ -2188,6 +2214,22 @@ def run_analyze(file, ref_pdfs, check_existence, check_claims, retry_failed,
             shutil.rmtree(ref_dir, ignore_errors=True)
 
     if "error" in result_holder:
+        # Clear the in-flight progress card before raising. Without this,
+        # the user sees a frozen mid-pipeline spinner alongside the error
+        # toast and can't tell that the run actually stopped.
+        yield (
+            "",                                            # dashboard
+            "",                                            # coverage
+            "",                                            # cards (clear spinner)
+            "",                                            # json
+            gr.update(value=None, visible=False),          # download
+            gr.update(value=None, visible=False),          # bib
+            gr.update(value=None, visible=False),          # annotated pdf
+            "",                                            # annotated status
+            gr.update(visible=False),                      # json accordion
+            gr.update(visible=False),                      # downloads row
+            gr.update(visible=False),                      # retry row
+        )
         err = result_holder["error"]
         if isinstance(err, gr.Error):
             raise err
@@ -3036,10 +3078,6 @@ def create_app() -> gr.Blocks:
                             value=False,
                         )
                         analyze_btn = gr.Button("Analyze", variant="primary", size="lg", elem_classes=["cc-analyze-btn"])
-                        # Hidden state — flipped to True only by the contextual
-                        # "Re-run with retries" button shown after a run that
-                        # turned up FABRICATED / UNVERIFIABLE references.
-                        analyze_retry = gr.State(value=False)
 
                         chk_claims.change(
                             fn=lambda checked: gr.update(visible=checked),
@@ -3089,14 +3127,13 @@ def create_app() -> gr.Blocks:
                     )
                 analyze_annotated_status = gr.HTML()
 
-                # Single click handler. show_progress_on pins the progress bar
-                # to the main results area only — without it, Gradio 6 paints a
-                # progress bar on every HTML output and you get 3-4 identical
-                # bars stacked above the result region.
+                # show_progress_on pins the progress bar to the main results
+                # area only — without it, Gradio 6 paints a progress bar on
+                # every HTML output and you get 3-4 identical bars stacked
+                # above the result region.
                 _analyze_inputs = [
                     analyze_file, analyze_refs,
                     chk_existence, chk_claims,
-                    analyze_retry,
                 ]
                 _analyze_outputs = [
                     analyze_dashboard, analyze_coverage, analyze_cards,
@@ -3104,28 +3141,42 @@ def create_app() -> gr.Blocks:
                     analyze_annotated_pdf, analyze_annotated_status,
                     analyze_json_acc, analyze_dl_row, analyze_retry_row,
                 ]
-                # First run — retry State is False by default, retry_row stays
-                # hidden until the generator's final yield decides whether
-                # there's anything worth retrying.
+
+                # Two thin wrappers that pin ``retry_failed`` per button.
+                # Earlier versions stored the flag in a ``gr.State`` toggled
+                # by a chained ``.then()``, but if the run between the toggle
+                # and the reset raised, the State was left at True — the next
+                # normal Analyze click silently re-ran as a retry. Splitting
+                # into dedicated handlers eliminates that race entirely: the
+                # main button never reads any state that could be left dirty
+                # by an interrupted retry chain.
+                def run_analyze_main(file, ref_pdfs, ce, cc, request: gr.Request = None):
+                    yield from run_analyze(
+                        file, ref_pdfs, ce, cc,
+                        retry_failed=False, request=request,
+                    )
+
+                def run_analyze_retry(file, ref_pdfs, ce, cc, request: gr.Request = None):
+                    yield from run_analyze(
+                        file, ref_pdfs, ce, cc,
+                        retry_failed=True, request=request,
+                    )
+
                 analyze_btn.click(
-                    fn=run_analyze,
+                    fn=run_analyze_main,
                     inputs=_analyze_inputs,
                     outputs=_analyze_outputs,
                     show_progress="hidden",
                 )
 
-                # Retry button — flips the hidden State to True for one shot,
-                # re-runs with the same form inputs, then resets to False so
-                # the next normal Analyze click doesn't accidentally retry.
+                # Retry button — clears NOT_FOUND cache entries for this
+                # paper and re-runs the same analysis. Surfaced contextually
+                # by the previous run when there's anything worth retrying.
                 analyze_retry_btn.click(
-                    fn=lambda: True, inputs=None, outputs=[analyze_retry],
-                ).then(
-                    fn=run_analyze,
+                    fn=run_analyze_retry,
                     inputs=_analyze_inputs,
                     outputs=_analyze_outputs,
                     show_progress="hidden",
-                ).then(
-                    fn=lambda: False, inputs=None, outputs=[analyze_retry],
                 )
 
             # ── Tab 2: Batch ───────────────────────────────────
@@ -3178,9 +3229,22 @@ def create_app() -> gr.Blocks:
                     )
 
                 def _run_batch_with_visibility(*args, request: gr.Request = None):
+                    # Generator: clear the previous batch's output before
+                    # ``run_batch`` starts. Without this, re-running a batch
+                    # that errors (rate limit, oversized upload, etc.) leaves
+                    # the previous batch's CSV/JSON/.bib download links
+                    # visible alongside the error toast — looks like the new
+                    # batch produced them.
+                    yield (
+                        "", "", "",                                       # summary, rollup, per-paper
+                        gr.update(value=None, visible=False),             # csv
+                        gr.update(value=None, visible=False),             # json
+                        gr.update(value=None, visible=False),             # bib
+                        gr.update(visible=False),                         # dl row
+                    )
                     out = run_batch(*args, request=request)
                     summary_html, rollup_html, per_paper_html, csv_path, json_path, bib_path = out
-                    return (
+                    yield (
                         summary_html, rollup_html, per_paper_html,
                         gr.update(value=csv_path, visible=bool(csv_path)),
                         gr.update(value=json_path, visible=bool(json_path)),

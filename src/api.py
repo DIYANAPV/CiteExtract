@@ -101,9 +101,9 @@ class HealthResponse(BaseModel):
 _ALLOWED_SUFFIXES = {".pdf", ".tex", ".bib", ".txt"}
 
 # Cap on uploaded file size. Research PDFs run large (figures, supplements);
-# 50 MB covers the realistic ceiling without inviting disk-fill DoS from an
+# 20 MB covers the realistic ceiling without inviting disk-fill DoS from an
 # unauthenticated client. Adjust via env if a legitimate workload exceeds it.
-_MAX_UPLOAD_BYTES = 50 * 1024 * 1024
+_MAX_UPLOAD_BYTES = 20 * 1024 * 1024
 
 
 def _suffix_for_upload(upload: UploadFile) -> str:

@@ -47,6 +47,7 @@ trap 'echo "[error] line $LINENO: command \"$BASH_COMMAND\" exited $?" >&2' ERR
 REGION="${REGION:-us-central1}"
 BUDGET_USD="${BUDGET_USD:-200}"
 GROBID_IMAGE="${GROBID_IMAGE:-grobid/grobid:0.8.2-crf}"
+GROBID_MIN_INSTANCES="${GROBID_MIN_INSTANCES:-1}"  # 1 = always warm (~€23/mo), 0 = scale to zero (~€5/mo, but reviewers eat ~30s cold starts)
 MAIN_CPU_ALWAYS="${MAIN_CPU_ALWAYS:-0}"
 SA_NAME="checkcitation-sa"
 SA_EMAIL="${SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
@@ -172,16 +173,18 @@ if [[ -n "${SERPAPI_KEY:-}" ]]; then
 fi
 
 # --- 5. Deploy GROBID ---
-# min=0 + default cpu-throttling: pay only during requests. Reviewers eat one
-# ~30s cold start per session. --allow-unauthenticated is acceptable inside a
-# short review window (URL is an unguessable hash); for longer-lived deploys,
-# switch to --no-allow-unauthenticated + ID-token auth in grobid_parser.py.
+# Default min=1 keeps GROBID always warm, so reviewers never hit a 30s+ cold
+# start on first PDF upload. Override with GROBID_MIN_INSTANCES=0 to scale to
+# zero and save ~€18/mo at the cost of cold-start UX. --allow-unauthenticated
+# is acceptable inside a short review window (URL is an unguessable hash);
+# for longer-lived deploys, switch to --no-allow-unauthenticated + ID-token
+# auth in grobid_parser.py.
 gcloud run deploy grobid \
   --image="$GROBID_IMAGE" \
   --region="$REGION" \
   --port=8070 \
   --memory=4Gi --cpu=2 \
-  --min-instances=0 --max-instances=2 \
+  --min-instances="$GROBID_MIN_INSTANCES" --max-instances=2 \
   --allow-unauthenticated \
   --timeout=300 \
   --startup-probe=httpGet.path=/api/isalive,httpGet.port=8070,initialDelaySeconds=10,periodSeconds=10,failureThreshold=20,timeoutSeconds=5 \

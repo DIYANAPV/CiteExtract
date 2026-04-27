@@ -9,7 +9,7 @@ from src.models.parsed_paper import ParsedPaper
 log = logging.getLogger(__name__)
 
 # Input limits to prevent runaway API calls and OOM
-MAX_FILE_SIZE_MB = 50
+MAX_FILE_SIZE_MB = 20
 MAX_REFERENCES = 500
 
 
