@@ -39,6 +39,13 @@ log = logging.getLogger(__name__)
 # Minimum words for a chunk to be useful
 _MIN_CHUNK_WORDS = 10
 
+# Minimum chars for a chunk to carry meaningful context. Short tail pieces
+# from `_recursive_split` (e.g. a section that ends 90 chars after the last
+# sentence boundary) get merged into their neighbour to avoid surfacing
+# 1-sentence "passages" that the model and human reader can't reason about.
+# Set ~40% of MAX so two short pieces still combine to under 1.4 × MAX.
+_MIN_CHUNK_CHARS = 200
+
 # Target chunk size — 512 chars based on Vectara NAACL 2025 study and
 # Feb 2026 benchmarks (recursive 512-char splitting ranked first at 69%
 # end-to-end accuracy, outperforming semantic and larger fixed-size chunks).
@@ -84,6 +91,100 @@ def chunk_text(
     return _chunk_from_plain_text(text)
 
 
+# Sentence boundary regexes used by `_snap_to_sentences`.
+# `_LEADING_SENT_BOUNDARY` finds the first `.|?|!` followed by whitespace and
+# a likely sentence-start character (capital letter, opening quote, paren, or
+# digit) — used to skip a leading partial sentence.
+# `_TRAILING_SENT_END` finds any `.|?|!` followed by whitespace or end-of-text
+# — used to trim a trailing partial sentence.
+_LEADING_SENT_BOUNDARY = re.compile(r'[.!?]\s+(?=["\'(\[]?[A-Z0-9])')
+_TRAILING_SENT_END = re.compile(r'[.!?](?=\s|$)')
+
+
+def _snap_to_sentences(text: str) -> str:
+    """Trim leading/trailing partial sentences from a chunk.
+
+    Recursive splitting + 50-char overlap can leave a chunk starting
+    mid-sentence (overlap inherits a fragment from the previous chunk)
+    or ending mid-sentence (the splitter fell back to a non-sentence
+    separator to fit max_chars). This produces hard-to-read passages
+    in the UI.
+
+    Snap forward to the first sentence start when the chunk doesn't
+    begin with a capital letter, and trim everything after the last
+    sentence-ending punctuation. If snapping would shrink the chunk
+    below the min-words threshold, return the original — better an
+    imperfect chunk than dropping the content entirely.
+    """
+    stripped = text.strip()
+    if not stripped:
+        return stripped
+
+    snapped = stripped
+
+    # Trim leading partial: chunks that genuinely start a sentence begin
+    # with a capital letter (or an opening quote/paren wrapping one).
+    # Anything else is a fragment — skip to the next sentence boundary.
+    if not snapped[:1].isupper() and not (
+        snapped[:1] in '"\'([' and snapped[1:2].isupper()
+    ):
+        m = _LEADING_SENT_BOUNDARY.search(snapped)
+        if m:
+            snapped = snapped[m.end():].lstrip()
+
+    # Trim trailing partial: cut after the last `.|?|!` followed by
+    # whitespace or end-of-text. If the chunk already ends cleanly,
+    # the regex matches at the final character and this is a no-op.
+    matches = list(_TRAILING_SENT_END.finditer(snapped))
+    if matches:
+        snapped = snapped[:matches[-1].end()].rstrip()
+
+    if len(snapped.split()) < _MIN_CHUNK_WORDS:
+        return stripped
+    return snapped
+
+
+def _merge_short_pieces(
+    pieces: list[str], min_chars: int = _MIN_CHUNK_CHARS,
+) -> list[str]:
+    """Combine pieces shorter than ``min_chars`` with their neighbour.
+
+    ``_recursive_split`` produces a max-512-char piece per slice, but a
+    section's tail (or a section that's intrinsically short) can leave
+    pieces well under that ceiling — landing in the UI as 1-2 sentence
+    "passages" that neither the model nor the human reader can use.
+
+    Strategy: walk forward, and any piece below ``min_chars`` gets merged
+    into the previous piece. If the very first piece is short, it is
+    merged into the next instead. The result is a list whose pieces are
+    each ≥ ``min_chars`` (best effort) — the ceiling can drift above
+    ``_MAX_CHUNK_CHARS`` in pathological merges, which is acceptable
+    because the alternative is a fragment the system cannot reason about.
+    """
+    if not pieces:
+        return pieces
+    out: list[str] = []
+    for piece in pieces:
+        if not piece:
+            continue
+        if out and len(piece) < min_chars:
+            # Merge into the previous piece. Insert a space if needed so we
+            # don't smash sentences together with no separator.
+            sep = "" if out[-1].endswith((" ", "\n", "\t")) else " "
+            out[-1] = out[-1] + sep + piece
+        else:
+            out.append(piece)
+    # Edge case: the very first piece was short — merged into the second
+    # via the walk above only if there was a `out` to merge into. If
+    # pieces[0] was the ONLY short one and there are subsequent pieces,
+    # the loop already left it as the first entry. Re-check head.
+    if len(out) >= 2 and len(out[0]) < min_chars:
+        sep = "" if out[0].endswith((" ", "\n", "\t")) else " "
+        out[1] = out[0] + sep + out[1]
+        out.pop(0)
+    return out
+
+
 def _chunk_from_sections(sections: list[dict]) -> list[Chunk]:
     """Chunk text that has section structure (e.g. from GROBID)."""
     chunks: list[Chunk] = []
@@ -94,9 +195,15 @@ def _chunk_from_sections(sections: list[dict]) -> list[Chunk]:
         if not text.strip():
             continue
         pieces = _recursive_split(text.strip())
+        pieces = _merge_short_pieces(pieces)
         pieces = _add_overlap(pieces)
         for piece in pieces:
-            if len(piece.split()) < _MIN_CHUNK_WORDS:
+            piece = _snap_to_sentences(piece)
+            # Drop pieces too short to give the LLM or the human reader
+            # useful context. The merge step above handles multi-piece
+            # sections; intrinsically tiny sections (e.g. a 90-char
+            # caption-style section) get filtered here.
+            if len(piece) < _MIN_CHUNK_CHARS or len(piece.split()) < _MIN_CHUNK_WORDS:
                 continue
             chunks.append(Chunk(text=piece, section_name=name or None, paragraph_index=idx))
             idx += 1
@@ -108,8 +215,10 @@ def _chunk_from_plain_text(text: str) -> list[Chunk]:
     chunks: list[Chunk] = []
     idx = 0
     pieces = _recursive_split(text.strip())
+    pieces = _merge_short_pieces(pieces)
     pieces = _add_overlap(pieces)
     for piece in pieces:
+        piece = _snap_to_sentences(piece)
         if len(piece.split()) < _MIN_CHUNK_WORDS:
             continue
         chunks.append(Chunk(text=piece, section_name=None, paragraph_index=idx))
@@ -323,6 +432,7 @@ def retrieve_with_index(
     bm25_candidates: int = 10,
     dense_candidates: int = 10,
     rrf_k: int = 60,
+    rerank_pool: int = 10,
 ) -> list[ScoredChunk]:
     """Hybrid (BM25 + dense + RRF + optional FlashRank) against a pre-built index.
 
@@ -330,6 +440,9 @@ def retrieve_with_index(
     returns ScoredChunk objects with ``rrf_score=None`` — matching the
     shape returned by ``retrieve_passages_bm25`` so callers can treat
     both paths interchangeably.
+
+    ``rerank_pool`` caps how many top-RRF candidates are sent to the
+    cross-encoder. Lower = fewer forward passes per query.
     """
     if not index.chunks:
         return []
@@ -357,7 +470,9 @@ def retrieve_with_index(
     dense_scores = {idx: score for idx, score in dense_ranking}
 
     merged = reciprocal_rank_fusion([bm25_ranking, dense_ranking], k=rrf_k)
-    reranked = _rerank_with_flashrank(query, merged[:15], index.chunks, top_k=top_k)
+    reranked = _rerank_with_flashrank(
+        query, merged[:rerank_pool], index.chunks, top_k=top_k,
+    )
     final = reranked if reranked is not None else merged[:top_k]
 
     scored: list[ScoredChunk] = []
@@ -472,8 +587,76 @@ def reciprocal_rank_fusion(
 
 
 # ---------------------------------------------------------------------------
-# Neural reranking (FlashRank)
+# Neural reranking — sentence-transformers CrossEncoder (preferred) with
+# FlashRank as fallback
 # ---------------------------------------------------------------------------
+#
+# The cross-encoder reads each (query, passage) pair jointly to score real
+# relevance, catching passages that BM25 or dense retrieval ranked wrong.
+#
+# Two backends are wired up:
+#  - sentence-transformers CrossEncoder (PyTorch). Predicts a list of
+#    (query, passage) pairs in a single batched forward pass. This lets
+#    the multi-query path score all sub-claims with one model invocation
+#    instead of one per query — that's where the speedup comes from.
+#  - FlashRank (ONNX). Older path. Kept as a fallback when the cross-
+#    encoder model isn't available locally so deployments that already
+#    rely on FlashRank don't break.
+#
+# Same model weights underneath (cross-encoder/ms-marco-MiniLM-L-12-v2),
+# so scores are within ~1% relative across backends — close enough that
+# top-k ranking is preserved on the queries we've seen. The score-parity
+# test in tests/ pins this.
+
+_CROSS_ENCODER_MODEL = "cross-encoder/ms-marco-MiniLM-L-12-v2"
+
+
+@functools.lru_cache(maxsize=1)
+def _get_cross_encoder(model_name: str = _CROSS_ENCODER_MODEL):
+    """Lazy-load a sentence-transformers CrossEncoder. Cached — model loads once."""
+    from sentence_transformers import CrossEncoder
+    log.info(f"Loading CrossEncoder reranker: {model_name}")
+    return CrossEncoder(model_name, max_length=512)
+
+
+def _cross_encoder_score_pairs(
+    pairs: list[tuple[str, str]],
+) -> Optional[list[float]]:
+    """Score (query, passage) pairs in one batched forward pass.
+
+    Returns one float per input pair, in [0, 1], in the same order.
+    Returns None if sentence-transformers isn't available or the model
+    fails to load — callers should then try ``_rerank_with_flashrank``
+    or fall through to RRF-only.
+
+    A sigmoid is applied to the model's raw logits so scores are
+    bounded in [0, 1] — this matches FlashRank's prior output range and
+    avoids surprising any downstream code (UI display, sort assumptions)
+    that expected positive rerank scores. Sigmoid is monotonic, so
+    ranking order is preserved.
+
+    Why this exists: the multi-query path expands a citing sentence into
+    1 + N sub-claims and reranks each query's candidate list against the
+    same cited paper. Scoring all (query_i, passage_j) pairs in one
+    invocation lets the cross-encoder batch them into a single forward
+    pass instead of paying model-call overhead 1 + N times.
+    """
+    if not pairs:
+        return []
+    try:
+        ce = _get_cross_encoder()
+    except (ImportError, OSError, RuntimeError) as e:
+        log.debug(f"CrossEncoder unavailable: {e}")
+        return None
+    try:
+        logits = ce.predict(list(pairs), show_progress_bar=False)
+    except (RuntimeError, ValueError) as e:
+        log.warning(f"CrossEncoder predict failed: {e}")
+        return None
+    # Sigmoid to [0,1] — monotonic, preserves ranking, matches prior range.
+    arr = np.asarray(logits, dtype=np.float64)
+    probs = 1.0 / (1.0 + np.exp(-arr))
+    return [float(p) for p in probs]
 
 
 def _rerank_with_flashrank(
@@ -482,14 +665,17 @@ def _rerank_with_flashrank(
     chunks: list[Chunk],
     top_k: int = 3,
 ) -> list[tuple[int, float]] | None:
-    """Rerank RRF candidates using FlashRank cross-encoder.
+    """Rerank RRF candidates with the cross-encoder.
 
-    FlashRank reads each (query, passage) pair jointly, scoring real
-    relevance rather than merging ranked lists. This catches passages
-    that BM25 or dense retrieval ranked wrong.
+    Prefers ``_cross_encoder_score_pairs`` (sentence-transformers,
+    batchable). Falls back to FlashRank's ONNX runtime if the
+    cross-encoder isn't available, then to None (caller falls back to
+    RRF-only).
 
-    Falls back to None if flashrank is not installed, so the pipeline
-    degrades gracefully to RRF-only.
+    Name kept for back-compat with existing call sites; behavior is now
+    cross-encoder-first. Single-query callers don't see a measurable
+    speed difference — the win comes from the batched multi-query path
+    in ``_rerank_pair_batches``.
 
     Args:
         query: The citing sentence (retrieval query).
@@ -498,37 +684,88 @@ def _rerank_with_flashrank(
         top_k: Number of reranked results to return.
 
     Returns:
-        Reranked list [(chunk_index, rerank_score), ...], or None if
-        flashrank is unavailable.
+        Reranked list [(chunk_index, rerank_score), ...], or None if all
+        backends are unavailable.
     """
-    try:
-        from flashrank import Ranker, RerankRequest
-    except ImportError:
-        return None
-
     if not candidates:
         return None
 
-    # Build passages for FlashRank
-    passages = []
-    idx_map = {}  # flashrank_position -> chunk_index
-    for i, (chunk_idx, _score) in enumerate(candidates):
-        passages.append({"id": i, "text": chunks[chunk_idx].text})
-        idx_map[i] = chunk_idx
+    pairs: list[tuple[str, str]] = [
+        (query, chunks[chunk_idx].text) for chunk_idx, _ in candidates
+    ]
+    scores = _cross_encoder_score_pairs(pairs)
+    if scores is not None:
+        scored = [(candidates[i][0], scores[i]) for i in range(len(candidates))]
+        scored.sort(key=lambda x: -x[1])
+        return scored[:top_k]
+
+    # Fallback: FlashRank (ONNX). Same model weights, different runtime.
+    try:
+        from flashrank import RerankRequest
+    except ImportError:
+        return None
+
+    passages = [
+        {"id": i, "text": chunks[chunk_idx].text}
+        for i, (chunk_idx, _) in enumerate(candidates)
+    ]
+    idx_map = {i: candidates[i][0] for i in range(len(candidates))}
 
     try:
         ranker = _get_flashrank_ranker()
-        request = RerankRequest(query=query, passages=passages)
-        results = ranker.rerank(request)
-
-        reranked = []
-        for r in results[:top_k]:
-            orig_idx = idx_map[r["id"]]
-            reranked.append((orig_idx, float(r["score"])))
-        return reranked
-    except Exception as e:
+        results = ranker.rerank(RerankRequest(query=query, passages=passages))
+    except (RuntimeError, OSError, ValueError) as e:
         log.warning(f"FlashRank reranking failed, falling back to RRF: {e}")
         return None
+
+    return [(idx_map[r["id"]], float(r["score"])) for r in results[:top_k]]
+
+
+def _rerank_pair_batches(
+    queries: list[str],
+    candidates_per_query: list[list[tuple[int, float]]],
+    chunks: list[Chunk],
+    top_k: int = 3,
+) -> Optional[list[list[tuple[int, float]]]]:
+    """Rerank N queries' candidate lists with ONE cross-encoder forward pass.
+
+    Builds the flat list ``[(q_1, p_1_1), (q_1, p_1_2), ..., (q_N, p_N_M)]``,
+    scores it in a single batched call, then splits results back per query.
+
+    Returns one reranked top_k list per input query, or None if the
+    cross-encoder is unavailable. When None, callers should fall back to
+    per-query reranking via ``_rerank_with_flashrank`` (which itself
+    falls back to FlashRank then to RRF-only).
+    """
+    if not queries or len(queries) != len(candidates_per_query):
+        return None
+
+    pairs: list[tuple[str, str]] = []
+    offsets: list[tuple[int, int]] = []
+    chunk_idx_per_pair: list[int] = []
+
+    for q, cands in zip(queries, candidates_per_query):
+        start = len(pairs)
+        for chunk_idx, _score in cands:
+            pairs.append((q, chunks[chunk_idx].text))
+            chunk_idx_per_pair.append(chunk_idx)
+        offsets.append((start, len(pairs)))
+
+    if not pairs:
+        return [[] for _ in queries]
+
+    scores = _cross_encoder_score_pairs(pairs)
+    if scores is None:
+        return None
+
+    out: list[list[tuple[int, float]]] = []
+    for start, end in offsets:
+        per_query = [
+            (chunk_idx_per_pair[i], scores[i]) for i in range(start, end)
+        ]
+        per_query.sort(key=lambda x: -x[1])
+        out.append(per_query[:top_k])
+    return out
 
 
 @functools.lru_cache(maxsize=1)

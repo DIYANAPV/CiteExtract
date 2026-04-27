@@ -23,7 +23,7 @@ DATASETS_DIR = EVAL_DIR / "datasets"
 RESULTS_DIR = EVAL_DIR / "results"
 
 ALL_VERDICTS = [
-    "FABRICATED", "MISREPRESENTED", "VALID", "UNVERIFIABLE",
+    "FABRICATED", "VALID", "UNVERIFIABLE",
 ]
 
 
@@ -117,7 +117,13 @@ async def evaluate_llm_papers() -> dict:
 
     Reports what the system finds. Useful for seeing how many refs are flagged.
     """
-    base = Path("/home/diyana-muhammed/Desktop/PhD/Generated-papers_AI-Researcher/latex")
+    # Path is configurable via env var so the test runner stays portable.
+    # Default looks under <repo>/data/llm_papers/latex.
+    import os
+    base = Path(os.environ.get(
+        "LLM_PAPERS_DIR",
+        Path(__file__).resolve().parents[2] / "data" / "llm_papers" / "latex",
+    ))
     if not base.exists():
         print(f"LLM papers directory not found: {base}")
         return {}

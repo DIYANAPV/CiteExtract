@@ -165,7 +165,17 @@ class TestFullTextCache:
         er = _make_existence(doi=None, oa_url=None, abstract="Fallback abstract.")
         mock_client = AsyncMock()
 
-        result = _run(get_full_text(er, mock_client, cache))
+        # Patch the new S2/arXiv fallbacks to no-op so we exercise the
+        # abstract_only path. The fallback paths have their own dedicated
+        # test coverage in test_fulltext_fallbacks.py.
+        with patch(
+            "src.verification.api_clients.fulltext._try_s2_fallback_pdf",
+            new=AsyncMock(return_value=None),
+        ), patch(
+            "src.verification.api_clients.fulltext._try_arxiv_fallback_pdf",
+            new=AsyncMock(return_value=None),
+        ):
+            result = _run(get_full_text(er, mock_client, cache))
         assert result.source == "abstract_only"
         assert result.abstract == "Fallback abstract."
 

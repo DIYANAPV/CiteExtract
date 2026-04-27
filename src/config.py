@@ -226,6 +226,18 @@ def cache() -> dict:
     }
 
 
+def experimental_fallbacks() -> dict:
+    """Toggles for experimental L2 fallback databases.
+
+    Returns a dict like ``{"openreview": True}``. Defaults are conservative
+    (off) so missing config doesn't change cascade behavior unexpectedly.
+    """
+    section = _get_section("experimental_fallbacks") or {}
+    return {
+        "openreview": bool(section.get("openreview", False)),
+    }
+
+
 # --- Agentic ---
 
 def agentic() -> Optional[dict]:

@@ -25,10 +25,19 @@ log = logging.getLogger(__name__)
 
 CACHE_DIR = Path("data/cache/reports")
 
+# Bump when verification semantics change such that previously-cached reports
+# are no longer trustworthy and must be regenerated. Folded into the cache
+# key, so any change here invalidates every existing entry on next access.
+#   v2 (2026-04-26): identity-keyed fulltext cache. Earlier reports were
+#                    built against per-input-ref_id keys that served wrong
+#                    cited papers across runs; bumping forces regeneration.
+SCHEMA_VERSION = 2
+
 
 def _config_fingerprint() -> str:
     """Hash of config sections that materially change verification output."""
     relevant = {
+        "schema_version": SCHEMA_VERSION,
         "agentic": config.agentic() or {},
         "comprehension": config.comprehension(),
         "thresholds": config.thresholds(),

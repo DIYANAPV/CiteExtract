@@ -39,19 +39,35 @@ def build_report(
 
 
 def _compute_summary(verdicts: list[CitationVerdict]) -> ReportSummary:
-    """Compute aggregate stats from verdicts."""
+    """Compute aggregate stats from verdicts.
+
+    ``by_verdict`` is sourced from ``metadata_verdict`` (the "does this paper
+    exist?" dimension). ``claim_breakdown`` is computed by counting every
+    per-sentence ClaimVerdict across all references. The two are reported
+    side by side so claim-uncertainty does not bleed into metadata-uncertainty
+    on the headline.
+    """
     total = len(verdicts)
     if total == 0:
         return ReportSummary()
 
     by_verdict: dict[str, int] = {}
+    claim_breakdown: dict[str, int] = {}
+    total_claim_sentences = 0
     flagged = 0
     for v in verdicts:
-        by_verdict[v.verdict] = by_verdict.get(v.verdict, 0) + 1
-        # Only count as flagged if the verdict itself is problematic,
-        # not just because informational flags exist (e.g. retraction_not_checked).
-        if v.verdict != "VALID":
+        # Metadata dimension. Quick mode mirrors the rolled-up verdict into
+        # metadata_verdict, so this also works when no claim agent ran.
+        meta_v = v.metadata_verdict or v.verdict
+        by_verdict[meta_v] = by_verdict.get(meta_v, 0) + 1
+        if meta_v != "VALID":
             flagged += 1
+
+        # Claim dimension — count every per-sentence verdict across all refs.
+        for cv in v.per_sentence_claim_verdicts.values():
+            label = cv.verdict
+            claim_breakdown[label] = claim_breakdown.get(label, 0) + 1
+            total_claim_sentences += 1
 
     valid_count = sum(by_verdict.get(vv, 0) for vv in _VALID_VERDICTS)
     # Exclude UNVERIFIABLE from the denominator — "couldn't check" shouldn't
@@ -73,6 +89,8 @@ def _compute_summary(verdicts: list[CitationVerdict]) -> ReportSummary:
     return ReportSummary(
         total_checked=total,
         by_verdict=by_verdict,
+        claim_breakdown=claim_breakdown,
+        total_claim_sentences=total_claim_sentences,
         integrity_score=round(integrity, 3),
         risk_level=risk,
         flagged_for_review=flagged,

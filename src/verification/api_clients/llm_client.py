@@ -12,6 +12,7 @@ from abc import ABC, abstractmethod
 from pydantic import BaseModel
 
 from src import config
+from src.verification import spend_guard
 
 log = logging.getLogger(__name__)
 
@@ -29,6 +30,15 @@ class CostTracker(BaseModel):
         self.total_input_tokens += input_tokens
         self.total_output_tokens += output_tokens
         self.total_calls += 1
+        # Mirror this call's marginal cost into the persistent monthly ledger
+        # so spend_guard.check_budget() at request entry points sees a global
+        # total across every code path that constructs a CostTracker.
+        pricing = config.llm_pricing()
+        marginal = (
+            input_tokens * pricing["input_cost_per_million"] / 1_000_000
+            + output_tokens * pricing["output_cost_per_million"] / 1_000_000
+        )
+        spend_guard.record(marginal)
 
     @property
     def estimated_cost_usd(self) -> float:

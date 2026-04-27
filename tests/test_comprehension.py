@@ -49,12 +49,16 @@ Conclusion
 
 In this work we presented the Transformer, a novel architecture based entirely on attention. The Transformer can be trained significantly faster than architectures based on recurrent or convolutional layers. We plan to extend the Transformer to other modalities and to investigate local attention mechanisms."""
 
+# Sections sized above the new 200-char min so the fixture exercises the
+# happy path of section chunking rather than the new tiny-section filter.
+# Targeted at ~250-350 chars each — reflects realistic per-section text in
+# parsed papers (intro, methods, etc. usually run multiple paragraphs).
 SAMPLE_SECTIONS = [
-    {"name": "Abstract", "text": "We propose a novel attention mechanism that replaces recurrence entirely. The Transformer architecture relies on self-attention."},
-    {"name": "Introduction", "text": "Recurrent neural networks have long been the dominant approach for sequence modeling tasks. However, they suffer from inherent sequential computation."},
-    {"name": "Methods", "text": "We propose a new simple network architecture called the Transformer. It is based entirely on attention mechanisms, dispensing with recurrence and convolutions entirely."},
-    {"name": "Experiments", "text": "We trained our models on the WMT 2014 English-to-German translation task. The Transformer achieves 28.4 BLEU on the English-to-German task."},
-    {"name": "Conclusion", "text": "In this work we presented the Transformer, a novel architecture based entirely on attention. We plan to extend the Transformer to other modalities."},
+    {"name": "Abstract", "text": "We propose a novel attention mechanism that replaces recurrence entirely. The Transformer architecture relies on self-attention to compute representations of its input and output. Experiments on machine translation tasks demonstrate that the Transformer is superior in quality while being more parallelizable and requiring significantly less time to train."},
+    {"name": "Introduction", "text": "Recurrent neural networks have long been the dominant approach for sequence modeling tasks such as language modeling and machine translation. However, they suffer from inherent sequential computation that prevents parallelization within training examples. Attention mechanisms have become an integral part of compelling sequence modeling, allowing modeling of dependencies without regard to their distance in the input or output sequences."},
+    {"name": "Methods", "text": "We propose a new simple network architecture called the Transformer. It is based entirely on attention mechanisms, dispensing with recurrence and convolutions entirely. The encoder maps an input sequence of symbol representations to a continuous representation. Given this representation, the decoder generates an output sequence one element at a time."},
+    {"name": "Experiments", "text": "We trained our models on the WMT 2014 English-to-German translation task. The training data consisted of about 4.5 million sentence pairs. We also evaluated on the English-to-French translation task. The Transformer achieves 28.4 BLEU on the English-to-German task, improving over the existing best results by more than 2 BLEU."},
+    {"name": "Conclusion", "text": "In this work we presented the Transformer, a novel architecture based entirely on attention. The Transformer can be trained significantly faster than architectures based on recurrent or convolutional layers. We plan to extend the Transformer to other modalities and to investigate local attention mechanisms."},
 ]
 
 
@@ -102,6 +106,44 @@ class TestChunkText:
         # Short fragments should be filtered out
         for c in chunks:
             assert len(c.text.split()) >= 10
+
+    def test_chunks_meet_min_chars(self):
+        """No chunk should be shorter than _MIN_CHUNK_CHARS — short tails
+        get merged with their neighbour, intrinsically tiny sections get
+        dropped. This guards against the UI surfacing 1-sentence "passages"
+        that the model and human reader cannot reason about.
+        """
+        from src.verification.comprehension import _MIN_CHUNK_CHARS
+        # Mix of intrinsically tiny sections and a long body whose tail
+        # would otherwise stay short after recursive splitting.
+        sections = [
+            {"name": "Tiny caption",
+             "text": "Just one short sentence that on its own is too brief to be useful."},  # ~70 chars
+            {"name": "Long body",
+             "text": ("This is a longer section with enough text. " * 30)},
+            {"name": "Short tail",
+             "text": "A small section."},  # 16 chars
+        ]
+        chunks = chunk_text("", sections=sections)
+        assert chunks, "expected at least the long body to produce chunks"
+        for c in chunks:
+            assert len(c.text) >= _MIN_CHUNK_CHARS, (
+                f"chunk under min_chars surfaced: section={c.section_name!r} "
+                f"chars={len(c.text)} text={c.text!r}"
+            )
+
+    def test_short_section_with_long_neighbour_via_plain_text(self):
+        """In plain-text mode, a short tail piece should merge with the
+        previous piece rather than land as a standalone fragment.
+        """
+        from src.verification.comprehension import _MIN_CHUNK_CHARS
+        # A long sentence that splits into multiple ~512-char pieces, with
+        # a deliberate short paragraph at the end.
+        text = "This is a longer sentence that should produce a substantial chunk. " * 12
+        text += "\n\nTiny tail."
+        chunks = chunk_text(text)
+        for c in chunks:
+            assert len(c.text) >= _MIN_CHUNK_CHARS
 
 
 # ---- BM25 retrieval ----
@@ -344,3 +386,43 @@ class TestRetrievalIndexParity:
         index = build_retrieval_index(chunks, model_name=None)
         with pytest.raises(Exception):  # FrozenInstanceError
             index.chunks = []  # type: ignore[misc]
+
+
+# ---- Rerank pool config knob ----
+
+class TestRerankPool:
+    def test_rerank_pool_passed_to_flashrank(self, monkeypatch):
+        """retrieve_with_index slices RRF candidates to ``rerank_pool`` before
+        reranking. Lower pool = fewer (query, passage) pairs sent to the
+        reranker = less CPU work per query.
+        """
+        from src.verification import comprehension as comp_module
+
+        chunks = chunk_text(SAMPLE_PAPER_TEXT)
+        index = build_retrieval_index(chunks, model_name="all-MiniLM-L6-v2")
+
+        seen_pool_sizes: list[int] = []
+
+        def _spy_rerank(query, candidates, chunks_arg, top_k=3):
+            seen_pool_sizes.append(len(candidates))
+            return [(c[0], 1.0 - i * 0.01) for i, c in enumerate(candidates[:top_k])]
+
+        monkeypatch.setattr(comp_module, "_rerank_with_flashrank", _spy_rerank)
+
+        retrieve_with_index("attention", index, top_k=3, rerank_pool=5)
+        retrieve_with_index("attention", index, top_k=3, rerank_pool=15)
+
+        # Pool size is capped by available RRF candidates (which can be < pool
+        # for short docs); the assertion is that the pool param caps the upper
+        # bound, not that it always reaches it.
+        assert seen_pool_sizes[0] <= 5
+        assert seen_pool_sizes[1] <= 15
+        assert seen_pool_sizes[1] >= seen_pool_sizes[0]
+
+    def test_rerank_pool_default_is_ten(self):
+        # Defaulting to 10 is the deliberate post-tuning choice — guards
+        # against a future accidental flip back to 15.
+        import inspect
+        from src.verification.comprehension import retrieve_with_index
+        sig = inspect.signature(retrieve_with_index)
+        assert sig.parameters["rerank_pool"].default == 10

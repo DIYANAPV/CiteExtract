@@ -20,7 +20,8 @@ log = logging.getLogger(__name__)
 
 from src.models.reference import Reference
 from src.models.verdict import ExistenceResult
-from src.verification.api_clients import arxiv, crossref, openalex, pubmed, semantic_scholar
+from src import config as _config
+from src.verification.api_clients import arxiv, crossref, openalex, openreview, pubmed, semantic_scholar
 from src.verification.cache import APICache
 from src.verification.matching import (
     PREPRINT_RE,
@@ -217,6 +218,32 @@ async def _check_existence_cascade(
                 await _cache_result(cache, reference.ref_id, result, _cache_key(reference))
                 return result
 
+    # --- Step 3.5: CrossRef title search ---
+    # Only fires when CrossRef wasn't already consulted via DOI lookup
+    # (Step 1 added it to ``databases_checked`` if so). Catches journal
+    # articles that S2/OpenAlex returned without a DOI as well as papers
+    # those DBs have weaker coverage on. CrossRef is also the canonical
+    # source for retraction signals, so a hit here gives the verdict
+    # better grounding even when the title was already matched elsewhere.
+    if reference.title and "crossref" not in databases_checked:
+        cr_record = await crossref.search_by_title(reference.title, client)
+        databases_checked.append("crossref")
+        if cr_record:
+            matched, sim, flags = is_title_match(reference.title, cr_record["title"])
+            all_flags.extend(flags)
+            if matched:
+                upgraded = await _try_upgrade_preprint(
+                    cr_record, reference, client, databases_checked, all_flags,
+                )
+                if upgraded:
+                    await _cache_result(cache, reference.ref_id, upgraded, _cache_key(reference))
+                    return upgraded
+                result = _build_found(
+                    reference, cr_record, "crossref", sim, databases_checked, all_flags,
+                )
+                await _cache_result(cache, reference.ref_id, result, _cache_key(reference))
+                return result
+
     # --- Step 4: PubMed (last resort) ---
     if reference.title:
         pm_record = await pubmed.search_by_title(reference.title, client)
@@ -251,6 +278,26 @@ async def _check_existence_cascade(
                     return upgraded
                 result = _build_found(
                     reference, arxiv_record, "arxiv", sim, databases_checked, all_flags
+                )
+                await _cache_result(cache, reference.ref_id, result, _cache_key(reference))
+                return result
+
+    # --- Step 5b: OpenReview (experimental, flag-gated) ---
+    # Closes the structural gap for tech reports that have no DOI and no
+    # arXiv ID — LeCun's "A Path Towards Autonomous Machine Intelligence"
+    # is the canonical example. Disabled by default to keep cascade
+    # behaviour stable; flip ``experimental_fallbacks.openreview: true``
+    # in config.yaml to opt in.
+    if reference.title and _config.experimental_fallbacks().get("openreview"):
+        or_record = await openreview.search_by_title(reference.title, client)
+        databases_checked.append("openreview")
+        if or_record:
+            matched, sim, flags = is_title_match(reference.title, or_record["title"])
+            all_flags.extend(flags)
+            if matched:
+                result = _build_found(
+                    reference, or_record, "openreview", sim,
+                    databases_checked, all_flags,
                 )
                 await _cache_result(cache, reference.ref_id, result, _cache_key(reference))
                 return result
@@ -443,11 +490,23 @@ async def _cross_validate_authors(
 
     Modifies result.flags in-place.
     """
-    from src.verification.matching import _author_tokens
+    from src.verification.matching import _author_tokens, _is_consortium_name
 
     ref_tokens = _author_tokens(reference.authors)
     primary_tokens = _author_tokens(result.matched_authors)
     if not ref_tokens:
+        # Reference author list is empty after consortium / corporate-author
+        # filtering. Llama 3 cites itself as authored by "Meta AI"; Qwen
+        # papers credit "Qwen Team". Suppressing the validation here and
+        # emitting a benign flag avoids the false-positive where
+        # ``_cross_validate_authors`` previously marked these as fabricated.
+        if reference.authors and all(
+            _is_consortium_name(a) for a in reference.authors if a.strip()
+        ):
+            result.flags.append(
+                "authors_corporate: ref author list is org-only "
+                "(e.g., Meta AI, Google Research) — skipping cross-validation"
+            )
         return
 
     # Pick a second DB that wasn't the primary source

@@ -13,6 +13,7 @@ from src.models.citation import Citation
 from src.models.parsed_paper import ParsedPaper
 from src.models.reference import Reference
 from src.parsers.base import BaseParser
+from src.parsers.marker_rule_check import annotate_citation_confidence
 
 
 # Patterns marking the end of a title in a reference string
@@ -152,6 +153,12 @@ class TextParser(BaseParser):
                         marker=det.marker,
                         position=det.position,
                     ))
+
+        if citations and references:
+            # Text parser links markers to refs by prose-detected key (same
+            # ambiguity class as GROBID). Run the rule-check vote; no LLM vote.
+            refs_by_id = {r.ref_id: r for r in references}
+            citations = annotate_citation_confidence(citations, refs_by_id)
 
         if not references and not citations:
             warnings.append("No references or citations found. Check text formatting.")

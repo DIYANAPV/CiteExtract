@@ -124,6 +124,32 @@ def cmd_comprehend(args: argparse.Namespace) -> None:
     print(f"Abstract only:       {cov.get('abstract_only', 0)}", file=sys.stderr)
     print(f"Not found:           {cov.get('not_found', 0)}", file=sys.stderr)
 
+    # When references end up abstract_only despite the system "knowing" the
+    # paper exists, the failure trace on each result tells us *why*. Print a
+    # one-line summary per ref so the user can debug without grep-ing logs.
+    fallthroughs = [
+        r for r in report.results
+        if r.full_text_source in ("abstract_only", "not_found")
+        and r.fetch_attempts
+    ]
+    if fallthroughs:
+        # Dedupe by ref_id (each citing sentence in the same ref shares the
+        # same fetch trace).
+        seen_refs: set[str] = set()
+        print(
+            f"\nFull-text fallthroughs ({len(set(r.ref_id for r in fallthroughs))} refs):",
+            file=sys.stderr,
+        )
+        for r in fallthroughs:
+            if r.ref_id in seen_refs:
+                continue
+            seen_refs.add(r.ref_id)
+            chain = " → ".join(
+                f"{a.source}:{a.status}" for a in r.fetch_attempts
+            )
+            title = (r.paper_metadata.get("title") or "?")[:50]
+            print(f"  [{r.ref_id}] {title}: {chain}", file=sys.stderr)
+
     # Show top results
     for r in report.results:
         if not r.citing_sentence or not r.top_passages:

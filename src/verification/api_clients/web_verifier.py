@@ -6,11 +6,14 @@ by checking if their URL resolves and/or if the Wayback Machine has archived the
 No API keys required. Uses existing httpx async client.
 """
 
+import asyncio
 import logging
 import re
 from typing import Optional
 
 import httpx
+
+from src.verification.url_safety import is_safe_external_url
 
 log = logging.getLogger(__name__)
 
@@ -76,11 +79,18 @@ async def verify_url(
 ) -> dict | None:
     """Check if a URL resolves to a live page.
 
-    Returns dict with page info if reachable, None otherwise.
+    Returns dict with page info if reachable, None otherwise. URLs that
+    point at private, loopback, link-local, or otherwise non-public
+    addresses are rejected up front to prevent SSRF: a reference of the
+    form `http://169.254.169.254/...` must not be probed.
     """
+    if not await asyncio.to_thread(is_safe_external_url, url):
+        log.debug(f"URL rejected as unsafe (private/non-http): {url}")
+        return None
+
     try:
         resp = await client.head(url, timeout=timeout, follow_redirects=True)
-        if resp.status_code in _LIVE_CODES:
+        if resp.status_code in _LIVE_CODES and is_safe_external_url(str(resp.url)):
             return {
                 "url": str(resp.url),
                 "status_code": resp.status_code,
@@ -95,7 +105,7 @@ async def verify_url(
             url, timeout=timeout, follow_redirects=True,
             headers={"Range": "bytes=0-1024"},  # limit download
         )
-        if resp.status_code in _LIVE_CODES:
+        if resp.status_code in _LIVE_CODES and is_safe_external_url(str(resp.url)):
             return {
                 "url": str(resp.url),
                 "status_code": resp.status_code,

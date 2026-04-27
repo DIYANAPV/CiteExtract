@@ -1,0 +1,10 @@
+#!include:.gitignore
+.git/
+.gcloudignore
+data/
+paper/
+experiment/
+baselines/
+tests/
+*.pdf
+*.pre_recovery

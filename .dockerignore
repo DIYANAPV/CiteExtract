@@ -1,0 +1,12 @@
+.git
+.env
+__pycache__
+*.pyc
+data/cache
+data/dataset_final.*
+.venv
+venv
+baselines/
+tests/
+*.egg-info
+*.pre_recovery

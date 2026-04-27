@@ -119,24 +119,21 @@ async def run_agentic_verification(
     if cache is None:
         cache = APICache()
 
-    # --- Pre-retrieve passages for FOUND refs with substantive citations ---
-    with stage("agentic_pre_retrieve", refs=len(parsed.references)):
-        passages_by_ref, fulltext_by_ref = await _pre_retrieve_passages(
-            parsed, exist_map, citation_groups, agentic_config, cost_tracker,
-            ref_pdfs_dir=ref_pdfs_dir,
-            prefetched_chunks=prefetched_chunks,
-            cache=cache,
-        )
-
-    # --- Triage all references ---
+    # --- Triage all references (no passages yet) ---
+    # Routes don't depend on passages — only the human-readable reason
+    # string for NEEDS_CLAIM does ("...substantive citing claims to verify"
+    # vs "...claims present but no passages pre-retrieved"). We patch that
+    # reason after pre-retrieve completes (see _patch_triage_reasons below).
+    # Running triage early lets metadata-dispatch start in parallel with
+    # the slow pre-retrieve step instead of blocking on it.
     with stage("agentic_triage", refs=len(parsed.references)):
         triage_config = agentic_config.get("triage", {})
         triage_results = triage_all(
             exist_map=exist_map,
             metadata_map=metadata_map,
             citations_by_ref=citation_groups,
-            passages_by_ref=passages_by_ref,
-            fulltext_by_ref=fulltext_by_ref,
+            passages_by_ref={},
+            fulltext_by_ref={},
             triage_config=triage_config,
         )
 
@@ -165,12 +162,19 @@ async def run_agentic_verification(
         f"(meta={len(needs_metadata)}, claim={len(needs_claim)}, both={len(needs_both)})"
     )
 
-    # --- Skip agents if nothing needs them ---
+    # --- No agents needed: just run pre-retrieve (still required for the
+    # comprehension report) and return early. ---
     if agent_count == 0:
+        with stage("agentic_pre_retrieve", refs=len(parsed.references)):
+            passages_by_ref, fulltext_by_ref = await _pre_retrieve_passages(
+                parsed, exist_map, citation_groups, agentic_config, cost_tracker,
+                ref_pdfs_dir=ref_pdfs_dir,
+                prefetched_chunks=prefetched_chunks,
+                cache=cache,
+            )
         if owns_cache:
             await cache.close()
         ordered = [verdicts[ref.ref_id] for ref in parsed.references if ref.ref_id in verdicts]
-        # Return whatever pre-retrieve already spent on decompose calls
         return ordered, cost_tracker.estimated_cost_usd, passages_by_ref, fulltext_by_ref
 
     # --- Set up shared resources ---
@@ -211,27 +215,56 @@ async def run_agentic_verification(
             timeout=agentic_config.get("timeout", 60),
             cost_tracker=cost_tracker,
             verdict_classes=int(claim_cfg.get("verdict_classes", 3)),
+            prompt_variant=str(claim_cfg.get("prompt_variant", "v3")),
         )
 
-        # --- Dispatch metadata agents in parallel ---
         async def _run_metadata(tr):
             async with semaphore:
                 return await _dispatch_metadata(tr, meta_agent, parsed)
 
-        meta_tasks = {tr.ref_id: _run_metadata(tr) for tr in needs_metadata}
-        if meta_tasks:
-            with stage("agentic_metadata_dispatch", count=len(meta_tasks),
-                       concurrency=max_concurrent):
-                meta_results = await asyncio.gather(
-                    *meta_tasks.values(), return_exceptions=True,
+        # --- Pre-retrieve and metadata-dispatch run concurrently ---
+        # Pre-retrieve produces passages (needed by claim agents). Metadata
+        # agents only consume existence + metadata + citation context, so
+        # they don't need passages. Whichever finishes first lets the other
+        # keep going; total wall time = max(pre_retrieve, metadata_dispatch)
+        # instead of their sum.
+        async def _do_pre_retrieve():
+            with stage("agentic_pre_retrieve", refs=len(parsed.references)):
+                return await _pre_retrieve_passages(
+                    parsed, exist_map, citation_groups, agentic_config, cost_tracker,
+                    ref_pdfs_dir=ref_pdfs_dir,
+                    prefetched_chunks=prefetched_chunks,
+                    cache=cache,
                 )
-            for ref_id, result in zip(meta_tasks.keys(), meta_results):
-                tr = next(t for t in needs_metadata if t.ref_id == ref_id)
-                if isinstance(result, Exception):
-                    log.error(f"MetadataAgent failed for {ref_id}: {result}")
-                    verdicts[ref_id] = fallback_to_quick(tr)
-                else:
-                    verdicts[ref_id] = result
+
+        async def _do_metadata_dispatch():
+            if not needs_metadata:
+                return {}
+            with stage("agentic_metadata_dispatch", count=len(needs_metadata),
+                       concurrency=max_concurrent):
+                tasks = {tr.ref_id: _run_metadata(tr) for tr in needs_metadata}
+                results = await asyncio.gather(
+                    *tasks.values(), return_exceptions=True,
+                )
+            return dict(zip(tasks.keys(), results))
+
+        (passages_by_ref, fulltext_by_ref), meta_results = await asyncio.gather(
+            _do_pre_retrieve(),
+            _do_metadata_dispatch(),
+        )
+
+        for ref_id, result in meta_results.items():
+            tr = next(t for t in needs_metadata if t.ref_id == ref_id)
+            if isinstance(result, Exception):
+                log.error(f"MetadataAgent failed for {ref_id}: {result}")
+                verdicts[ref_id] = fallback_to_quick(tr)
+            else:
+                verdicts[ref_id] = result
+
+        # Attach the now-available passages to the triage results that
+        # claim/both dispatch will consume, and refresh the reason string
+        # for NEEDS_CLAIM rows that we triaged before passages existed.
+        _attach_passages_to_triage(needs_claim + needs_both, passages_by_ref, fulltext_by_ref)
 
         # --- Dispatch claim agents in parallel ---
         async def _run_claim(tr):
@@ -253,7 +286,7 @@ async def run_agentic_verification(
                 else:
                     verdicts[ref_id] = result
 
-        # --- Dispatch NEEDS_BOTH (sequential: metadata → claim) ---
+        # --- Dispatch NEEDS_BOTH (metadata + claim concurrent inside) ---
         async def _run_both(tr):
             async with semaphore:
                 return await _dispatch_both(tr, meta_agent, claim_agent, parsed)
@@ -298,6 +331,30 @@ async def run_agentic_verification(
 # ---------------------------------------------------------------------------
 # Dispatch helpers
 # ---------------------------------------------------------------------------
+
+# Triage runs before pre-retrieve so metadata-dispatch can start in parallel
+# with passage retrieval. Triage emits this reason when a NEEDS_CLAIM ref
+# has no passages yet — replace it with the populated reason once passages
+# arrive so PDF/CSV/BibTeX exports show the accurate explanation.
+_NO_PASSAGES_REASON = "Metadata matches, claims present but no passages pre-retrieved"
+_PASSAGES_REASON = "Metadata matches, substantive citing claims to verify"
+
+
+def _attach_passages_to_triage(
+    triage_results: list,
+    passages_by_ref: PassagesByRef,
+    fulltext_by_ref: FullTextByRef,
+) -> None:
+    """Mutate triage results in place with passages produced after triage ran."""
+    for tr in triage_results:
+        passages = passages_by_ref.get(tr.ref_id)
+        if passages:
+            tr.pre_retrieved_passages = passages
+            if tr.triage_reason == _NO_PASSAGES_REASON:
+                tr.triage_reason = _PASSAGES_REASON
+        ft = fulltext_by_ref.get(tr.ref_id)
+        if ft is not None:
+            tr.full_text_result = ft
 
 
 async def _dispatch_metadata(tr, meta_agent, parsed) -> CitationVerdict:
@@ -692,7 +749,12 @@ async def fetch_and_chunk_for_refs(
             try:
                 user_pdf = user_pdf_map.get(ref.ref_id)
                 ft = await get_full_text(exist, client, cache, user_pdf_path=user_pdf)
-                text = ft.full_text or ft.abstract or ""
+                # Only chunk the body. The abstract is handed to the claim
+                # agent separately as `### Abstract` in the user message,
+                # so chunking it again would just feed the same text twice
+                # under "Retrieved Passages" — the model has no way to know
+                # the two are the same content.
+                text = ft.full_text or ""
                 if not text.strip():
                     return ref.ref_id, ft, []
                 sections = ft.sections if ft.sections else None
@@ -831,6 +893,7 @@ async def _pre_retrieve_passages(
     bm25_candidates = comp_cfg.get("bm25_candidates", 10)
     dense_candidates = comp_cfg.get("dense_candidates", 10)
     rrf_k = comp_cfg.get("rrf_k", 60)
+    rerank_pool = comp_cfg.get("rerank_pool", 10)
 
     # Aggregated CPU cost across refs (wall-clock would understate the work
     # because retrieval runs concurrently). These counters give us the real
@@ -880,6 +943,7 @@ async def _pre_retrieve_passages(
                             rrf_k=rrf_k,
                             full_top_k=mq_full_top_k,
                             sub_top_k=mq_sub_top_k,
+                            rerank_pool=rerank_pool,
                         )
                     else:
                         scored = retrieve_with_index(
@@ -888,6 +952,7 @@ async def _pre_retrieve_passages(
                             bm25_candidates=bm25_candidates,
                             dense_candidates=dense_candidates,
                             rrf_k=rrf_k,
+                            rerank_pool=rerank_pool,
                         )
                     ref_passages[cit.citing_sentence] = scored
                 ref_retrieve_secs = time.perf_counter() - t_retrieve_start

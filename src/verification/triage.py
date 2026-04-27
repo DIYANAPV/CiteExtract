@@ -32,7 +32,6 @@ from src.verification.matching import WEB_SOURCES
 log = logging.getLogger(__name__)
 
 # Default thresholds (overridable via config)
-_DEFAULT_TITLE_EXACT_THRESHOLD = 0.95
 _DEFAULT_MIN_DBS_FOR_FABRICATED = 2
 
 
@@ -120,7 +119,6 @@ def triage_reference(
     citations: list[Citation],
     pre_retrieved_passages: Optional[dict[str, list]] = None,
     full_text_result: Optional[FullTextResult] = None,
-    title_exact_threshold: float = _DEFAULT_TITLE_EXACT_THRESHOLD,
     min_dbs_for_fabricated: int = _DEFAULT_MIN_DBS_FOR_FABRICATED,
 ) -> TriageResult:
     """Classify a single reference into a verification route.
@@ -132,7 +130,6 @@ def triage_reference(
         citations: All citations for this reference in the paper.
         pre_retrieved_passages: Pre-retrieved passages keyed by citing sentence.
         full_text_result: Full text retrieval result for the cited paper.
-        title_exact_threshold: Title similarity above this = confident match.
         min_dbs_for_fabricated: Minimum databases checked to declare FABRICATED.
 
     Returns:
@@ -180,7 +177,18 @@ def triage_reference(
         )
 
     # --- FOUND: check for retraction ---
+    # Retraction is a deterministic DB signal, not a judgment call — the
+    # metadata agent adds nothing. But the paper text is still retrievable,
+    # so when the reference has substantive citations we still want the
+    # claim agent to tell us whether the text supported the claim (e.g.
+    # sentences citing the retracted finding itself). The merger injects
+    # metadata_verdict=FABRICATED deterministically on this path.
     if metadata and metadata.is_retracted:
+        if substantive:
+            return _result(
+                TriageRoute.NEEDS_CLAIM,
+                "Paper retracted — still verify whether citing text is supported",
+            )
         return _result(TriageRoute.CLEAR_FABRICATED, "Paper has been retracted")
 
     # --- FOUND: check for DOI-title mismatch flag ---
@@ -194,11 +202,12 @@ def triage_reference(
         mismatched = [c.field for c in metadata.comparisons if c.status == "MISMATCH" and c.field != "title"]
         return _result(route, f"Metadata mismatch in: {', '.join(mismatched)}")
 
-    # --- FOUND: check borderline title similarity ---
-    title_sim = _get_title_similarity(existence, metadata)
-    if title_sim is not None and title_sim < title_exact_threshold:
+    # --- FOUND: check for title mismatch (binary at thresholds.title_match) ---
+    title_comp = _get_title_comparison(metadata)
+    if title_comp and title_comp.status == "MISMATCH":
         route = TriageRoute.NEEDS_BOTH if has_claims else TriageRoute.NEEDS_METADATA
-        return _result(route, f"Borderline title similarity ({title_sim:.2f}) — needs investigation")
+        sim_str = f"{title_comp.similarity:.2f}" if title_comp.similarity is not None else "n/a"
+        return _result(route, f"Title mismatch (similarity={sim_str})")
 
     # --- FOUND: check unmatched authors ---
     author_comp = _get_author_comparison(metadata)
@@ -232,19 +241,13 @@ def triage_reference(
 # Helper functions
 # ---------------------------------------------------------------------------
 
-def _get_title_similarity(
-    existence: ExistenceResult,
-    metadata: Optional[MetadataResult],
-) -> Optional[float]:
-    """Get title similarity from existence or metadata result."""
-    # Prefer existence.title_similarity (set during L2)
-    if existence.title_similarity is not None:
-        return existence.title_similarity
-    # Fall back to metadata comparison
-    if metadata:
-        for comp in metadata.comparisons:
-            if comp.field == "title" and comp.similarity is not None:
-                return comp.similarity
+def _get_title_comparison(metadata: Optional[MetadataResult]) -> Optional[FieldComparison]:
+    """Get the title FieldComparison from metadata result."""
+    if not metadata:
+        return None
+    for comp in metadata.comparisons:
+        if comp.field == "title":
+            return comp
     return None
 
 
@@ -311,7 +314,6 @@ def triage_all(
     if triage_config is None:
         triage_config = {}
 
-    title_thresh = triage_config.get("title_exact_threshold", _DEFAULT_TITLE_EXACT_THRESHOLD)
     min_dbs = triage_config.get("min_databases_for_fabricated", _DEFAULT_MIN_DBS_FOR_FABRICATED)
 
     results = []
@@ -331,7 +333,6 @@ def triage_all(
             citations=citations,
             pre_retrieved_passages=passages,
             full_text_result=ft,
-            title_exact_threshold=title_thresh,
             min_dbs_for_fabricated=min_dbs,
         )
         results.append(result)

@@ -1,16 +1,9 @@
-"""Metadata Agent — focused LLM agent for investigating metadata mismatches.
+"""Metadata Agent — LLM agent for investigating metadata mismatches.
 
-Only invoked when the triage step identifies ambiguous metadata (borderline
-title similarity, unmatched authors, DOI-title mismatch, etc.).  Receives a
+Invoked when the triage step identifies ambiguous metadata (borderline
+title similarity, unmatched authors, DOI-title mismatch, etc.). Receives a
 pre-digested evidence package and judges whether the mismatch is cosmetic
 or indicates a real problem.
-
-Compared to the monolithic CitationAgent:
-- Shorter prompt (~60 lines vs ~130)
-- Fewer tools (5 vs 8): search_crossref_by_doi, search_semantic_scholar,
-  compare_titles, compare_authors, verify_web_source
-- Fewer rounds (3 vs 8)
-- No claim verification
 """
 
 import json

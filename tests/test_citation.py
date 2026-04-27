@@ -3,7 +3,7 @@
 import pytest
 
 from src.citation.detector import CitationDetector, normalize_author_name
-from src.citation.context_extractor import extract_context, split_sentences, has_citation
+from src.citation.context_extractor import extract_context, split_sentences
 
 
 # ---- Author name normalization ----
@@ -292,21 +292,3 @@ class TestContextExtraction:
         ctx = extract_context("", 0, method="simple")
         assert ctx["citing_sentence"] == ""
 
-
-# ---- Has Citation ----
-
-class TestHasCitation:
-    def test_numbered(self):
-        assert has_citation("The result [5] is significant.") is True
-
-    def test_author_year(self):
-        assert has_citation("As shown by (Smith, 2020).") is True
-
-    def test_narrative(self):
-        assert has_citation("Smith (2020) found that.") is True
-
-    def test_harvard(self):
-        assert has_citation("As shown (Smith 2020) in studies.") is True
-
-    def test_no_citation(self):
-        assert has_citation("Just a regular sentence.") is False

@@ -3,21 +3,21 @@
 **Citation verification for scientific papers, with evidence.**
 
 CheckCite takes a paper — PDF, LaTeX, BibTeX, or plain text — and returns,
-for every reference, one of four verdicts (`VALID`, `FABRICATED`,
-`MISREPRESENTED`, `UNVERIFIABLE`) together with the passage from the
-cited paper that supports or contradicts the citing sentence. It is
-designed to close two gaps in prior work: existence-focused tools do not
-check whether the cited paper actually supports the claim, and
-semantic-alignment tools assume the reference has already been resolved
-and retrieved. CheckCite does both in a single pass and returns the
-evidence a human would need to judge borderline cases.
+for every reference, two independent verdicts: a metadata-driven
+top-level verdict (`VALID`, `FABRICATED`, `UNVERIFIABLE`) plus a
+claim-support dimension (`SUPPORTED`, `CONTRADICTS`, `NEUTRAL`,
+`UNVERIFIABLE`) telling whether the cited paper actually supports the
+citing sentence. The two travel together with the passage that grounds
+each finding. The design closes two gaps in prior work: existence-focused
+tools do not check whether the cited paper actually supports the claim,
+and semantic-alignment tools assume the reference has already been
+resolved and retrieved. CheckCite does both in a single pass and returns
+the evidence a human would need to judge borderline cases.
 
-The semantic stage uses a novel **multi-query retrieval** method:
-citing sentences are decomposed into sub-claims, evidence is retrieved
-for each sub-claim, and the unioned passage set is scored against the
-full original claim. This reaches 84.89% accuracy on a 741-instance
-cross-domain benchmark, exceeding P3 (83.7%) and SemanticCite (83.4%).
-See the [paper](paper/main.tex) for the full story.
+The semantic stage uses a multi-query retrieval method: citing
+sentences are decomposed into sub-claims, evidence is retrieved for each
+sub-claim, and the unioned passage set is scored against the full
+original claim.
 
 ---
 
@@ -25,7 +25,7 @@ See the [paper](paper/main.tex) for the full story.
 
 ```bash
 # 1. Clone and install
-git clone https://github.com/diyana-muhammed/checkcitation
+git clone <anonymized-repository-url>
 cd checkcitation
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
@@ -45,9 +45,8 @@ python app.py                                # or use the web UI at localhost:78
 
 ## Docker
 
-A ready-to-run image will be published to GHCR at
-`ghcr.io/diyana-muhammed/checkcitation:latest`. Build locally in the
-meantime:
+A ready-to-run image will be published to a container registry. Build
+locally in the meantime:
 
 ```bash
 docker compose up --build        # web UI at http://localhost:7860
@@ -81,10 +80,8 @@ L3 — Semantic verification (2 LLM calls per reference)
 Combined per-reference verdict (+ evidence passages + flags)
 ```
 
-The multi-query decomposition in L3 is the paper's main technical
-contribution; details in
-[`src/verification/multiquery.py`](src/verification/multiquery.py) and in
-Section 3.2 of the [paper](paper/main.tex).
+Implementation of the multi-query decomposition lives in
+[`src/verification/multiquery.py`](src/verification/multiquery.py).
 
 ## Verification modes
 
@@ -135,42 +132,18 @@ OPENALEX_MAILTO=you@uni.edu     # optional polite-pool email
 
 `--quick` mode works without any API key.
 
-## Reproducing the paper
+## Experiments
 
-Every number reported in the paper can be regenerated from the
-benchmark JSONL with a single command:
-
-```bash
-bash experiment/ours/run_all_ablations.sh
-python paper/scripts/make_main_table.py
-```
-
-This runs the main CheckCite configuration plus four single-variable
-ablations (A1 single-query, A2 n_sub=3, A3 sub_top_k=2, A5 3-class
-verifier), writes one JSON per run under
-[`experiment/results/`](experiment/results/), and regenerates
-[`paper/tables/main_results.{csv,md,tex}`](paper/tables/) from those
-JSONs. Total runtime is approximately 5.5 hours on a single machine at
-12-way concurrency; total LLM cost is approximately USD 1.20 at
-published `gpt-4o-mini` pricing.
-
-All experimental code lives under [`experiment/`](experiment/) and
-imports the same primitives used in production (`src/`): there is one
-source of truth per component. See
-[`experiment/README.md`](experiment/README.md) for individual commands
-and [`paper/ablation_plan.md`](paper/ablation_plan.md) for the frozen
-reference configuration each ablation varies from.
-
-Baselines (P3, SemanticCite) are in
-[`experiment/baselines/`](experiment/baselines/) with their own runners;
-Benchmark B (741 citation instances from five sources) lives at
-[`experiment/baselines/benchmark_data/benchmark_enriched.jsonl`](experiment/baselines/benchmark_data/).
+Experimental code lives under [`experiment/`](experiment/) and imports
+the same primitives used in production code under `src/`. See
+[`experiment/README.md`](experiment/README.md) for runners and
+configurations.
 
 ## Output
 
 Verdicts are written to `data/output/` as JSON. Each reference gets:
 
-- A verdict (`FABRICATED`, `MISREPRESENTED`, `VALID`, or `UNVERIFIABLE`)
+- A metadata verdict (`VALID` / `FABRICATED` / `UNVERIFIABLE`) and, in agentic mode, a claim verdict (`SUPPORTED` / `CONTRADICTS` / `NEUTRAL` / `UNVERIFIABLE`)
 - A natural-language explanation
 - Flags for human review
 - Evidence trail: databases checked, metadata comparison
@@ -210,7 +183,7 @@ checkcitation/
 │   └── models/                   Pydantic data models
 ├── experiment/                   Paper experiments (imports from src/)
 │   ├── ours/                     Main runner + ablations
-│   ├── baselines/                P3 and SemanticCite for head-to-head
+│   ├── baselines/                Comparison baselines
 │   └── results/                  JSON outputs
 ├── paper/                        LaTeX sources, tables, figures
 └── tests/                        Unit + integration tests
@@ -225,19 +198,14 @@ python -m pytest tests/ -v --ignore=tests/test_existence.py   # offline
 
 ## Citing CheckCite
 
-If you use CheckCite in research, please cite the paper:
-
 ```bibtex
-@misc{checkcite2026,
-  title  = {CheckCite: Decomposed Retrieval and Holistic Verification for Citation Accuracy in Scientific Papers},
-  author = {Muhammed, Diyana and others},
+@misc{checkcite,
+  title  = {CheckCite},
+  author = {Anonymous},
   year   = {2026},
-  note   = {TPDL 2026 submission}
+  note   = {Submitted for double-blind review}
 }
 ```
-
-A machine-readable `CITATION.cff` is included at the repo root for
-GitHub's citation widget.
 
 ## Licence
 

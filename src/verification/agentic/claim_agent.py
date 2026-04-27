@@ -31,6 +31,23 @@ log = logging.getLogger(__name__)
 
 _PROMPTS_DIR = Path(__file__).parent / "prompts"
 
+# Delimiters used to mark untrusted content embedded in the user message.
+# The system prompts (claim_{2,3}class.txt) instruct the model to treat
+# anything between these markers as data, never as instructions.
+UNTRUSTED_OPEN = "<<<UNTRUSTED_PASSAGE>>>"
+UNTRUSTED_CLOSE = "<<<END_UNTRUSTED>>>"
+
+
+def _wrap_untrusted(text: str) -> str:
+    """Fence text so the agent prompt cannot confuse it with instructions.
+
+    Strips any pre-existing copies of the markers from the input so a
+    crafted passage cannot close the fence early and inject content that
+    appears to live outside the untrusted region.
+    """
+    cleaned = text.replace(UNTRUSTED_OPEN, "").replace(UNTRUSTED_CLOSE, "")
+    return f"{UNTRUSTED_OPEN}\n{cleaned}\n{UNTRUSTED_CLOSE}"
+
 # Valid verdict values per scheme.
 _VERDICT_VALUES: dict[int, list[str]] = {
     3: ["SUPPORTS", "CONTRADICTS", "NEUTRAL"],
@@ -44,11 +61,30 @@ _DEFAULT_VERDICT: dict[int, str] = {
 }
 
 
-def load_claim_prompt(verdict_classes: int) -> str:
-    """Load the system prompt text for the chosen verdict scheme."""
+def load_claim_prompt(verdict_classes: int, variant: str = "") -> str:
+    """Load the system prompt text for the chosen verdict scheme.
+
+    ``variant`` selects between revisions of the prompt:
+      - ``""`` or ``"baseline"``: original ``claim_{N}class.txt``
+      - ``"v2"`` / ``"v3"`` / etc.: ``claim_{N}class_v{X}.txt``
+
+    A new variant is added by dropping a file in the prompts directory and
+    referencing it via the ``claim_agent.prompt_variant`` config key. This
+    lets us A/B prompt revisions and roll back without editing code.
+    """
     if verdict_classes not in _VERDICT_VALUES:
         raise ValueError(f"verdict_classes must be 2 or 3, got {verdict_classes}")
-    path = _PROMPTS_DIR / f"claim_{verdict_classes}class.txt"
+    suffix = f"_{variant}" if variant and variant != "baseline" else ""
+    path = _PROMPTS_DIR / f"claim_{verdict_classes}class{suffix}.txt"
+    if not path.exists():
+        # Defensive: fall back to baseline rather than crashing the pipeline
+        # when a typo'd variant lands in config. Surfacing the warning here
+        # is far better than a 500 from the agent.
+        log.warning(
+            "claim prompt variant %r not found at %s; falling back to baseline",
+            variant, path,
+        )
+        path = _PROMPTS_DIR / f"claim_{verdict_classes}class.txt"
     return path.read_text(encoding="utf-8")
 
 
@@ -199,7 +235,7 @@ def build_claim_user_message(
         parts.append(f"\n*Full text available via: {full_text_source}*")
 
     if paper_abstract:
-        parts.append(f"\n### Abstract\n{paper_abstract[:1500]}")
+        parts.append(f"\n### Abstract\n{_wrap_untrusted(paper_abstract[:1500])}")
 
     # Citing contexts with passages
     for i, ctx in enumerate(citing_contexts, 1):
@@ -236,13 +272,37 @@ def build_claim_user_message(
                 section = f" (Section: {p.get('section', 'unknown')})" if p.get("section") else ""
                 score = f" [score: {p.get('score', 0):.3f}]" if p.get("score") else ""
                 parts.append(f"\n**Passage {j}**{section}{score}")
-                parts.append(p.get("text", ""))
+                parts.append(_wrap_untrusted(p.get("text", "")))
         else:
-            parts.append(
-                "\n### Retrieved Passages\n"
-                "No passages were pre-retrieved. Use retrieve_cited_paper_passages "
-                "to fetch relevant passages if needed."
+            # Body text unavailable (paywalled / abstract-only / not_found).
+            # The title and abstract are the only evidence the agent can
+            # reason from — surface them HERE as the available evidence
+            # rather than leaving the agent to scroll back to the metadata
+            # block. The model_usage / background rules in the system
+            # prompt allow title- or abstract-level evidence to count, so
+            # the prompt naming this block "evidence" rather than "no
+            # passages" makes the prompt's rules actually applicable.
+            evidence_lines = ["\n### Available evidence",
+                              "The cited paper's body text is unavailable "
+                              "(paywalled or unindexed). Evaluate the "
+                              "citation using:"]
+            evidence_lines.append(
+                f"- **Title**: {paper_title}"
             )
+            if paper_abstract:
+                evidence_lines.append(f"- **Abstract** (full text follows above)")
+            else:
+                evidence_lines.append(
+                    "- **Abstract**: not available"
+                )
+            evidence_lines.append(
+                "\nFor citations that name a model / dataset / tool / method, "
+                "the title alone is often sufficient evidence (the cited paper "
+                "is the source for the named thing). For background / topical "
+                "citations, accept topical alignment between the title (and "
+                "abstract, if any) and the citing paragraph."
+            )
+            parts.extend(evidence_lines)
 
     parts.append("\n---\n## Your Task")
     parts.append(
@@ -272,6 +332,7 @@ class ClaimAgent:
         timeout: int = 60,
         cost_tracker: Optional[CostTracker] = None,
         verdict_classes: int = 3,
+        prompt_variant: str = "",
     ) -> None:
         self._client = openai_client
         self._tools = tool_executor
@@ -282,7 +343,8 @@ class ClaimAgent:
         self._timeout = timeout
         self._cost_tracker = cost_tracker or CostTracker()
         self._verdict_classes = verdict_classes
-        self._system_prompt = load_claim_prompt(verdict_classes)
+        self._prompt_variant = prompt_variant
+        self._system_prompt = load_claim_prompt(verdict_classes, prompt_variant)
         self._verdict_schema = build_verdict_schema(verdict_classes)
         self._default_verdict = _DEFAULT_VERDICT[verdict_classes]
 

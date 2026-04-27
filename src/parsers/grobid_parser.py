@@ -11,6 +11,8 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import Optional
 
+from defusedxml.ElementTree import fromstring as _safe_fromstring
+
 log = logging.getLogger(__name__)
 
 import requests
@@ -28,6 +30,10 @@ from src.models.citation import Citation
 from src.models.parsed_paper import ParsedPaper
 from src.models.reference import Reference
 from src.parsers.base import BaseParser
+from src.parsers.marker_rule_check import (
+    annotate_citation_confidence,
+    normalize_marker_key,
+)
 
 TEI_NS = {"tei": "http://www.tei-c.org/ns/1.0"}
 
@@ -167,7 +173,7 @@ class GrobidParser(BaseParser):
             cache_path.parent.mkdir(parents=True, exist_ok=True)
             cache_path.write_text(xml_content, encoding="utf-8")
 
-        root = ET.fromstring(xml_content)
+        root = _safe_fromstring(xml_content)
 
         warnings: list[str] = []
 
@@ -205,6 +211,9 @@ class GrobidParser(BaseParser):
                 root, full_text, references_dict, warnings,
                 bid_override=biblio_id_map,
             )
+            # Annotate with rule-check confidence. LLM vote is unavailable on
+            # the fallback path, so only GROBID + rule-check participate.
+            citations = annotate_citation_confidence(citations, references_dict)
 
         # Deduplicate references with identical titles
         references_dict, dedup_count = self._deduplicate_references(references_dict)
@@ -228,8 +237,10 @@ class GrobidParser(BaseParser):
                 _json.dumps(result.model_dump(), default=str),
                 encoding="utf-8",
             )
-        except Exception:
-            pass  # non-critical — caching is best-effort
+        except (OSError, TypeError) as e:
+            # Non-critical — caching is best-effort. Logged at debug so disk-full
+            # symptoms are still discoverable when investigating.
+            log.debug(f"ParsedPaper cache write failed: {type(e).__name__}: {e}")
 
         return result
 
@@ -271,11 +282,21 @@ class GrobidParser(BaseParser):
             sync_client = OpenAI(api_key=api_key, timeout=timeout)
 
             import json as _json
+            from src.parsers.llm_ref_parser import _wrap_untrusted
 
             # Split into batches of ~30 refs to avoid API timeouts.
             # Each batch gets ALL markers (for matching), but only its refs.
             batch_size = 30
             llm_refs = []
+            cost = 0.0
+            cost_capped = False
+            pricing = llm_config.get("pricing", {})
+            input_per_m = pricing.get("input_cost_per_million", 0.15)
+            output_per_m = pricing.get("output_cost_per_million", 0.60)
+            # Hard cap on per-paper LLM spend. Defaults to $0.50 — typical
+            # papers run ~$0.02; the cap is a circuit breaker for outliers
+            # (500-reference review articles) or misconfigured models.
+            max_cost = float(llm_config.get("max_cost_per_paper", 0.50))
             for i in range(0, len(raw_refs), batch_size):
                 batch_refs = raw_refs[i:i + batch_size]
                 # Renumber refs in batch starting from their original position
@@ -283,12 +304,18 @@ class GrobidParser(BaseParser):
                 for j, ref_text in enumerate(batch_refs):
                     numbered_refs.append((i + j + 1, ref_text))
 
-                prompt_lines = [f"[{num}] {text}" for num, text in numbered_refs]
+                # Fence raw text so prompt-injection inside a malicious PDF
+                # reference can't impersonate instructions to the model.
+                prompt_lines = [
+                    f"[{num}] {_wrap_untrusted(text)}"
+                    for num, text in numbered_refs
+                ]
+                fenced_markers = [_wrap_untrusted(m) for m in markers]
                 batch_prompt = f"""## Raw References (from bibliography section)
 {chr(10).join(prompt_lines)}
 
 ## Citation Markers (from body text)
-{chr(10).join(markers)}
+{chr(10).join(fenced_markers)}
 
 ## Response Format
 Respond in JSON:
@@ -310,19 +337,65 @@ Respond in JSON:
                 batch_data = _json.loads(response.choices[0].message.content or "{}")
                 llm_refs.extend(batch_data.get("references", []))
 
-            # Calculate cost
-            cost = 0.0
-            pricing = llm_config.get("pricing", {})
-            if response.usage and pricing:
-                cost = (
-                    response.usage.prompt_tokens * pricing.get("input_cost_per_million", 0.15) / 1_000_000
-                    + response.usage.completion_tokens * pricing.get("output_cost_per_million", 0.60) / 1_000_000
-                )
+                # Accumulate per-batch cost (the previous version only
+                # captured the final batch's usage, undercounting cost on
+                # any paper with more than 30 references).
+                if response.usage and pricing:
+                    batch_cost = (
+                        response.usage.prompt_tokens * input_per_m / 1_000_000
+                        + response.usage.completion_tokens * output_per_m / 1_000_000
+                    )
+                    cost += batch_cost
+                    # Outlier path: this module computes cost inline rather than
+                    # via CostTracker, so record explicitly to keep the monthly
+                    # ledger accurate.
+                    from src.verification import spend_guard
+                    spend_guard.record(batch_cost)
 
-            log.info(f"LLM parsed {len(llm_refs)} references, cost: ${cost:.4f}")
+                if cost > max_cost:
+                    log.warning(
+                        f"LLM ref-parsing cost ${cost:.4f} exceeded cap "
+                        f"${max_cost:.2f}; stopping after batch {i // batch_size + 1} "
+                        f"of {(len(raw_refs) + batch_size - 1) // batch_size}."
+                    )
+                    warnings.append(
+                        f"LLM ref-parsing stopped at cost cap (${cost:.4f} > "
+                        f"${max_cost:.2f}); some references may be missing."
+                    )
+                    cost_capped = True
+                    break
+
+            log.info(
+                f"LLM parsed {len(llm_refs)} references, cost: ${cost:.4f}"
+                + (" (cost-capped)" if cost_capped else "")
+            )
+        except _httpx.HTTPError as e:
+            # Transport / network errors are recoverable; fall back to GROBID.
+            log.warning(f"LLM ref parsing transport error: {type(e).__name__}: {e}")
+            warnings.append(
+                f"LLM ref parsing failed (network): {type(e).__name__}. "
+                "Using GROBID fallback."
+            )
+            return None
+        except _json.JSONDecodeError as e:
+            # Model returned non-JSON despite response_format. Fall back.
+            log.warning(f"LLM ref parsing returned invalid JSON: {e}")
+            warnings.append(
+                "LLM ref parsing returned invalid JSON. Using GROBID fallback."
+            )
+            return None
         except Exception as e:
-            msg = str(e) or type(e).__name__
-            warnings.append(f"LLM ref parsing failed: {msg}. Using GROBID fallback.")
+            # OpenAI errors are imported lazily inside the try block, so we
+            # discriminate by class name to avoid an upfront import at module load.
+            mod = type(e).__module__ or ""
+            if mod.startswith("openai") and type(e).__name__ == "AuthenticationError":
+                # Misconfigured key is operator error — fail fast rather than
+                # silently degrade to GROBID-only parsing for every paper.
+                raise
+            log.warning(f"LLM ref parsing failed: {type(e).__name__}: {e}")
+            warnings.append(
+                f"LLM ref parsing failed: {type(e).__name__}. Using GROBID fallback."
+            )
             return None
 
         if not llm_refs:
@@ -332,7 +405,7 @@ Respond in JSON:
 
         # Build Reference objects from LLM output
         references: dict[str, Reference] = {}
-        marker_to_ref: dict[str, str] = {}  # marker text → ref_id
+        marker_to_ref_norm: dict[str, str] = {}  # normalized marker → ref_id
 
         for llm_ref in llm_refs:
             ref_num = llm_ref.get("ref_num")
@@ -403,9 +476,11 @@ Respond in JSON:
             )
             references[ref_id] = ref
 
-            # Build marker → ref_id mapping
+            # Build marker → ref_id mapping, consumed by annotate_citation_confidence.
             for marker in (llm_ref.get("matched_markers") or []):
-                marker_to_ref[marker.strip()] = ref_id
+                key = normalize_marker_key(marker)
+                if key:
+                    marker_to_ref_norm[key] = ref_id
 
         if not references:
             return None
@@ -413,6 +488,9 @@ Respond in JSON:
         # Build Citation objects using GROBID's own target mapping (most reliable)
         citations, orphaned_bids = self._build_citations_from_grobid_targets_with_orphans(
             root, full_text, references, extra_warnings
+        )
+        citations = annotate_citation_confidence(
+            citations, references, marker_to_ref_norm
         )
 
         # Recover orphaned refs: if body text cites a ref that was dropped,
@@ -470,6 +548,9 @@ Respond in JSON:
                 # Rebuild citations to include the recovered refs
                 citations, _ = self._build_citations_from_grobid_targets_with_orphans(
                     root, full_text, references, extra_warnings
+                )
+                citations = annotate_citation_confidence(
+                    citations, references, marker_to_ref_norm
                 )
 
         return references, citations, extra_warnings

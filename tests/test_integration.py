@@ -52,6 +52,6 @@ def test_quick_pipeline_end_to_end(clean_caches):
     assert len(paper_report.verdicts) == len(parsed.references)
 
     for v in paper_report.verdicts:
-        assert v.verdict in {"VALID", "FABRICATED", "MISREPRESENTED", "UNVERIFIABLE"}
+        assert v.verdict in {"VALID", "FABRICATED", "UNVERIFIABLE"}
         assert v.mode == "quick"
         assert v.ref_id, "Verdict missing ref_id"

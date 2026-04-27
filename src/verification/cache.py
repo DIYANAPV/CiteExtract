@@ -4,6 +4,7 @@ Caches metadata, abstracts, and existence results with configurable TTL.
 Abstracts cached here are reused in L4 semantic verification at zero extra cost.
 """
 
+import hashlib
 import json
 import time
 from pathlib import Path
@@ -40,6 +41,72 @@ def _init_ttls() -> None:
     TTL_ABSTRACT = cfg["ttl_abstract"]
     TTL_RETRACTION = cfg["ttl_retraction"]
     TTL_NOT_FOUND = cfg["ttl_not_found"]
+
+
+# ---------------------------------------------------------------------------
+# Cited-paper cache keys
+# ---------------------------------------------------------------------------
+#
+# Resources scoped to a *cited paper* (full text, abstract, etc.) must be
+# keyed by what the paper IS, not by where it happens to appear in some
+# input paper. Per-input ``ref_id`` values like "13" collide across runs
+# of different input papers and serve cached content from the wrong paper
+# back on the next run — corrupting passage retrieval downstream.
+#
+# Identity priority: DOI > arXiv ID > normalised-title hash. Returns None
+# when no identifier is available so the caller can decide whether to skip
+# caching entirely (recommended) or fall back to a per-input scope (loses
+# cross-paper sharing and risks collisions — only acceptable if the data
+# can never poison a future run).
+
+
+def cited_paper_identity(
+    *,
+    doi: Optional[str] = None,
+    arxiv_id: Optional[str] = None,
+    title: Optional[str] = None,
+) -> Optional[str]:
+    """Build a stable identity string for a cited paper, or None.
+
+    DOIs and arXiv IDs are normalised to lowercase since both are
+    case-insensitive in practice (DOI spec; arXiv numeric IDs are digits
+    + lowercase ``v``). Titles are run through ``normalize_title`` so
+    capitalisation, punctuation, and minor whitespace differences hash
+    to the same identity.
+    """
+    if doi:
+        return f"doi:{doi.strip().lower()}"
+    if arxiv_id:
+        return f"arxiv:{arxiv_id.strip().lower()}"
+    if title:
+        from src.verification.matching import normalize_title
+        norm = normalize_title(title)
+        if norm:
+            digest = hashlib.sha256(norm.encode("utf-8")).hexdigest()[:16]
+            return f"title:{digest}"
+    return None
+
+
+def cited_paper_cache_key(
+    prefix: str,
+    *,
+    doi: Optional[str] = None,
+    arxiv_id: Optional[str] = None,
+    title: Optional[str] = None,
+) -> Optional[str]:
+    """Cache key for any per-cited-paper resource. Returns None when no
+    identity is available — caller should skip caching in that case.
+
+    Two different input papers citing the same work will produce the
+    same key, so the second run reuses the first's fetch. Two input
+    papers whose ``ref_id`` 13 happens to point at different works
+    will produce different keys, eliminating the cross-paper collision
+    that the legacy ``f"{prefix}:{ref_id}"`` scheme suffered from.
+    """
+    identity = cited_paper_identity(doi=doi, arxiv_id=arxiv_id, title=title)
+    if identity is None:
+        return None
+    return f"{prefix}:{identity}"
 
 
 class APICache:
@@ -136,6 +203,25 @@ class APICache:
         db = await self._ensure_db()
         cursor = await db.execute(
             "DELETE FROM cache WHERE key LIKE 'existence:%' AND value LIKE '%NOT_FOUND%'"
+        )
+        await db.commit()
+        return cursor.rowcount
+
+    async def purge_legacy_fulltext_keys(self) -> int:
+        """Delete legacy ``fulltext:{ref_id}`` entries left over from the
+        per-input ref_id scheme. Those entries served content from a
+        different cited paper when the same ref_id appeared in a later
+        run on a different input paper. Identity-keyed entries
+        (``fulltext:doi:…``, ``fulltext:arxiv:…``, ``fulltext:title:…``)
+        are kept. Safe to run repeatedly. Returns rows deleted.
+        """
+        db = await self._ensure_db()
+        cursor = await db.execute(
+            "DELETE FROM cache "
+            "WHERE key LIKE 'fulltext:%' "
+            "  AND key NOT LIKE 'fulltext:doi:%' "
+            "  AND key NOT LIKE 'fulltext:arxiv:%' "
+            "  AND key NOT LIKE 'fulltext:title:%'"
         )
         await db.commit()
         return cursor.rowcount

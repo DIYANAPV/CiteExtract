@@ -12,6 +12,7 @@ from typing import Optional
 from xml.etree import ElementTree
 
 import httpx
+from defusedxml.ElementTree import fromstring as _safe_fromstring
 
 from src.verification.api_clients.rate_limiter import fetch_with_retry
 from src.verification.matching import title_similarity
@@ -58,7 +59,7 @@ async def search_by_title(
 def _parse_response(xml_text: str, query_title: str) -> Optional[dict]:
     """Parse arXiv Atom XML response and find best title match."""
     try:
-        root = ElementTree.fromstring(xml_text)
+        root = _safe_fromstring(xml_text)
     except ElementTree.ParseError:
         return None
 

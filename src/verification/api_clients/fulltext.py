@@ -18,6 +18,7 @@ import asyncio
 import logging
 import re
 import tempfile
+import time
 from pathlib import Path
 from typing import Optional
 
@@ -25,16 +26,23 @@ import httpx
 import requests
 
 from src import config
-from src.models.comprehension import FullTextResult
+from src.models.comprehension import FetchAttempt, FullTextResult
 from src.models.verdict import ExistenceResult
 from src.verification.api_clients.rate_limiter import fetch_with_retry
 from src.verification.url_safety import is_safe_external_url
-from src.verification.cache import APICache
+from src.verification.cache import APICache, cited_paper_cache_key
 
 log = logging.getLogger(__name__)
 
 # Cache TTL for full text (7 days — PDFs don't change often)
 TTL_FULLTEXT = 7 * 86400
+
+# Soft truncation point for cached full text.
+# 800K chars ≈ 200 pages of body text — covers every modern frontier-model
+# paper (PaLM, Llama 3, OLMo, GPT-4 tech report) without bloating the
+# SQLite cache. The previous 200K hard cap was poisoning the cache for
+# every paper longer than ~50 pages.
+_FULLTEXT_CACHE_MAX_CHARS = 800_000
 
 # User-Agent for polite access
 _UA = "CheckCitation/1.0 (academic citation verification; mailto:{email})"
@@ -43,6 +51,46 @@ _UA = "CheckCitation/1.0 (academic citation verification; mailto:{email})"
 _PDF_MAX_RETRIES = 2
 _PDF_BASE_DELAY = 2.0
 _PDF_RETRYABLE_STATUS = {429, 500, 502, 503, 504}
+
+# Maximum depth for HTML→PDF citation_pdf_url chasing. Set to 1 because
+# institutional landing pages (HAL, ResearchGate, university repos) typically
+# point straight at the PDF; nested chains are usually loops.
+_HTML_PDF_REDIRECT_MAX_DEPTH = 1
+
+# Google Scholar's published convention for "this page is about a paper, here
+# is the PDF": ``<meta name="citation_pdf_url" content="...">``. Both attribute
+# orders are seen in the wild — match permissively.
+# See: https://scholar.google.com/intl/en/scholar/inclusion.html#indexing
+_CITATION_PDF_URL_RE = re.compile(
+    r'<meta\s+name=["\']citation_pdf_url["\']\s+content=["\']([^"\']+)["\']',
+    re.IGNORECASE,
+)
+_CITATION_PDF_URL_RE_REVERSED = re.compile(
+    r'<meta\s+content=["\']([^"\']+)["\']\s+name=["\']citation_pdf_url["\']',
+    re.IGNORECASE,
+)
+# HTML body we'll scan for the meta tag — past 256K it's almost certainly
+# either not a paper landing page or has the meta tag in the head already.
+_HTML_PARSE_MAX_BYTES = 256 * 1024
+
+# Per-host concurrency caps for PDF downloads. Keys are URL hosts
+# (lowercased; both ``arxiv.org`` and ``export.arxiv.org`` route to the
+# same arXiv backend so they share a budget). Without a cap, fanning out
+# 13+ concurrent arXiv downloads triggers 429s that silently fall through
+# to abstract_only — which is the leak this dict closes.
+#
+# Numbers picked empirically: arXiv tolerates ~4–8 sustained concurrent
+# downloads before throttling kicks in. ``_PDF_DEFAULT_CONCURRENCY`` for
+# unknown hosts is intentionally generous since publishers are usually fine.
+_PDF_HOST_CONCURRENCY: dict[str, int] = {
+    "arxiv.org": 4,
+    "export.arxiv.org": 4,
+    "www.arxiv.org": 4,
+}
+_PDF_DEFAULT_CONCURRENCY = 8
+
+# Cache of host-keyed semaphores. Lazy-init per loop, like _grobid_extract_semaphore.
+_pdf_host_semaphores: dict[str, asyncio.Semaphore] = {}
 
 # GROBID availability flag (checked once per process — guarded by _grobid_check_lock).
 _grobid_available: Optional[bool] = None
@@ -89,6 +137,29 @@ def _reset_grobid_state_for_tests() -> None:
     _grobid_check_lock = None
 
 
+def _reset_pdf_host_semaphores_for_tests() -> None:
+    """Clear cached per-host PDF semaphores between tests."""
+    _pdf_host_semaphores.clear()
+
+
+def _get_pdf_host_semaphore(pdf_url: str) -> asyncio.Semaphore:
+    """Return the bounded semaphore that caps concurrent downloads to a host.
+
+    Per-host caps keep us under arXiv's 429 ceiling without serializing —
+    other hosts get a more generous default. Created lazily on first use
+    because ``asyncio.Semaphore`` requires a running event loop.
+    """
+    from urllib.parse import urlparse
+
+    host = (urlparse(pdf_url).hostname or "").lower()
+    sem = _pdf_host_semaphores.get(host)
+    if sem is None:
+        cap = _PDF_HOST_CONCURRENCY.get(host, _PDF_DEFAULT_CONCURRENCY)
+        sem = asyncio.Semaphore(cap)
+        _pdf_host_semaphores[host] = sem
+    return sem
+
+
 # ---------------------------------------------------------------------------
 # Main entry point
 # ---------------------------------------------------------------------------
@@ -116,56 +187,143 @@ async def get_full_text(
     """
     ref_id = existence_result.ref_id
 
-    # Check cache first
-    cached = await cache.get(f"fulltext:{ref_id}")
-    if cached:
-        return FullTextResult(**cached)
+    # Cache key is the cited paper's content identity (DOI / arXiv / title
+    # hash) — not the per-input ``ref_id``, which collides across runs and
+    # would serve a previous paper's full text. ``cache_key`` is None when
+    # we have no identifier at all, in which case we skip caching rather
+    # than fall back to a colliding key.
+    #
+    # ``fulltext_v2`` bumps past the legacy ``fulltext:`` keys that were
+    # written with the old 200K-char cap. Long papers (PaLM, Llama 3, OLMo)
+    # got cached as ``not_found`` under the v1 prefix; the v2 keyspace skips
+    # those poisoned entries entirely. ``scripts/purge_legacy_fulltext_cache.py``
+    # can drop the v1 rows for an immediate disk cleanup.
+    cache_key = cited_paper_cache_key(
+        "fulltext_v2",
+        doi=existence_result.matched_doi,
+        arxiv_id=existence_result.matched_arxiv_id,
+        title=existence_result.matched_title,
+    )
+
+    if cache_key:
+        cached = await cache.get(cache_key)
+        if cached:
+            return FullTextResult(**cached)
+
+    # Per-call trace of every waterfall step. Attached to whatever
+    # FullTextResult we end up returning (and persisted in the cache).
+    attempts: list[FetchAttempt] = []
+
+    def _finalize(result: FullTextResult) -> FullTextResult:
+        result.attempts = list(attempts)
+        return result
 
     # 1. User-uploaded PDF (highest quality, no API call)
     if user_pdf_path and Path(user_pdf_path).exists():
+        started = time.perf_counter()
         result = await _extract_from_pdf(user_pdf_path, source="user_pdf")
         if result.full_text:
-            await _cache_fulltext(cache, ref_id, result)
+            attempts.append(_make_attempt("user_pdf", "ok", started))
+            result = _finalize(result)
+            await _cache_fulltext(cache, cache_key, ref_id, result)
             return result
+        attempts.append(_make_attempt(
+            "user_pdf",
+            "grobid_failed" if result.source == "not_found" else "empty_text",
+            started,
+            user_pdf_path,
+        ))
 
     # Paper not found in L2 — can only return abstract or not_found
     if existence_result.status != "FOUND":
-        return FullTextResult(source="not_found", abstract=existence_result.abstract)
+        return _finalize(FullTextResult(
+            source="not_found", abstract=existence_result.abstract,
+        ))
 
     # 2. Semantic Scholar openAccessPdf (URL already available from L2)
     if existence_result.oa_url:
-        result = await _download_and_extract(
-            existence_result.oa_url, client, source="s2_api"
+        result, atts = await _download_and_extract(
+            existence_result.oa_url, client, source="oa_url",
         )
+        attempts.extend(atts)
         if result and result.full_text:
             result.abstract = result.abstract or existence_result.abstract
-            await _cache_fulltext(cache, ref_id, result)
+            # NB: ``result.source`` here is whatever path actually succeeded
+            # — usually ``oa_url``, but ``html_meta_pdf`` when the URL was
+            # an HTML landing page that we rescued via the meta-tag scrape.
+            # We deliberately preserve the rescue-path label so the public
+            # source field credits the recovery rather than masquerading
+            # the HAL/ResearchGate hit as a direct OA download.
+            result = _finalize(result)
+            await _cache_fulltext(cache, cache_key, ref_id, result)
             return result
 
     # 3. Unpaywall (by DOI)
     if existence_result.matched_doi:
         pdf_url = await _unpaywall_pdf_url(existence_result.matched_doi, client)
         if pdf_url:
-            result = await _download_and_extract(pdf_url, client, source="unpaywall")
+            result, atts = await _download_and_extract(
+                pdf_url, client, source="unpaywall",
+            )
+            attempts.extend(atts)
             if result and result.full_text:
                 result.abstract = result.abstract or existence_result.abstract
-                await _cache_fulltext(cache, ref_id, result)
+                result = _finalize(result)
+                await _cache_fulltext(cache, cache_key, ref_id, result)
                 return result
+        else:
+            attempts.append(FetchAttempt(
+                source="unpaywall", status="skipped",
+                detail="no_oa_pdf_url",
+            ))
 
     # 4. arXiv (if arxiv_id available on the original reference)
     arxiv_id = _get_arxiv_id(existence_result)
     if arxiv_id:
-        result = await _download_and_extract_arxiv(arxiv_id, client)
+        result, atts = await _download_and_extract_arxiv(arxiv_id, client)
+        attempts.extend(atts)
         if result and result.full_text:
             result.abstract = result.abstract or existence_result.abstract
-            await _cache_fulltext(cache, ref_id, result)
+            result = _finalize(result)
+            await _cache_fulltext(cache, cache_key, ref_id, result)
             return result
 
-    # 5. Abstract-only fallback
-    result = FullTextResult(
+    # 5. Semantic Scholar fallback re-query.
+    #    L2 stops at the first DB that returns a strong match. When that's
+    #    crossref/openalex/pubmed, S2's openAccessPdf field is never
+    #    consulted — even though S2 frequently has an OA copy of the same
+    #    paper. Retrying S2 here covers the dead-DOI long tail and any paper
+    #    L2 happened to find via a non-S2 source.
+    result = await _try_s2_fallback_pdf(existence_result, client, attempts)
+    if result and result.full_text:
+        result.abstract = result.abstract or existence_result.abstract
+        result = _finalize(result)
+        await _cache_fulltext(cache, cache_key, ref_id, result)
+        return result
+
+    # 6. arXiv-by-title fallback.
+    #    No arxiv_id on the L2 record AND the DOI didn't map to one. Many
+    #    papers are on arXiv but never get linked from publisher metadata
+    #    (e.g. ACM DOIs without arxiv preprint cross-refs). Search arXiv
+    #    by the matched title with the existing similarity threshold.
+    result = await _try_arxiv_fallback_pdf(
+        existence_result, arxiv_id, client, attempts,
+    )
+    if result and result.full_text:
+        result.abstract = result.abstract or existence_result.abstract
+        result = _finalize(result)
+        await _cache_fulltext(cache, cache_key, ref_id, result)
+        return result
+
+    # 7. Abstract-only fallback
+    attempts.append(FetchAttempt(
+        source="abstract_only",
+        status="ok" if existence_result.abstract else "empty_text",
+    ))
+    result = _finalize(FullTextResult(
         source="abstract_only",
         abstract=existence_result.abstract,
-    )
+    ))
     # Only cache the fallback if the paper had no OA sources at all.
     # If it had sources but downloads failed transiently, leave uncached
     # so the next run retries fresh.
@@ -173,9 +331,10 @@ async def get_full_text(
         existence_result.oa_url
         or existence_result.matched_doi
         or arxiv_id
+        or existence_result.matched_title  # S2/arxiv title fallbacks were also tried
     )
     if not had_oa_sources:
-        await _cache_fulltext(cache, ref_id, result)
+        await _cache_fulltext(cache, cache_key, ref_id, result)
     return result
 
 
@@ -263,10 +422,10 @@ def _get_arxiv_id(existence_result: ExistenceResult) -> Optional[str]:
 
 async def _download_and_extract_arxiv(
     arxiv_id: str, client: httpx.AsyncClient
-) -> Optional[FullTextResult]:
+) -> tuple[Optional[FullTextResult], list[FetchAttempt]]:
     """Download arXiv PDF and extract text.
 
-    Uses https://arxiv.org/pdf/{arxiv_id} directly.
+    Uses https://export.arxiv.org/pdf/{arxiv_id} directly.
     Rate limit: ~1 request per 3 seconds (be polite).
     """
     pdf_url = f"https://export.arxiv.org/pdf/{arxiv_id}"
@@ -278,36 +437,116 @@ async def _download_and_extract_arxiv(
 # ---------------------------------------------------------------------------
 
 
+def _truncate_detail(detail: Optional[str]) -> Optional[str]:
+    """Cap detail strings at 200 chars so attempts payloads stay small."""
+    if detail is None:
+        return None
+    s = str(detail)
+    return s if len(s) <= 200 else s[:197] + "..."
+
+
+def _make_attempt(
+    source: str,
+    status: str,
+    started_at: float,
+    detail: Optional[str] = None,
+) -> FetchAttempt:
+    """Build a FetchAttempt, computing wall-clock from a perf_counter mark."""
+    return FetchAttempt(
+        source=source,
+        status=status,
+        ms=int((time.perf_counter() - started_at) * 1000),
+        detail=_truncate_detail(detail),
+    )
+
+
+def _extract_citation_pdf_url(
+    body: bytes, base_url: str
+) -> Optional[str]:
+    """Find a ``citation_pdf_url`` meta tag on an HTML landing page.
+
+    Returns an absolute URL or ``None``. Resolves protocol-relative
+    (``//host/path``) and host-relative (``/path``) URLs against the
+    page that served the HTML so callers don't have to.
+    """
+    if not body:
+        return None
+    snippet = body[:_HTML_PARSE_MAX_BYTES]
+    try:
+        html = snippet.decode("utf-8", errors="replace")
+    except Exception:
+        return None
+    m = _CITATION_PDF_URL_RE.search(html) or _CITATION_PDF_URL_RE_REVERSED.search(html)
+    if not m:
+        return None
+    pdf_url = m.group(1).strip()
+    if not pdf_url:
+        return None
+    # Resolve relative forms.
+    if pdf_url.startswith("//"):
+        pdf_url = "https:" + pdf_url
+    elif pdf_url.startswith("/"):
+        from urllib.parse import urlparse
+
+        parsed = urlparse(base_url)
+        if parsed.scheme and parsed.netloc:
+            pdf_url = f"{parsed.scheme}://{parsed.netloc}{pdf_url}"
+    return pdf_url
+
+
 async def _download_and_extract(
     pdf_url: str,
     client: httpx.AsyncClient,
     source: str,
-) -> Optional[FullTextResult]:
+    _html_depth: int = 0,
+) -> tuple[Optional[FullTextResult], list[FetchAttempt]]:
     """Download a PDF from a URL and extract text via GROBID.
 
     Retries on connection errors and 5xx/429 with exponential backoff.
+    Returns ``(result, attempts)`` so callers can record what happened —
+    ``result`` is ``None`` on failure (network, non-PDF, GROBID). The
+    ``attempts`` list normally contains one entry but is multi-element
+    when the HTML-landing-page rescue chains a second download (the
+    first ``not_pdf`` attempt is preserved alongside the recursive
+    ``html_meta_pdf`` attempt, so the trace doesn't lose the initial
+    landing-page hop).
 
     SSRF guard: ``pdf_url`` may originate from third-party metadata
     sources (Unpaywall, Semantic Scholar) which we don't fully trust to
     return only public URLs. Reject anything pointing at private /
     loopback / link-local / cloud-metadata addresses up front, and
     re-check the resolved URL after redirect-following.
+
+    HTML-landing-page rescue: when the response is HTML (not a PDF), we
+    look for the Google-Scholar-standard ``citation_pdf_url`` meta tag
+    and recursively try the URL it points at. ``_html_depth`` caps the
+    recursion at one redirect (HAL, ResearchGate, university repos
+    redirect once; deeper chains are usually loops).
     """
+    started = time.perf_counter()
+
     if not await asyncio.to_thread(is_safe_external_url, pdf_url):
         log.warning(f"PDF URL rejected as unsafe (private/non-http): {pdf_url}")
-        return None
+        return None, [_make_attempt(source, "unsafe_url", started, pdf_url)]
 
     tmp_path: Optional[str] = None
     last_error: Optional[Exception] = None
+    last_status: Optional[int] = None
+    host_sem = _get_pdf_host_semaphore(pdf_url)
 
     for attempt in range(_PDF_MAX_RETRIES + 1):
         try:
-            resp = await client.get(
-                pdf_url,
-                headers={"User-Agent": _user_agent()},
-                timeout=30,
-                follow_redirects=True,
-            )
+            # Cap concurrent in-flight downloads per host so arXiv (and
+            # similar) don't 429 us into the abstract_only fallthrough. The
+            # semaphore is held only for the network GET; PDF parsing
+            # afterwards has its own (GROBID) semaphore.
+            async with host_sem:
+                resp = await client.get(
+                    pdf_url,
+                    headers={"User-Agent": _user_agent()},
+                    timeout=30,
+                    follow_redirects=True,
+                )
 
             # Redirects could land on a private IP — reject the response.
             if not is_safe_external_url(str(resp.url)):
@@ -315,10 +554,22 @@ async def _download_and_extract(
                     f"PDF download redirected to unsafe URL "
                     f"(initial={pdf_url}, final={resp.url})"
                 )
-                return None
+                return None, [_make_attempt(
+                    source, "unsafe_url", started,
+                    f"redirect_to:{resp.url}",
+                )]
+
+            last_status = resp.status_code
 
             if resp.status_code in _PDF_RETRYABLE_STATUS and attempt < _PDF_MAX_RETRIES:
                 delay = _PDF_BASE_DELAY * (2 ** attempt)
+                # Honor server's Retry-After header if it asks for longer.
+                retry_after = resp.headers.get("Retry-After")
+                if retry_after:
+                    try:
+                        delay = max(delay, float(retry_after))
+                    except ValueError:
+                        pass
                 log.debug(
                     f"PDF download HTTP {resp.status_code} for {pdf_url} "
                     f"(attempt {attempt + 1}/{_PDF_MAX_RETRIES + 1}), retrying in {delay:.0f}s"
@@ -328,19 +579,57 @@ async def _download_and_extract(
 
             if resp.status_code != 200:
                 log.debug(f"PDF download failed: {pdf_url} -> HTTP {resp.status_code}")
-                return None
+                return None, [_make_attempt(
+                    source, "http_error", started,
+                    f"http_{resp.status_code}",
+                )]
 
             content_type = resp.headers.get("content-type", "")
             if "pdf" not in content_type and "octet-stream" not in content_type:
+                # HTML landing pages (HAL, ResearchGate, university repos)
+                # often advertise the real PDF via a ``citation_pdf_url``
+                # meta tag. Try that one level deep before giving up. We
+                # preserve the original ``not_pdf`` attempt alongside the
+                # recursive call's attempts so the trace shows the full
+                # landing-page → PDF hop, not just the rescue half.
+                landing_attempt = _make_attempt(
+                    source, "not_pdf", started,
+                    f"content-type:{content_type}|url:{resp.url}",
+                )
+                if (
+                    _html_depth < _HTML_PDF_REDIRECT_MAX_DEPTH
+                    and ("html" in content_type or "text" in content_type)
+                ):
+                    embedded = _extract_citation_pdf_url(resp.content, str(resp.url))
+                    if embedded and embedded != pdf_url:
+                        log.debug(
+                            f"HTML landing page at {pdf_url} advertised "
+                            f"citation_pdf_url={embedded} — recursing."
+                        )
+                        result, child_attempts = await _download_and_extract(
+                            embedded,
+                            client,
+                            source="html_meta_pdf",
+                            _html_depth=_html_depth + 1,
+                        )
+                        return result, [landing_attempt, *child_attempts]
                 log.debug(f"Not a PDF: {pdf_url} -> {content_type}")
-                return None
+                return None, [landing_attempt]
 
             # Write to temp file for parsing
             with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as f:
                 f.write(resp.content)
                 tmp_path = f.name
 
-            return await _extract_from_pdf(tmp_path, source=source)
+            extracted = await _extract_from_pdf(tmp_path, source=source)
+            if extracted.full_text:
+                return extracted, [_make_attempt(source, "ok", started)]
+            # GROBID returned no text — _extract_from_pdf already logged.
+            return extracted, [_make_attempt(
+                source,
+                "grobid_failed" if extracted.source == "not_found" else "empty_text",
+                started,
+            )]
 
         except httpx.RequestError as e:
             last_error = e
@@ -353,20 +642,24 @@ async def _download_and_extract(
                 await asyncio.sleep(delay)
                 continue
             log.debug(f"PDF download/extract failed for {pdf_url}: {e}")
-            return None
+            status = "timeout" if isinstance(e, httpx.TimeoutException) else "http_error"
+            return None, [_make_attempt(source, status, started, f"{type(e).__name__}: {e}")]
         except (httpx.HTTPError, OSError, ValueError) as e:
             log.warning(
                 f"PDF download/extract failed for {pdf_url}: "
                 f"{type(e).__name__}: {e}"
             )
-            return None
+            return None, [_make_attempt(source, "http_error", started, f"{type(e).__name__}: {e}")]
         finally:
             if tmp_path:
                 Path(tmp_path).unlink(missing_ok=True)
                 tmp_path = None
 
     log.debug(f"PDF download exhausted retries for {pdf_url}: {last_error}")
-    return None
+    detail = f"retries_exhausted:last_status={last_status}"
+    if last_error is not None:
+        detail += f":{type(last_error).__name__}"
+    return None, [_make_attempt(source, "http_error", started, detail)]
 
 
 async def _ensure_grobid_available() -> bool:
@@ -520,21 +813,188 @@ def _extract_via_grobid(pdf_path: str) -> tuple[Optional[str], list[dict]]:
 
 
 # ---------------------------------------------------------------------------
+# Fallback fetch paths
+# ---------------------------------------------------------------------------
+#
+# These run AFTER the primary cascade (S2 oa_url → Unpaywall → arXiv-by-id)
+# has failed. They exist because L2's existence cascade short-circuits on
+# the first matching database and never asks the others for an OA URL —
+# so a paper that is fully open via S2 may be marked abstract_only just
+# because L2 happened to match it via crossref first.
+#
+# Both fallbacks tag their successful FullTextResult with a distinct
+# ``source`` label (``s2_fallback`` / ``arxiv_fallback``) so we can
+# measure how often each rescues a paper that would otherwise have been
+# abstract_only.
+
+
+async def _try_s2_fallback_pdf(
+    existence_result: ExistenceResult,
+    client: httpx.AsyncClient,
+    attempts: list[FetchAttempt],
+) -> Optional[FullTextResult]:
+    """Re-query Semantic Scholar for openAccessPdf when L2 didn't go through it.
+
+    Skipped when:
+      - L2 already used S2 (we'd be re-asking the same DB for the same answer)
+      - L2 source is "web" (the cited thing isn't a scholarly paper — a blog
+        post or social-media URL — so an S2 lookup is pointless)
+      - We have no DOI and no title to search by
+
+    Returns a FullTextResult with full_text on success, or None on miss /
+    download failure (caller proceeds to the next fallback step).
+    Appends a FetchAttempt to ``attempts`` describing the outcome.
+    """
+    if existence_result.source in {"semantic_scholar", "web"}:
+        attempts.append(FetchAttempt(
+            source="s2_fallback", status="skipped",
+            detail=f"primary_source={existence_result.source}",
+        ))
+        return None
+    if not existence_result.matched_doi and not existence_result.matched_title:
+        attempts.append(FetchAttempt(
+            source="s2_fallback", status="skipped", detail="no_doi_or_title",
+        ))
+        return None
+
+    from src.verification.api_clients import semantic_scholar
+
+    started = time.perf_counter()
+    paper: Optional[dict] = None
+    if existence_result.matched_doi:
+        paper = await semantic_scholar.lookup_by_id(
+            f"DOI:{existence_result.matched_doi}", client,
+        )
+    if paper is None and existence_result.matched_title:
+        paper = await semantic_scholar.search_by_title(
+            existence_result.matched_title, client,
+        )
+    if not paper:
+        attempts.append(_make_attempt("s2_fallback", "http_error", started, "s2_lookup_miss"))
+        return None
+
+    oa = paper.get("openAccessPdf")
+    pdf_url = oa.get("url") if isinstance(oa, dict) else None
+    if not pdf_url:
+        attempts.append(_make_attempt("s2_fallback", "skipped", started, "no_openAccessPdf"))
+        return None
+
+    result, atts = await _download_and_extract(pdf_url, client, source="s2_fallback")
+    attempts.extend(atts)
+    if result and result.full_text:
+        return result
+    return None
+
+
+async def _try_arxiv_fallback_pdf(
+    existence_result: ExistenceResult,
+    arxiv_id_already_tried: Optional[str],
+    client: httpx.AsyncClient,
+    attempts: list[FetchAttempt],
+) -> Optional[FullTextResult]:
+    """Search arXiv by title for papers with no arxiv_id on the L2 record.
+
+    Skipped when:
+      - We already tried an arxiv_id in the primary cascade
+      - L2 source is already "arxiv" (no point re-asking) or "web"
+      - There is no matched_title to search by
+
+    The underlying ``arxiv.search_by_title`` already enforces the
+    configured title-similarity threshold, so a weak match silently
+    returns None instead of fetching an unrelated paper.
+    """
+    if arxiv_id_already_tried:
+        attempts.append(FetchAttempt(
+            source="arxiv_fallback", status="skipped",
+            detail="arxiv_id_already_tried",
+        ))
+        return None
+    if existence_result.source in {"arxiv", "web"}:
+        attempts.append(FetchAttempt(
+            source="arxiv_fallback", status="skipped",
+            detail=f"primary_source={existence_result.source}",
+        ))
+        return None
+    if not existence_result.matched_title:
+        attempts.append(FetchAttempt(
+            source="arxiv_fallback", status="skipped",
+            detail="no_matched_title",
+        ))
+        return None
+
+    from src.verification.api_clients import arxiv as arxiv_client
+
+    started = time.perf_counter()
+    paper = await arxiv_client.search_by_title(
+        existence_result.matched_title, client,
+    )
+    if not paper or not paper.get("arxiv_id"):
+        attempts.append(_make_attempt(
+            "arxiv_fallback", "skipped", started, "title_search_miss",
+        ))
+        return None
+
+    result, atts = await _download_and_extract_arxiv(paper["arxiv_id"], client)
+    attempts.extend(atts)
+    if result and result.full_text:
+        # Distinct source label so logs / cache audits can attribute the
+        # rescue to the title-search fallback rather than a primary hit.
+        result.source = "arxiv_fallback"
+        return result
+    return None
+
+
+# ---------------------------------------------------------------------------
 # Cache helper
 # ---------------------------------------------------------------------------
 
 
-async def _cache_fulltext(cache: APICache, ref_id: str, result: FullTextResult) -> None:
-    """Cache a FullTextResult. Truncates full_text to avoid bloating the cache."""
+async def _cache_fulltext(
+    cache: APICache,
+    cache_key: Optional[str],
+    ref_id: str,
+    result: FullTextResult,
+) -> None:
+    """Persist a FullTextResult under its content-identity cache key.
+
+    ``cache_key`` may be None when the cited paper has no DOI, arXiv ID,
+    or title to identify it (only happens for very malformed references).
+    In that case we silently skip caching — better to refetch on the next
+    run than risk serving the wrong paper's content under a colliding
+    per-input ``ref_id`` key.
+
+    ``ref_id`` is kept only for the size-limit log message so it remains
+    traceable to the source reference.
+    """
+    if cache_key is None:
+        return
     data = result.model_dump()
-    # Reject text over 200K chars (~50 pages) — likely a dissertation or
-    # corrupted extraction. Log error so the caller knows.
-    if data.get("full_text") and len(data["full_text"]) > 200_000:
-        char_count = len(data["full_text"])
-        log.error(
-            f"Full text for {ref_id} exceeds 200K chars ({char_count} chars). "
-            f"Skipping — likely a dissertation or corrupted extraction."
+    # Soft truncation: legitimate frontier-model papers (PaLM, Llama 3,
+    # OLMo) routinely exceed 200K chars and the previous hard cap was
+    # writing them back as ``source: not_found``, which silently broke
+    # passage retrieval on every subsequent run. We now keep the first
+    # ``_FULLTEXT_CACHE_MAX_CHARS`` and tag ``truncated=True`` so the
+    # downstream chunker still has plenty of body to work with and
+    # consumers can tell that they're looking at a partial copy.
+    full_text = data.get("full_text") or ""
+    if full_text and len(full_text) > _FULLTEXT_CACHE_MAX_CHARS:
+        original_len = len(full_text)
+        data["full_text"] = full_text[:_FULLTEXT_CACHE_MAX_CHARS]
+        data["truncated"] = True
+        log.info(
+            f"Full text for {ref_id} truncated from {original_len} to "
+            f"{_FULLTEXT_CACHE_MAX_CHARS} chars before caching."
         )
-        data["full_text"] = None
-        data["source"] = "not_found"
-    await cache.set(f"fulltext:{ref_id}", data, TTL_FULLTEXT)
+        # Sections may also be huge — drop any whose ``text`` runs past
+        # the truncation point so the cached entry doesn't carry duplicate
+        # body text in two places. The chunker reads ``full_text`` first.
+        kept_sections: list[dict] = []
+        running_len = 0
+        for sec in data.get("sections", []):
+            sec_text = sec.get("text", "") or ""
+            if running_len + len(sec_text) > _FULLTEXT_CACHE_MAX_CHARS:
+                break
+            kept_sections.append(sec)
+            running_len += len(sec_text)
+        data["sections"] = kept_sections
+    await cache.set(cache_key, data, TTL_FULLTEXT)

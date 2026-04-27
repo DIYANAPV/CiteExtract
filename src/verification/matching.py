@@ -126,17 +126,60 @@ def normalize_author(name: str) -> str:
     return n
 
 
+_CORPORATE_AUTHOR_NAMES = frozenset({
+    # Org-only labels we see verbatim in bibliographies.
+    "openai", "anthropic", "deepmind", "google deepmind", "meta ai",
+    "google ai", "google research", "google brain", "facebook ai research",
+    "fair", "microsoft research", "ibm research", "nvidia research",
+    "apple machine learning research", "apple", "amazon science",
+    "salesforce research", "huggingface", "hugging face", "cohere",
+    "allen institute for ai", "allen institute for artificial intelligence",
+    "ai2", "stability ai", "mistral ai", "databricks", "snowflake ai research",
+    "deepseek ai", "deepseek-ai", "qwen team", "ollama",
+})
+
+# Trailing tokens that mark a name as a corporate/research org rather than a
+# person. Matched on the *last* whitespace-separated token (case-insensitive)
+# so "Meta AI" → trailing "ai", "Google Research" → trailing "research".
+_CORPORATE_TRAILING_TOKENS = frozenset({
+    "ai", "research", "lab", "labs", "team", "inc", "ltd", "corp",
+    "foundation", "group", "institute",
+})
+
+
 def _is_consortium_name(name: str) -> bool:
     """Detect consortium/group author names that aren't individual people.
 
+    Catches three patterns:
+
+    1. **Stylistic markers** — "the …", "X Collaboration", "Y Consortium"
+       (the historical case the existing test suite covers).
+    2. **Known corporate authors** — exact matches against a curated list
+       (Meta AI, Google Research, Anthropic, OpenAI …) so the cross-
+       validation guard in :func:`_cross_validate_authors` doesn't flag
+       e.g. "Meta AI" as a fabricated co-author on a real Llama paper.
+    3. **Org-suffix names** — anything ending in ``AI`` / ``Research`` /
+       ``Lab`` / ``Inc`` etc., which catches the long tail of one-off
+       corporate labels we don't enumerate explicitly.
+
     Examples: "the KSS Cave Studies Team", "DeepSeek-AI",
-    "The ATLAS Collaboration", "WHO Expert Committee".
+    "The ATLAS Collaboration", "WHO Expert Committee", "Meta AI",
+    "Google Research".
     """
-    lower = name.lower().strip()
-    # Starts with "the " — almost always a consortium
+    raw = name.strip()
+    if not raw:
+        return False
+    lower = raw.lower()
+
+    # 2. Known corporate-author full names.
+    if lower in _CORPORATE_AUTHOR_NAMES:
+        return True
+
+    # 1a. Starts with "the " — almost always a consortium
     if lower.startswith("the "):
         return True
-    # Known consortium keywords
+
+    # 1b. Known consortium keywords anywhere in the name
     consortium_keywords = {
         "team", "collaboration", "consortium", "committee", "group",
         "network", "initiative", "project", "working party", "taskforce",
@@ -144,12 +187,23 @@ def _is_consortium_name(name: str) -> bool:
     for kw in consortium_keywords:
         if kw in lower:
             return True
-    # All uppercase or single token with dash (e.g., "DeepSeek-AI", "OpenAI")
-    if '-' in name and len(name.split()) == 1 and name[0].isupper():
-        # Could be "DeepSeek-AI" — check if it's not a hyphenated surname
-        parts = name.split('-')
+
+    # 3. Org-suffix names: trailing token is a corporate marker.
+    # Limited to short author strings (≤ 4 tokens) to avoid false positives
+    # on "Andrew Y. Ng Lab Director" style nonsense; real corporate authors
+    # are short — "Meta AI", "Google Research", "Allen AI Institute".
+    tokens = raw.split()
+    if 1 <= len(tokens) <= 4:
+        last = tokens[-1].lower().rstrip(".,;:")
+        if last in _CORPORATE_TRAILING_TOKENS:
+            return True
+
+    # 1c. Hyphenated single-token uppercase forms (e.g., "DeepSeek-AI").
+    if '-' in raw and len(tokens) == 1 and raw[0].isupper():
+        parts = raw.split('-')
         if any(p.isupper() for p in parts):
             return True
+
     return False
 
 

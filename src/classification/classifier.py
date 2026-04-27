@@ -1,29 +1,57 @@
 """Classification (L5) — decision tree combining L2 + L3 results.
 
-Maps existence + metadata results into final verdicts:
-FABRICATED, VALID, UNVERIFIABLE.
-
-Claim verification (MISREPRESENTED) is handled separately via
-passage-based analysis in the comprehension pipeline.
+The top-level verdict is metadata-driven only: FABRICATED, VALID, or
+UNVERIFIABLE. The claim dimension (does the cited paper actually support
+the citing sentence?) is reported separately as ``claim_verdict`` —
+SUPPORTED / CONTRADICTS / NEUTRAL / UNVERIFIABLE — so the user reads it
+as a second, orthogonal signal on the verdict card rather than seeing it
+collapsed into the top-level rollup.
 """
 
 from typing import Optional
 
 from pydantic import BaseModel, Field
 
+from src.models.comprehension import ClaimVerdict
 from src.models.verdict import ExistenceResult
 from src.verification.metadata import MetadataResult
 
 
 class CitationVerdict(BaseModel):
-    """Final verdict for a single reference."""
+    """Final verdict for a single reference.
+
+    Carries two independent verdict dimensions — metadata (does the cited
+    paper exist and match the reference metadata?) and claim (does the
+    cited paper actually support the citing sentence?). The top-level
+    ``verdict`` is a roll-up of the two for back-compat with reports.
+    """
 
     ref_id: str
-    verdict: str = Field(description="FABRICATED, MISREPRESENTED, VALID, UNVERIFIABLE")
+    verdict: str = Field(description="FABRICATED, VALID, UNVERIFIABLE (metadata-driven top-level)")
     mode: str = Field(description="'quick' (rule-based) or 'agentic'")
     action: str = Field(description="no_action, verify_claim, remove_citation")
     explanation: str = Field(description="Human-readable summary of why this verdict was given")
     flags: list[str] = Field(default_factory=list)
+
+    # Two-dimension verdicts (agentic mode populates both independently)
+    metadata_verdict: Optional[str] = Field(
+        default=None,
+        description="VALID, FABRICATED, UNVERIFIABLE (metadata dimension)",
+    )
+    metadata_flags: list[str] = Field(default_factory=list)
+    metadata_explanation: Optional[str] = None
+    claim_verdict: Optional[str] = Field(
+        default=None,
+        description="SUPPORTED, CONTRADICTS, NEUTRAL, UNVERIFIABLE, or None if not applicable",
+    )
+    claim_flags: list[str] = Field(default_factory=list)
+    claim_explanation: Optional[str] = None
+
+    # Per-citing-sentence claim agent output, keyed by literal citing sentence.
+    # Empty in quick mode and in agentic when the route did not run the claim
+    # agent. Surfaces individual SUPPORTS/CONTRADICTS/NEUTRAL judgments and
+    # evidence quotes that the claim_verdict roll-up necessarily flattens.
+    per_sentence_claim_verdicts: dict[str, ClaimVerdict] = Field(default_factory=dict)
 
     # Evidence trail
     existence: Optional[ExistenceResult] = None
@@ -38,6 +66,23 @@ class CitationVerdict(BaseModel):
         default=None,
         description="BibTeX entry generated from database metadata",
     )
+
+
+def rollup_verdict(
+    metadata_verdict: Optional[str],
+    claim_verdict: Optional[str] = None,  # kept for back-compat call sites
+) -> str:
+    """Top-level verdict is metadata-driven only.
+
+    The claim dimension is shown separately on the verdict card so users
+    can read it as an independent signal — collapsing CONTRADICTS into
+    the top-level was conflating a "wrong paper cited" finding with a
+    "right paper, mismatched claim" finding, two materially different
+    actions for the user.
+
+    Returns the metadata verdict, or UNVERIFIABLE if metadata never ran.
+    """
+    return metadata_verdict or "UNVERIFIABLE"
 
 
 def classify_quick(
@@ -57,28 +102,49 @@ def classify_quick(
         all_flags.extend(metadata.flags)
     all_flags = list(dict.fromkeys(all_flags))
 
+    def _build(
+        verdict: str,
+        action: str,
+        explanation: str,
+        flags: list[str],
+        **extra,
+    ) -> CitationVerdict:
+        # Quick mode only evaluates metadata; mirror the fields so both
+        # quick and agentic verdicts expose the same two-dimension shape.
+        return CitationVerdict(
+            ref_id=ref_id,
+            verdict=verdict,
+            mode="quick",
+            action=action,
+            explanation=explanation,
+            flags=flags,
+            metadata_verdict=verdict,
+            metadata_flags=flags,
+            metadata_explanation=explanation,
+            claim_verdict=None,
+            claim_flags=[],
+            claim_explanation=None,
+            existence=existence,
+            metadata=metadata,
+            **extra,
+        )
+
     # 1. NOT_FOUND → FABRICATED (if enough databases checked) or UNVERIFIABLE
     if existence.status == "NOT_FOUND":
         checked = existence.databases_checked
         if len(checked) >= 2:
-            return CitationVerdict(
-                ref_id=ref_id,
+            return _build(
                 verdict="FABRICATED",
-                mode="quick",
                 action="remove_citation",
                 explanation=(
                     f"Reference not found in any database. "
                     f"Checked: {', '.join(checked)}."
                 ),
                 flags=all_flags,
-                existence=existence,
-                metadata=metadata,
             )
         else:
-            return CitationVerdict(
-                ref_id=ref_id,
+            return _build(
                 verdict="UNVERIFIABLE",
-                mode="quick",
                 action="no_action",
                 explanation=(
                     f"Could not verify this reference — only "
@@ -88,31 +154,23 @@ def classify_quick(
                     f"errors or rate limits."
                 ),
                 flags=all_flags + ["insufficient_database_coverage"],
-                existence=existence,
-                metadata=metadata,
             )
 
     # 2. Retracted → FABRICATED
     if metadata and metadata.is_retracted:
-        return CitationVerdict(
-            ref_id=ref_id,
+        return _build(
             verdict="FABRICATED",
-            mode="quick",
             action="remove_citation",
             explanation="This paper has been retracted. Check the retraction notice before citing.",
             flags=all_flags + ["retracted"],
-            existence=existence,
-            metadata=metadata,
         )
 
     # 3. Metadata mismatch (blended or misattributed) → FABRICATED
     if metadata and metadata.has_metadata_mismatch:
         mismatched = [c for c in metadata.comparisons if c.status == "MISMATCH" and c.field != "title"]
         fields = ", ".join(c.field for c in mismatched)
-        return CitationVerdict(
-            ref_id=ref_id,
+        return _build(
             verdict="FABRICATED",
-            mode="quick",
             action="remove_citation",
             explanation=(
                 f"Title matches a real paper but {fields} "
@@ -121,21 +179,15 @@ def classify_quick(
                 f"incorrect or fabricated."
             ),
             flags=all_flags,
-            existence=existence,
-            metadata=metadata,
         )
 
     # 4. All clear — generate corrected citation from DB metadata
     apa, bibtex = _format_corrected_citation(existence)
-    return CitationVerdict(
-        ref_id=ref_id,
+    return _build(
         verdict="VALID",
-        mode="quick",
         action="no_action",
         explanation="Reference exists and metadata matches.",
         flags=all_flags,
-        existence=existence,
-        metadata=metadata,
         corrected_apa=apa,
         corrected_bibtex=bibtex,
     )

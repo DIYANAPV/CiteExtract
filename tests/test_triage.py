@@ -158,6 +158,22 @@ class TestClearFabricated:
         assert result.route == TriageRoute.CLEAR_FABRICATED
         assert "retracted" in result.triage_reason.lower()
 
+    def test_retracted_with_substantive_citations_routes_to_claim(self):
+        """Retracted paper with citing text must still run the claim agent.
+
+        The paper text is retrievable, so the claim agent can judge whether
+        the citing sentence is supported. The merger injects
+        metadata_verdict=FABRICATED deterministically on this path.
+        """
+        result = triage_reference(
+            ref_id="1",
+            existence=_exist(),
+            metadata=_meta(is_retracted=True),
+            citations=[_citation()],
+        )
+        assert result.route == TriageRoute.NEEDS_CLAIM
+        assert "retracted" in result.triage_reason.lower()
+
 
 # ---------------------------------------------------------------------------
 # Route: UNVERIFIABLE
@@ -211,15 +227,16 @@ class TestNeedsMetadata:
         )
         assert result.route == TriageRoute.NEEDS_METADATA
 
-    def test_borderline_title_no_claims(self):
+    def test_title_mismatch_no_claims(self):
+        """Title below 0.80 threshold — metadata agent investigates."""
         result = triage_reference(
             ref_id="1",
-            existence=_exist(title_sim=0.88),
-            metadata=_meta(title_sim=0.88),
+            existence=_exist(title_sim=0.70),
+            metadata=_meta(title_status="MISMATCH", title_sim=0.70),
             citations=[],
         )
         assert result.route == TriageRoute.NEEDS_METADATA
-        assert "borderline" in result.triage_reason.lower()
+        assert "title mismatch" in result.triage_reason.lower()
 
     def test_doi_title_mismatch_no_claims(self):
         result = triage_reference(
@@ -305,14 +322,26 @@ class TestNeedsBoth:
         )
         assert result.route == TriageRoute.NEEDS_BOTH
 
-    def test_borderline_title_with_claims(self):
+    def test_title_mismatch_with_claims(self):
+        """Title below 0.80 + claims — run metadata and claim agents."""
         result = triage_reference(
             ref_id="1",
-            existence=_exist(title_sim=0.90),
-            metadata=_meta(title_sim=0.90),
+            existence=_exist(title_sim=0.70),
+            metadata=_meta(title_status="MISMATCH", title_sim=0.70),
             citations=[_citation()],
         )
         assert result.route == TriageRoute.NEEDS_BOTH
+
+    def test_near_match_title_with_claims_routes_to_claim(self):
+        """Title in former borderline band (0.80-0.95) is now a clean match."""
+        cit = _citation()
+        result = triage_reference(
+            ref_id="1",
+            existence=_exist(title_sim=0.90),
+            metadata=_meta(title_sim=0.90),  # status defaults to MATCH
+            citations=[cit],
+        )
+        assert result.route == TriageRoute.NEEDS_CLAIM
 
     def test_doi_mismatch_with_claims(self):
         result = triage_reference(
@@ -382,21 +411,5 @@ class TestTriageAll:
         by_id = {r.ref_id: r for r in results}
         assert by_id["1"].route == TriageRoute.CLEAR_VALID
         assert by_id["2"].route == TriageRoute.CLEAR_FABRICATED
-        assert by_id["3"].route == TriageRoute.NEEDS_BOTH  # borderline title + claims
-
-    def test_config_override_thresholds(self):
-        """Custom threshold changes borderline behavior."""
-        exist_map = {"1": _exist(ref_id="1", title_sim=0.92)}
-        metadata_map = {"1": _meta(ref_id="1", title_sim=0.92)}
-        citations_by_ref = {"1": []}
-
-        # Default threshold 0.95 → NEEDS_METADATA (0.92 < 0.95)
-        results_default = triage_all(exist_map, metadata_map, citations_by_ref)
-        assert results_default[0].route == TriageRoute.NEEDS_METADATA
-
-        # Lower threshold to 0.90 → CLEAR_VALID (0.92 >= 0.90)
-        results_custom = triage_all(
-            exist_map, metadata_map, citations_by_ref,
-            triage_config={"title_exact_threshold": 0.90},
-        )
-        assert results_custom[0].route == TriageRoute.CLEAR_VALID
+        # Title 0.88 is >= 0.80 (match) → claims present → NEEDS_CLAIM
+        assert by_id["3"].route == TriageRoute.NEEDS_CLAIM

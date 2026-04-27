@@ -12,6 +12,7 @@ Set these in `.env` (local) or via your host's secret manager (cloud).
 | --- | --- | --- |
 | `OPENAI_API_KEY` | Required for Agentic mode | LLM calls during claim verification |
 | `REVIEW_ACCESS_TOKEN` | Recommended for public URLs | Unguessable string; anyone without it sees a 403 page |
+| `MONTHLY_BUDGET_USD` | Recommended for public URLs | Hard ceiling on cumulative OpenAI spend per calendar month. New analyses are refused once reached. Unset = no cap. See §5 *Spend ceiling*. |
 | `DAILY_ANALYSIS_LIMIT` | Optional | Global papers/day across all users, counts singles + batch papers (default: 40) |
 | `HOURLY_IP_LIMIT` | Optional | Single-paper analyses/hour per IP (default: 10) |
 | `HOURLY_IP_BATCH_LIMIT` | Optional | Batch submissions/hour per IP (default: 2) |
@@ -95,18 +96,77 @@ The token only needs to resist casual scraping and bots — not determined attac
 
 ---
 
-## 5. Cloud Run deploy *(stub — fill in when ready)*
+## 5. Cloud Run deploy
 
-Intended shape:
+`scripts/deploy_gcp.sh` is the source of truth — it creates the project, links billing, sets a budget alert, stores secrets in Secret Manager, deploys GROBID, builds and deploys the main app, and prints the reviewer link. Re-running it is safe.
 
-1. `gcloud run deploy grobid` — separate service for GROBID
-2. `gcloud run deploy checkcitation` — main app, points `GROBID_SERVICE_URL` at the GROBID service
-3. Both in `us-central1` (always-free tier)
-4. Put secrets (`OPENAI_API_KEY`, `REVIEW_ACCESS_TOKEN`) in Secret Manager; mount as env vars
-5. Set a GCP budget alert at $50/$100/$200 (the $300 new-account trial is the outer bound)
-6. `min-instances=1` during the active review period so reviewers don't hit cold starts
+### One-time prerequisites
 
-Write the actual commands when you're ready to run them.
+1. Activate the $300 / 90-day free trial at https://console.cloud.google.com (credit card required, but the account *pauses* at $0 — it does not auto-charge)
+2. Install the [gcloud CLI](https://cloud.google.com/sdk/docs/install), then `gcloud auth login`
+3. Complete §2 above (OpenAI project-scoped key with monthly cap) — the script needs the key
+4. `gcloud billing accounts list` and copy the `ACCOUNT_ID`
+
+### Run
+
+```bash
+PROJECT_ID=citecheck-demo-2026 \
+BILLING_ACCOUNT_ID=XXXXXX-XXXXXX-XXXXXX \
+OPENAI_API_KEY=sk-proj-... \
+REVIEW_ACCESS_TOKEN=$(python3 -c "import secrets; print(secrets.token_urlsafe(16))") \
+./scripts/deploy_gcp.sh
+```
+
+Pick a `PROJECT_ID` that doesn't contain your name or institution — the project ID is occasionally visible (build logs, custom domains) and would break double-blind review.
+
+The first run takes ~15–20 minutes, mostly the Cloud Build step on the torch/sentence-transformers image. Subsequent re-runs (config changes, code updates) take ~3–5 minutes.
+
+### Deployed shape
+
+- **GROBID** (`grobid/grobid:0.8.2-crf`, 4Gi/2vCPU): `min=0 max=2`, default request-based billing — pay only when a PDF is being parsed. Reviewers eat one ~30s cold start per session. HTTP startup probe at `/api/isalive` so the JVM finishes booting before traffic hits.
+- **Main app** (this repo's [Dockerfile](Dockerfile), 4Gi/1vCPU): `min=max=1`, default request-based billing, `concurrency=5`. One warm instance avoids cold starts for reviewers and sidesteps the multi-instance issues with the in-process job store ([src/job_store.py](src/job_store.py)) and on-disk SQLite cache (`data/cache/api_cache.db`). HTTP startup probe at `/health`.
+- **Secrets** `openai-api-key` and `review-access-token` in Secret Manager, mounted as env vars on the runtime service account `checkcitation-sa@<PROJECT>.iam.gserviceaccount.com`.
+- **Budget alert** at 25 / 50 / 90 / 100 % of $200 (override with `BUDGET_USD=`).
+- **Smoke test**: the script `curl`s `/health` after deploy and exits non-zero if it doesn't return 200.
+
+### Spend ceiling
+
+Independent of any OpenAI org-level cap (which a `member` account can't set), the deploy bakes in a per-month USD ceiling enforced in code at [src/verification/spend_guard.py](src/verification/spend_guard.py).
+
+- Every LLM call's USD cost is appended to `data/cache/spend/<YYYY-MM>.json` via an `fcntl.flock`-guarded write (one record per call, atomic).
+- Before each analysis, the rate-limit gate in [app.py](app.py) calls `spend_guard.check_budget()`. If cumulative spend has reached `MONTHLY_BUDGET_USD`, reviewers see a "service paused for the month" message instead of starting an analysis. In-flight analyses are not killed — the worst overrun is `<concurrency> × max_cost_per_paper`, ~$2.50 for the default config.
+- Default in the deploy script: `MONTHLY_BUDGET_USD=150`. Override at deploy time: `MONTHLY_BUDGET_USD=50 ./scripts/deploy_gcp.sh`.
+- Auto-rolls over on calendar month (UTC).
+- Counter survives across requests on the warm `min=1` instance. If Cloud Run evicts the instance (rare), the file is lost and the next instance starts at $0 — the OpenAI dashboard remains your second pair of eyes.
+- Bump or remove the cap without redeploying: `gcloud run services update checkcitation --region=us-central1 --update-env-vars=MONTHLY_BUDGET_USD=300`.
+
+### Cost expectation
+
+After the per-billing-account free tier (180k vCPU-s, 360k GiB-s, 2M requests / month), this configuration runs ≈ **$45 over 90 days** for typical peer-review traffic — roughly $5/mo compute on the main service, $5/mo for sporadic GROBID use, $5/mo for build/storage/egress. The $300 trial credit is the outer bound; the $200 budget alert is the inner one.
+
+If you'll drive the async API endpoint hard (long-running pipeline jobs through `POST /api/v1/jobs`), pass `MAIN_CPU_ALWAYS=1` to the script. That switches the main service to instance-based billing (`--no-cpu-throttling`) so FastAPI BackgroundTasks aren't CPU-throttled between requests. Cost rises to ≈$90/mo, ~$270 over 90 days — still inside the credit, but tighter.
+
+### Known limitation: instance-bounded state
+
+The job store, API cache, and verdict cache all live on the container's local filesystem. With `min=max=1` this is fine — the same instance handles every request and survives across deploys (Cloud Run keeps the old revision serving until the new one is healthy). It would break under autoscaling. If you ever need to lift `max-instances`, migrate [src/job_store.py](src/job_store.py) and [src/verification/cache.py](src/verification/cache.py) to Firestore + GCS first.
+
+### Rotate the token after camera-ready
+
+```bash
+printf "%s" "new-token" | gcloud secrets versions add review-access-token --data-file=-
+gcloud run services update checkcitation --region=us-central1 \
+  --update-secrets="REVIEW_ACCESS_TOKEN=review-access-token:latest"
+```
+
+The pre-review PDF's link stops working immediately. (`printf` instead of `echo -n` because some shells add a newline anyway, which Secret Manager stores as part of the secret value.)
+
+### Wind down after publication
+
+```bash
+gcloud projects delete <PROJECT_ID>
+```
+
+Marks the project for deletion in 30 days, taking the services, secrets, build artifacts, and budget with it. Cancel within 30 days if you change your mind.
 
 ---
 
