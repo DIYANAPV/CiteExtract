@@ -214,37 +214,31 @@ def _find_citation_target(
             Typically means the GROBID bibr text and the rendered glyphs
             disagree (line wrap, comma variant, partial wrap).
 
-    Strategy (in order, each skipping positions already annotated):
-      1. Locate the citing sentence on some page; pick the marker rect closest
-         to it on that page. This handles repeated markers correctly.
-      2. Fall back to the first not-yet-used marker occurrence anywhere in
-         the document.
+    Strategy chain (each skipping positions already annotated; first hit wins):
+      1. Literal marker, sentence-anchored: find the page holding the citing
+         sentence and pick the marker rect closest to it. Handles repeated
+         markers correctly.
+      2. Literal marker, anywhere: first unused occurrence in the document.
+      3. Unicode-normalized marker, sentence-anchored: when the marker has
+         diacritics or composed glyphs that the PDF text-layer encodes
+         differently (e.g. ``ş`` → ``s``, ``ı`` → ``i``).
+      4. Surname-only fallback, sentence-anchored: last-resort search for
+         just the leading author surname on the citing-sentence's page,
+         scoped to the sentence's vertical band so we don't accidentally
+         place the icon on an unrelated mention of that surname elsewhere
+         on the page.
     """
     sentence_prefix = _safe_sentence_prefix(cit.citing_sentence)
     # Tracks "did search_for(marker) ever return >0 rects on any page". Lets
     # the caller distinguish the two failure modes when we return None.
     any_marker_match = False
 
-    # Strategy 1: sentence-first — find the page holding this citing sentence
-    if sentence_prefix:
-        for page_idx, page in enumerate(doc):
-            sentence_rects = page.search_for(sentence_prefix)
-            if not sentence_rects:
-                continue
-            marker_rects = page.search_for(marker)
-            if not marker_rects:
-                continue
-            any_marker_match = True
-            s0 = sentence_rects[0]
-            for rect in sorted(
-                marker_rects,
-                key=lambda r: abs(r.y0 - s0.y0) + abs(r.x0 - s0.x0),
-            ):
-                key = (page_idx, int(rect.x0), int(rect.y0))
-                if key not in used_positions:
-                    return (page_idx, rect), "found"
+    # Strategy 1: literal marker, sentence-anchored
+    target = _find_anchored_match(doc, marker, sentence_prefix, used_positions)
+    if target is not None:
+        return target, "found"
 
-    # Strategy 2: first unused occurrence anywhere in the document
+    # Strategy 2: literal marker, anywhere
     for page_idx, page in enumerate(doc):
         marker_rects = page.search_for(marker)
         if marker_rects:
@@ -254,7 +248,167 @@ def _find_citation_target(
             if key not in used_positions:
                 return (page_idx, rect), "found"
 
+    # Strategy 3: unicode-normalized literal, sentence-anchored
+    # ``Taşkın`` → ``Taskin`` etc. Some PDFs encode diacritics as composed
+    # glyphs that PyMuPDF can't return as text; the ASCII variant may.
+    normalized = _normalize_unicode_marker(marker)
+    if normalized != marker:
+        target = _find_anchored_match(
+            doc, normalized, sentence_prefix, used_positions,
+        )
+        if target is not None:
+            log.info(
+                "annotator: unicode-normalized fallback matched %r → %r",
+                marker[:60], normalized[:60],
+            )
+            return target, "found"
+
+    # Strategy 4: surname-only fallback, anchored to citing sentence's page
+    # AND restricted to the sentence's vertical band (±2 lines). The band
+    # restriction is what makes this safe — without it, "Wager" by itself
+    # could land on an unrelated mention of the same surname.
+    surname = _surname_from_marker(marker)
+    if surname is not None and sentence_prefix:
+        target = _find_surname_near_sentence(
+            doc, surname, sentence_prefix, used_positions,
+        )
+        if target is not None:
+            log.info(
+                "annotator: surname-only fallback matched %r → %r",
+                marker[:60], surname,
+            )
+            return target, "found"
+
     return None, ("all_collided" if any_marker_match else "not_in_text")
+
+
+def _find_anchored_match(
+    doc, marker: str, sentence_prefix: str,
+    used_positions: set[tuple[int, int, int]],
+) -> Optional[tuple[int, fitz.Rect]]:
+    """Locate a marker rect on the page that contains the citing sentence,
+    preferring the closest occurrence to the sentence anchor."""
+    if not sentence_prefix or not marker:
+        return None
+    for page_idx, page in enumerate(doc):
+        sentence_rects = page.search_for(sentence_prefix)
+        if not sentence_rects:
+            continue
+        marker_rects = page.search_for(marker)
+        if not marker_rects:
+            continue
+        s0 = sentence_rects[0]
+        for rect in sorted(
+            marker_rects,
+            key=lambda r: abs(r.y0 - s0.y0) + abs(r.x0 - s0.x0),
+        ):
+            key = (page_idx, int(rect.x0), int(rect.y0))
+            if key not in used_positions:
+                return page_idx, rect
+    return None
+
+
+# Vertical tolerance (in PDF points) for the surname-only fallback. ~2 lines
+# of body text at typical 11pt with 13pt leading. Anything outside this band
+# is almost certainly an unrelated mention of the same surname.
+_SURNAME_BAND_POINTS = 30.0
+
+
+def _find_surname_near_sentence(
+    doc, surname: str, sentence_prefix: str,
+    used_positions: set[tuple[int, int, int]],
+) -> Optional[tuple[int, fitz.Rect]]:
+    """Last-resort search: find the surname on the citing-sentence's page,
+    scoped to a vertical band around the sentence so we don't place the
+    icon on an unrelated mention of that surname elsewhere on the page."""
+    for page_idx, page in enumerate(doc):
+        sentence_rects = page.search_for(sentence_prefix)
+        if not sentence_rects:
+            continue
+        s0 = sentence_rects[0]
+        for rect in sorted(
+            page.search_for(surname),
+            key=lambda r: abs(r.y0 - s0.y0) + abs(r.x0 - s0.x0),
+        ):
+            if abs(rect.y0 - s0.y0) > _SURNAME_BAND_POINTS:
+                # Outside the citing sentence's band → likely unrelated.
+                continue
+            key = (page_idx, int(rect.x0), int(rect.y0))
+            if key not in used_positions:
+                return page_idx, rect
+    return None
+
+
+# Atomic non-ASCII Latin characters that NFKD won't decompose. Each maps
+# to its closest ASCII equivalent so the normalized form is searchable in
+# PDFs whose text-layer dropped the original glyph.
+_LATIN_ATOM_MAP = {
+    "ı": "i", "İ": "I",   # Turkish dotless / dotted I
+    "ø": "o", "Ø": "O",   # Scandinavian
+    "æ": "ae", "Æ": "AE",
+    "œ": "oe", "Œ": "OE",
+    "đ": "d", "Đ": "D",
+    "ł": "l", "Ł": "L",
+    "ß": "ss",
+    "ð": "d", "Ð": "D",
+    "þ": "th", "Þ": "Th",
+}
+
+
+def _normalize_unicode_marker(marker: str) -> str:
+    """Strip combining diacritics + map atomic Latin chars so ``ş``/``ı``/
+    ``é``/``ø`` collapse to ``s``/``i``/``e``/``o``. Lets us search PDFs
+    whose text-layer encoded the original glyphs in a way PyMuPDF can't
+    extract verbatim.
+
+    Two-step: NFKD strip handles composed glyphs (``ş`` = ``s`` + cedilla),
+    then the atomic-map handles characters that NFKD leaves alone (``ı``
+    is a base character with no combining mark).
+    """
+    import unicodedata
+    if not marker:
+        return ""
+    decomposed = unicodedata.normalize("NFKD", marker)
+    no_diacritics = "".join(c for c in decomposed if not unicodedata.combining(c))
+    return "".join(_LATIN_ATOM_MAP.get(c, c) for c in no_diacritics)
+
+
+_SURNAME_RE = re.compile(
+    r"[A-Za-zÀ-ſ][A-Za-zÀ-ſ'\-]+",
+    re.UNICODE,
+)
+# Function words that look like surnames at the start of a marker. Skipping
+# these avoids the surname-only fallback latching onto a non-name word.
+_SURNAME_STOPWORDS = frozenset({
+    "and", "or", "the", "in", "of", "et", "etal",
+})
+
+
+def _surname_from_marker(marker: str) -> Optional[str]:
+    """Return the leading author surname from an author-year marker, or None.
+
+    Used as a last-resort PDF search target when the literal and Unicode
+    fallbacks both miss. Only useful for author-year markers — numeric
+    markers like ``[42]`` return None (the surname-fallback wouldn't help
+    anyway).
+
+    Returns surnames of length >= 4 only; shorter tokens (initials, "Liu")
+    risk false-positive matches in unrelated body text.
+    """
+    if not marker:
+        return None
+    # Strip leading non-letter chars (parens, commas, semicolons, brackets).
+    text = marker.lstrip(" ,;([{")
+    if not text or text[0].isdigit():
+        return None
+    # First word-ish token. Reject stopwords and too-short tokens.
+    m = _SURNAME_RE.match(text)
+    if m is None:
+        return None
+    token = m.group()
+    if token.lower() in _SURNAME_STOPWORDS or len(token) < 4:
+        return None
+    return token
 
 
 def _safe_sentence_prefix(sentence: Optional[str], length: int = 40) -> str:

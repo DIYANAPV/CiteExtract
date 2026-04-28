@@ -238,3 +238,112 @@ class TestBasicAnnotation:
         # Both occurrences exist in the PDF — both should be claimed.
         assert stats.annotated == 2
         assert stats.skipped_collision == 0
+
+
+# ---------------------------------------------------------------------------
+# Annotator search-fallback strategies (Phase 4: edge-case recall)
+# ---------------------------------------------------------------------------
+
+
+class TestSurnameFromMarker:
+    """The surname-only fallback is only ever as good as its input. These
+    tests pin down the parsing of marker → leading-surname so neither
+    over-fires (false positives on stopwords) nor under-fires (drops
+    legitimate surnames)."""
+
+    def test_simple_paren_author_year(self):
+        from src.report.pdf_annotator import _surname_from_marker
+        assert _surname_from_marker("(Smith, 2020)") == "Smith"
+
+    def test_truncated_trailing_half(self):
+        # Trailing half of a multi-cite — leading paren missing.
+        from src.report.pdf_annotator import _surname_from_marker
+        assert _surname_from_marker("Wager and Middleton, 2008)") == "Wager"
+
+    def test_narrative_form(self):
+        from src.report.pdf_annotator import _surname_from_marker
+        assert _surname_from_marker("Yamada et al. (2025)") == "Yamada"
+
+    def test_numeric_marker_returns_none(self):
+        # No surname to search for; the fallback can't help here.
+        from src.report.pdf_annotator import _surname_from_marker
+        assert _surname_from_marker("[42]") is None
+
+    def test_short_surname_returns_none(self):
+        # Short tokens like "Liu" or "Wu" risk landing on unrelated text;
+        # we conservatively skip them.
+        from src.report.pdf_annotator import _surname_from_marker
+        assert _surname_from_marker("(Liu, 2023)") is None
+        assert _surname_from_marker("(Wu et al., 2024)") is None
+
+    def test_stopword_first_token_returns_none(self):
+        # A multi-cite that starts with "and " (e.g. ", and Smith, 2020")
+        # — the fallback should skip past it conceptually, but for
+        # safety we just refuse to extract a surname.
+        from src.report.pdf_annotator import _surname_from_marker
+        assert _surname_from_marker("and Smith, 2020)") is None
+
+    def test_hyphenated_surname_kept_whole(self):
+        from src.report.pdf_annotator import _surname_from_marker
+        assert _surname_from_marker("(Müller-Schmidt, 2019)") == "Müller-Schmidt"
+
+    def test_empty_marker_returns_none(self):
+        from src.report.pdf_annotator import _surname_from_marker
+        assert _surname_from_marker("") is None
+
+
+class TestNormalizeUnicodeMarker:
+    """Unicode normalization should strip diacritics but leave structure
+    intact, so the result is a plausible search target in a PDF whose
+    text-layer dropped the diacritics."""
+
+    def test_turkish_chars_stripped(self):
+        from src.report.pdf_annotator import _normalize_unicode_marker
+        assert _normalize_unicode_marker("(Taşkın, 2025)") == "(Taskin, 2025)"
+
+    def test_german_umlaut_stripped(self):
+        from src.report.pdf_annotator import _normalize_unicode_marker
+        assert _normalize_unicode_marker("(Müller, 2020)") == "(Muller, 2020)"
+
+    def test_french_accent_stripped(self):
+        from src.report.pdf_annotator import _normalize_unicode_marker
+        assert _normalize_unicode_marker("(Céspedes, 2025)") == "(Cespedes, 2025)"
+
+    def test_ascii_marker_unchanged(self):
+        from src.report.pdf_annotator import _normalize_unicode_marker
+        assert _normalize_unicode_marker("(Smith, 2020)") == "(Smith, 2020)"
+
+    def test_empty_returns_empty(self):
+        from src.report.pdf_annotator import _normalize_unicode_marker
+        assert _normalize_unicode_marker("") == ""
+
+
+class TestSurnameOnlyFallback:
+    """End-to-end: when the literal marker isn't searchable in the PDF
+    but the surname alone IS, the annotator should still place an icon —
+    scoped to the citing sentence's page so we don't latch onto an
+    unrelated mention of the surname."""
+
+    def test_recovers_when_literal_marker_missing_but_surname_present(
+        self, tmp_path,
+    ):
+        # PDF text has "Wager" alone (think hyphenated line-wrap stripped
+        # the surname) — literal marker won't match, but surname will.
+        pdf = _make_pdf(
+            tmp_path,
+            "Studies by Wager show evidence of citation drift in this area.",
+        )
+        out = str(tmp_path / "out.pdf")
+        cit = _citation(
+            ref_id="1",
+            marker="Wager and Middleton, 2008)",
+            position=11,
+            sentence="Studies by Wager show evidence of citation drift in this area.",
+        )
+        parsed = _parsed([cit], [_ref()])
+        report = _report([_verdict()])
+
+        stats = annotate_pdf(pdf, report, parsed, out)
+
+        assert stats.annotated == 1, "Surname fallback should rescue this citation"
+        assert stats.skipped_not_found == 0
