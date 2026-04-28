@@ -119,6 +119,122 @@ def _clean_grobid_reference(ref_data: dict) -> dict | None:
     return ref_data
 
 
+# ---------------------------------------------------------------------------
+# LLM ref-parsing batch dispatch (parallel)
+# ---------------------------------------------------------------------------
+#
+# The LLM-driven structured ref parser splits long bibliographies into
+# batches of ~30 refs each so per-call output stays well under the model's
+# max-tokens cap. Sequential mode worked but a 90-ref paper paid 3× the
+# wall-clock latency of a 30-ref paper. Dispatching all batches in
+# parallel collapses that to ~1× the slowest batch's latency.
+#
+# The functions below are module-level so they're independently
+# unit-testable; the parser holds no state across batches.
+
+# Cap on concurrent in-flight LLM calls per ref-parsing invocation.
+# OpenAI's default tier comfortably handles >>4 RPS for gpt-4o-mini; 4
+# is a safe headroom that gives 90-ref papers full parallelism without
+# risking 429 rate-limit responses.
+_REF_PARSING_PARALLEL_WORKERS = 4
+
+
+def _build_ref_parsing_batches(
+    raw_refs: list[str], markers: list[str], batch_size: int,
+) -> list[tuple[str, int, int]]:
+    """Build the prompt + max-tokens pair for each batch.
+
+    Returns a list of ``(prompt, max_tokens, batch_size)`` triples. Pure
+    function — no side effects, no API calls — so it's easy to test and
+    safe to feed into a thread pool.
+    """
+    from src.parsers.llm_ref_parser import _wrap_untrusted
+
+    fenced_markers = [_wrap_untrusted(m) for m in markers]
+    markers_section = chr(10).join(fenced_markers)
+
+    batches: list[tuple[str, int, int]] = []
+    for i in range(0, len(raw_refs), batch_size):
+        batch_refs = raw_refs[i:i + batch_size]
+        prompt_lines = [
+            f"[{i + j + 1}] {_wrap_untrusted(text)}"
+            for j, text in enumerate(batch_refs)
+        ]
+        prompt = (
+            "## Raw References (from bibliography section)\n"
+            + chr(10).join(prompt_lines)
+            + "\n\n## Citation Markers (from body text)\n"
+            + markers_section
+            + "\n\n## Response Format\nRespond in JSON:\n"
+            + '{"references": [\n'
+            '  {"ref_num": 1, "title": "...", "authors": ["First Last"], '
+            '"year": 2020, "venue": "...", "doi": null, "arxiv_id": null, '
+            '"is_garbage": false, "matched_markers": ["(Smith et al., 2020)"]}\n'
+            ']}'
+        )
+        max_tokens = min(max(len(batch_refs) * 150 + 1000, 4096), 16384)
+        batches.append((prompt, max_tokens, len(batch_refs)))
+    return batches
+
+
+def _dispatch_ref_parsing_batches(
+    sync_client, model: str, temperature: float,
+    batches: list[tuple[str, int, int]], pricing: dict,
+) -> tuple[list[dict], float]:
+    """Run all batches in parallel and aggregate refs + cost.
+
+    Per-batch failures (transport, malformed JSON) bubble up as exceptions
+    from the caller's wrapping ``try/except`` so the parser falls back to
+    GROBID's structured pass — same behavior as the old sequential code.
+
+    Cost is recorded against ``spend_guard`` per-batch so the monthly
+    ledger stays accurate even when individual batches return zero refs.
+    """
+    import json as _json
+    from src.parsers.llm_ref_parser import _SYSTEM_PROMPT
+    from src.verification import spend_guard
+
+    input_per_m = pricing.get("input_cost_per_million", 0.15)
+    output_per_m = pricing.get("output_cost_per_million", 0.60)
+
+    def _call_one(prompt: str, max_tokens: int):
+        return sync_client.chat.completions.create(
+            model=model,
+            messages=[
+                {"role": "system", "content": _SYSTEM_PROMPT},
+                {"role": "user", "content": prompt},
+            ],
+            temperature=temperature,
+            max_tokens=max_tokens,
+            response_format={"type": "json_object"},
+        )
+
+    if len(batches) == 1:
+        # Tiny papers: skip the threadpool and call inline.
+        responses = [_call_one(batches[0][0], batches[0][1])]
+    else:
+        from concurrent.futures import ThreadPoolExecutor
+
+        workers = min(len(batches), _REF_PARSING_PARALLEL_WORKERS)
+        with ThreadPoolExecutor(max_workers=workers) as ex:
+            futures = [ex.submit(_call_one, p, m) for p, m, _ in batches]
+            responses = [f.result() for f in futures]
+
+    llm_refs: list[dict] = []
+    total_cost = 0.0
+    for response in responses:
+        batch_data = _json.loads(response.choices[0].message.content or "{}")
+        llm_refs.extend(batch_data.get("references", []))
+        if response.usage and pricing:
+            batch_cost = (
+                response.usage.prompt_tokens * input_per_m / 1_000_000
+                + response.usage.completion_tokens * output_per_m / 1_000_000
+            )
+            total_cost += batch_cost
+            spend_guard.record(batch_cost)
+    return llm_refs, total_cost
+
+
 class GrobidParser(BaseParser):
     """Parse PDFs via GROBID TEI XML for structured reference and text extraction."""
 
@@ -202,23 +318,48 @@ class GrobidParser(BaseParser):
         if llm_result is not None:
             references_dict, citations, extra_warnings = llm_result
             warnings.extend(extra_warnings)
+            biblio_id_map_for_rebuild: dict[str, str] | None = None
         else:
             # --- Fallback: GROBID's own structured parsing ---
-            references_dict, biblio_id_map = self._extract_bibliography(root, paper_title)
+            references_dict, biblio_id_map_for_rebuild = self._extract_bibliography(
+                root, paper_title,
+            )
 
             # Use GROBID's target mapping for citations (reliable, 87% coverage)
             citations = self._build_citations_from_grobid_targets(
                 root, full_text, references_dict, warnings,
-                bid_override=biblio_id_map,
+                bid_override=biblio_id_map_for_rebuild,
             )
             # Annotate with rule-check confidence. LLM vote is unavailable on
             # the fallback path, so only GROBID + rule-check participate.
             citations = annotate_citation_confidence(citations, references_dict)
 
-        # Deduplicate references with identical titles
-        references_dict, dedup_count = self._deduplicate_references(references_dict)
-        if dedup_count > 0:
-            warnings.append(f"Deduplicated {dedup_count} reference(s) with identical titles.")
+        # --- Phase 3: LLM bibliography completion ---
+        # When Phase 2 dropped a meaningful number of unlinked candidates,
+        # GROBID's listBibl is almost certainly incomplete. Read the
+        # references section straight from the PDF and let the LLM recover
+        # the missing entries, then re-run citation building so previously
+        # unlinked candidates can now find their target.
+        citations = self._maybe_complete_bibliography(
+            file_path, root, full_text, references_dict, citations,
+            biblio_id_map_for_rebuild, warnings,
+        )
+
+        # Deduplicate references with identical titles, then remap any
+        # citation ref_ids that pointed at the dropped duplicates so they
+        # follow the kept ref. Without the remap, those citations become
+        # orphans (no matching verdict) and the annotator silently skips
+        # them — caught by the ``skipped_no_verdict`` Phase 1 counter
+        # but a real recall loss for the user.
+        references_dict, dedup_remap = self._deduplicate_references(references_dict)
+        if dedup_remap:
+            for cit in citations:
+                if cit.ref_id in dedup_remap:
+                    cit.ref_id = dedup_remap[cit.ref_id]
+            warnings.append(
+                f"Deduplicated {len(dedup_remap)} reference(s) with identical "
+                f"titles; remapped citations to kept refs."
+            )
 
         result = ParsedPaper(
             references=list(references_dict.values()),
@@ -243,6 +384,89 @@ class GrobidParser(BaseParser):
             log.debug(f"ParsedPaper cache write failed: {type(e).__name__}: {e}")
 
         return result
+
+    def _maybe_complete_bibliography(
+        self,
+        file_path: str,
+        root: ET.Element,
+        full_text: str,
+        references_dict: dict[str, Reference],
+        citations: list[Citation],
+        biblio_id_map: dict[str, str] | None,
+        warnings: list[str],
+    ) -> list[Citation]:
+        """Run LLM bibliography completion when Phase 2 reported a big gap.
+
+        Sits between Phase 2 (citation recovery) and reference dedup. If
+        the recovery stats stashed on ``self`` show many unlinked
+        candidates AND we have an OpenAI key, read the references section
+        straight from the PDF, recover refs GROBID's structured pass
+        missed, merge them in, and re-run citation building so previously
+        unlinked candidates can now find their target.
+
+        Returns the (possibly re-built) citation list. Mutates
+        ``references_dict`` in place to add recovered refs.
+        """
+        from src import config as app_config
+        from src.parsers.bibliography_completion import (
+            assign_ref_ids,
+            complete_bibliography_sync,
+            should_complete,
+        )
+
+        recovery_stats = getattr(self, "_last_recovery_stats", None)
+        if recovery_stats is None:
+            return citations
+
+        if not should_complete(
+            recovery_stats.grobid_orphan_dropped,
+            recovery_stats.regex_dropped,
+            len(references_dict),
+        ):
+            return citations
+
+        api_key = app_config.openai_api_key()
+        if not api_key:
+            warnings.append(
+                "Bibliography completion skipped — set OPENAI_API_KEY to "
+                f"recover the {recovery_stats.grobid_orphan_dropped + recovery_stats.regex_dropped} "
+                "candidate(s) that didn't link to any reference."
+            )
+            return citations
+
+        llm_config = app_config.llm() or {}
+        log.info(
+            "phase3: triggering bibliography completion "
+            "(orphan_dropped=%d, regex_dropped=%d, refs=%d)",
+            recovery_stats.grobid_orphan_dropped,
+            recovery_stats.regex_dropped,
+            len(references_dict),
+        )
+
+        extra_refs, cost = complete_bibliography_sync(
+            file_path, references_dict, llm_config, api_key,
+        )
+        if not extra_refs:
+            return citations
+
+        assign_ref_ids(extra_refs, references_dict)
+        for ref in extra_refs:
+            references_dict[ref.ref_id] = ref
+
+        # Re-run citation building so the previously-orphan bibrs and
+        # previously-dropped regex hits can link to the freshly-recovered
+        # refs. Re-uses the same body XML walk — fast.
+        citations = self._build_citations_from_grobid_targets(
+            root, full_text, references_dict, warnings,
+            bid_override=biblio_id_map,
+        )
+        citations = annotate_citation_confidence(citations, references_dict)
+
+        warnings.append(
+            f"Bibliography completion: recovered {len(extra_refs)} reference(s) "
+            f"GROBID dropped (cost ${cost:.4f}); citations re-linked."
+        )
+        return citations
 
     def _try_llm_parsing(
         self, root: ET.Element, full_text: str, warnings: list[str]
@@ -284,91 +508,31 @@ class GrobidParser(BaseParser):
             import json as _json
             from src.parsers.llm_ref_parser import _wrap_untrusted
 
-            # Split into batches of ~30 refs to avoid API timeouts.
-            # Each batch gets ALL markers (for matching), but only its refs.
+            # Build one batch per ~30 refs. Each batch gets ALL markers
+            # (for matching) but only its slice of the references.
             batch_size = 30
-            llm_refs = []
-            cost = 0.0
-            cost_capped = False
             pricing = llm_config.get("pricing", {})
-            input_per_m = pricing.get("input_cost_per_million", 0.15)
-            output_per_m = pricing.get("output_cost_per_million", 0.60)
             # Hard cap on per-paper LLM spend. Defaults to $0.50 — typical
             # papers run ~$0.02; the cap is a circuit breaker for outliers
             # (500-reference review articles) or misconfigured models.
             max_cost = float(llm_config.get("max_cost_per_paper", 0.50))
-            for i in range(0, len(raw_refs), batch_size):
-                batch_refs = raw_refs[i:i + batch_size]
-                # Renumber refs in batch starting from their original position
-                numbered_refs = []
-                for j, ref_text in enumerate(batch_refs):
-                    numbered_refs.append((i + j + 1, ref_text))
 
-                # Fence raw text so prompt-injection inside a malicious PDF
-                # reference can't impersonate instructions to the model.
-                prompt_lines = [
-                    f"[{num}] {_wrap_untrusted(text)}"
-                    for num, text in numbered_refs
-                ]
-                fenced_markers = [_wrap_untrusted(m) for m in markers]
-                batch_prompt = f"""## Raw References (from bibliography section)
-{chr(10).join(prompt_lines)}
-
-## Citation Markers (from body text)
-{chr(10).join(fenced_markers)}
-
-## Response Format
-Respond in JSON:
-{{"references": [
-  {{"ref_num": 1, "title": "...", "authors": ["First Last"], "year": 2020, "venue": "...", "doi": null, "arxiv_id": null, "is_garbage": false, "matched_markers": ["(Smith et al., 2020)"]}}
-]}}"""
-
-                batch_max = min(max(len(batch_refs) * 150 + 1000, 4096), 16384)
-                response = sync_client.chat.completions.create(
-                    model=model,
-                    messages=[
-                        {"role": "system", "content": _SYSTEM_PROMPT},
-                        {"role": "user", "content": batch_prompt},
-                    ],
-                    temperature=temperature,
-                    max_tokens=batch_max,
-                    response_format={"type": "json_object"},
-                )
-                batch_data = _json.loads(response.choices[0].message.content or "{}")
-                llm_refs.extend(batch_data.get("references", []))
-
-                # Accumulate per-batch cost (the previous version only
-                # captured the final batch's usage, undercounting cost on
-                # any paper with more than 30 references).
-                if response.usage and pricing:
-                    batch_cost = (
-                        response.usage.prompt_tokens * input_per_m / 1_000_000
-                        + response.usage.completion_tokens * output_per_m / 1_000_000
-                    )
-                    cost += batch_cost
-                    # Outlier path: this module computes cost inline rather than
-                    # via CostTracker, so record explicitly to keep the monthly
-                    # ledger accurate.
-                    from src.verification import spend_guard
-                    spend_guard.record(batch_cost)
-
-                if cost > max_cost:
-                    log.warning(
-                        f"LLM ref-parsing cost ${cost:.4f} exceeded cap "
-                        f"${max_cost:.2f}; stopping after batch {i // batch_size + 1} "
-                        f"of {(len(raw_refs) + batch_size - 1) // batch_size}."
-                    )
-                    warnings.append(
-                        f"LLM ref-parsing stopped at cost cap (${cost:.4f} > "
-                        f"${max_cost:.2f}); some references may be missing."
-                    )
-                    cost_capped = True
-                    break
-
-            log.info(
-                f"LLM parsed {len(llm_refs)} references, cost: ${cost:.4f}"
-                + (" (cost-capped)" if cost_capped else "")
+            batches = _build_ref_parsing_batches(raw_refs, markers, batch_size)
+            llm_refs, cost = _dispatch_ref_parsing_batches(
+                sync_client, model, temperature, batches, pricing,
             )
+
+            if cost > max_cost:
+                log.warning(
+                    f"LLM ref-parsing cost ${cost:.4f} exceeded cap "
+                    f"${max_cost:.2f}"
+                )
+                warnings.append(
+                    f"LLM ref-parsing exceeded cost cap "
+                    f"(${cost:.4f} > ${max_cost:.2f})."
+                )
+
+            log.info(f"LLM parsed {len(llm_refs)} references, cost: ${cost:.4f}")
         except _httpx.HTTPError as e:
             # Transport / network errors are recoverable; fall back to GROBID.
             log.warning(f"LLM ref parsing transport error: {type(e).__name__}: {e}")
@@ -682,13 +846,17 @@ Respond in JSON:
         if body is None:
             return []
 
-        citations: list[Citation] = []
         unresolved: set[str] = set()
 
-        # Rebuild body text while tracking positions of <ref> elements
-        # This mirrors _extract_text_and_citations but records citation info
+        # Rebuild body text while tracking positions of <ref> elements.
+        # Every bibr the body contains becomes a ``BibrSpan`` — including
+        # orphans (no ``target`` attribute, or ``target`` pointing to a ref
+        # that didn't survive dedup). The recovery layer downstream merges
+        # these with a regex sweep, so we never silently drop a bibr.
+        from src.parsers.citation_recovery import BibrSpan, recover_citations
+
         text_parts: list[str] = []
-        citation_spots: list[dict] = []  # {ref_id, marker_text, char_position}
+        bibr_spans: list[BibrSpan] = []
         tei_uri = TEI_NS["tei"]
         bibr_tag = f"{{{tei_uri}}}ref"
         structural_tags = frozenset((
@@ -712,17 +880,33 @@ Respond in JSON:
                 if marker_text:
                     text_parts.append(marker_text)
 
+                # Convert each ``target`` token into a BibrSpan. A
+                # multi-target bibr like ``target="#b1 #b2"`` produces one
+                # span per target so downstream dedup can resolve each
+                # independently.
+                emitted_any = False
                 for t in target.split():
                     bid = t.lstrip("#")
                     ref_num = bid_to_refnum.get(bid)
                     if ref_num and ref_num in references:
-                        citation_spots.append({
-                            "ref_id": ref_num,
-                            "marker": marker_text or f"[{ref_num}]",
-                            "position": char_pos,
-                        })
+                        bibr_spans.append(BibrSpan(
+                            position=char_pos,
+                            marker=marker_text or f"[{ref_num}]",
+                            target_ref_id=ref_num,
+                        ))
+                        emitted_any = True
                     elif bid:
                         unresolved.add(bid)
+
+                # Bibr had no ``target`` at all, or its targets all pointed
+                # to dropped refs — emit a single orphan span so the
+                # recovery layer can attempt to link it heuristically.
+                if not emitted_any and marker_text:
+                    bibr_spans.append(BibrSpan(
+                        position=char_pos,
+                        marker=marker_text,
+                        target_ref_id=None,
+                    ))
                 continue
 
             # "enter" phase
@@ -745,17 +929,32 @@ Respond in JSON:
         rebuilt_text = re.sub(r" +", " ", rebuilt_text)
         rebuilt_text = re.sub(r"\n{3,}", "\n\n", rebuilt_text)
 
-        # Build Citation objects from the recorded spots
-        for spot in citation_spots:
-            ctx = extract_context(rebuilt_text, spot["position"])
-            citations.append(Citation(
-                ref_id=spot["ref_id"],
-                citing_sentence=ctx["citing_sentence"],
-                context_before=ctx["context_before"],
-                context_after=ctx["context_after"],
-                marker=spot["marker"],
-                position=spot["position"],
-            ))
+        # Run the recovery merge: GROBID bibrs ∪ regex sweep, deduped by
+        # span overlap, with unlinked candidates dropped.
+        citations, recovery_stats = recover_citations(
+            rebuilt_text, bibr_spans, references,
+        )
+        # Stash on the instance so ``parse()`` can decide whether to
+        # trigger Phase 3 (LLM bibliography completion) without us having
+        # to plumb the stats through 4 layers of call-stack. Safe because
+        # the parser is sync and used as one-shot per PDF.
+        self._last_recovery_stats = recovery_stats
+
+        # Surface a one-line summary in the warnings so the user can tell
+        # which engine placed each citation when investigating misplaced
+        # annotations. Only emit when recovery actually contributed,
+        # otherwise we'd add noise on clean PDFs.
+        recovered = (
+            recovery_stats.grobid_orphan_linked + recovery_stats.regex_added
+        )
+        if recovered > 0:
+            warnings.append(
+                f"Citation recovery: GROBID resolved "
+                f"{recovery_stats.grobid_resolved}; rescued "
+                f"{recovery_stats.grobid_orphan_linked} orphan bibr(s); "
+                f"regex sweep added {recovery_stats.regex_added} candidate(s); "
+                f"{recovery_stats.final} total after dedup."
+            )
 
         if unresolved:
             warnings.append(
@@ -768,20 +967,29 @@ Respond in JSON:
     @staticmethod
     def _deduplicate_references(
         references: dict[str, Reference],
-    ) -> tuple[dict[str, Reference], int]:
-        """Remove references with duplicate titles, keeping the first occurrence."""
-        seen_titles: set[str] = set()
+    ) -> tuple[dict[str, Reference], dict[str, str]]:
+        """Remove references with duplicate titles, keeping the first occurrence.
+
+        Returns:
+            ``(deduped, remap)`` where ``remap`` is ``{dropped_ref_id:
+            kept_ref_id}`` — every ref that was removed maps to the
+            survivor with the same title. Callers MUST apply this remap
+            to citation ``ref_id``s, otherwise citations that pointed to
+            the dropped ref end up orphaned and the annotator silently
+            skips them (counted as ``skipped_no_verdict``).
+        """
+        seen_titles: dict[str, str] = {}  # normalized_title -> kept_ref_id
         deduped: dict[str, Reference] = {}
-        removed = 0
+        remap: dict[str, str] = {}
         for ref_id, ref in references.items():
             norm = _normalize_text(ref.title or "")
             if norm and norm in seen_titles:
-                removed += 1
+                remap[ref_id] = seen_titles[norm]
                 continue
             if norm:
-                seen_titles.add(norm)
+                seen_titles[norm] = ref_id
             deduped[ref_id] = ref
-        return deduped, removed
+        return deduped, remap
 
     # --- GROBID communication ---
 

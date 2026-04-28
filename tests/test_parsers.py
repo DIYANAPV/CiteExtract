@@ -207,3 +207,84 @@ class TestRouter:
         big_file.write_bytes(b"x" * (MAX_FILE_SIZE_MB * 1024 * 1024 + 1))
         with pytest.raises(InputTooLargeError):
             parse_file(str(big_file))
+
+
+# ---- GROBID parser: reference dedup + citation remap ----
+
+
+class TestGrobidDedupRemap:
+    """Regression guards for the citation-orphaning bug when two refs
+    share a title.
+
+    GROBID + the LLM ref parser can occasionally emit two ``Reference``
+    entries with the same title (different ``raw_text`` whitespace,
+    different field set, etc.). ``_deduplicate_references`` keeps one and
+    drops the other. Citations that pointed at the dropped one used to
+    be silently orphaned — the annotator's ``skipped_no_verdict`` counter
+    would tick up and the user would see a missing comment-box.
+
+    These tests pin down: (a) the remap is built correctly, and
+    (b) the kept ref is the first occurrence (stable for cache replay).
+    """
+
+    @staticmethod
+    def _ref(ref_id: str, title: str, year: int = 2020):
+        from src.models.reference import Reference
+        return Reference(
+            ref_id=ref_id, title=title, authors=["A"],
+            year=year, source_format="grobid",
+        )
+
+    def test_no_dupes_returns_empty_remap(self):
+        from src.parsers.grobid_parser import GrobidParser
+
+        refs = {
+            "1": self._ref("1", "Title One"),
+            "2": self._ref("2", "Title Two"),
+        }
+        deduped, remap = GrobidParser._deduplicate_references(refs)
+
+        assert remap == {}
+        assert set(deduped.keys()) == {"1", "2"}
+
+    def test_dropped_ref_appears_in_remap_with_kept_target(self):
+        from src.parsers.grobid_parser import GrobidParser
+
+        # Refs 1 and 3 share a title; ref 1 is the first occurrence and
+        # should be the kept survivor.
+        refs = {
+            "1": self._ref("1", "Shared Title"),
+            "2": self._ref("2", "Other Title"),
+            "3": self._ref("3", "Shared Title"),
+        }
+        deduped, remap = GrobidParser._deduplicate_references(refs)
+
+        assert set(deduped.keys()) == {"1", "2"}, "Survivor should be the first-seen duplicate"
+        assert remap == {"3": "1"}, "Dropped ref must map to its kept twin"
+
+    def test_first_occurrence_wins_even_with_three_duplicates(self):
+        from src.parsers.grobid_parser import GrobidParser
+
+        refs = {
+            "1": self._ref("1", "Same Title"),
+            "5": self._ref("5", "Same Title"),
+            "9": self._ref("9", "Same Title"),
+        }
+        deduped, remap = GrobidParser._deduplicate_references(refs)
+
+        assert list(deduped.keys()) == ["1"]
+        assert remap == {"5": "1", "9": "1"}
+
+    def test_empty_title_is_not_deduped(self):
+        """Refs with no title are kept as distinct — without a title we
+        can't safely declare them duplicates."""
+        from src.parsers.grobid_parser import GrobidParser
+
+        refs = {
+            "1": self._ref("1", ""),
+            "2": self._ref("2", ""),
+        }
+        deduped, remap = GrobidParser._deduplicate_references(refs)
+
+        assert set(deduped.keys()) == {"1", "2"}
+        assert remap == {}
