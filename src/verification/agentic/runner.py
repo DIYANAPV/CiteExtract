@@ -1009,19 +1009,57 @@ async def _pre_retrieve_passages(
 
             return ref.ref_id, ft, ref_passages
 
-    with stage("pre_retrieve.retrieve_block", refs=len(refs_needing)):
-        tasks = [_retrieve_one(ref, substantive) for ref, _, substantive in refs_needing]
-        results = await asyncio.gather(*tasks, return_exceptions=True)
+    # Per-ref hard ceiling: a single hung PDF download (paywalled redirect,
+    # cloudflare challenge, slow OA mirror) can otherwise hold up the whole
+    # gather indefinitely. 180s is generous — a ref that legitimately needs
+    # more than that has a structural problem we want to surface, not paper
+    # over silently.
+    _PER_REF_TIMEOUT_S = 180.0
 
-    for result in results:
-        if isinstance(result, Exception):
-            log.warning(f"Passage retrieval task raised: {result}")
-            continue
-        ref_id, ft, ref_passages = result
-        if ft is not None:
-            fulltext_by_ref[ref_id] = ft
-        if ref_passages is not None:
-            passages_by_ref[ref_id] = ref_passages
+    timing_log_progress = logging.getLogger("checkcitation.timing")
+
+    async def _retrieve_one_bounded(ref, substantive):
+        try:
+            return await asyncio.wait_for(
+                _retrieve_one(ref, substantive),
+                timeout=_PER_REF_TIMEOUT_S,
+            )
+        except asyncio.TimeoutError:
+            log.warning(
+                "pre_retrieve: ref_id=%s exceeded %.0fs timeout; "
+                "recording empty passages and continuing.",
+                ref.ref_id, _PER_REF_TIMEOUT_S,
+            )
+            return ref.ref_id, None, None
+
+    with stage("pre_retrieve.retrieve_block", refs=len(refs_needing)):
+        tasks = [
+            _retrieve_one_bounded(ref, substantive)
+            for ref, _, substantive in refs_needing
+        ]
+        # ``as_completed`` so we can emit a per-ref progress event the UI
+        # can render as "Retrieve cited paper passages (K / N)". Without
+        # this, the UI shows the stage spinning for the whole block —
+        # 200s+ on rich-bibliography papers — with no indication of
+        # forward motion. The progress events use the same STAGE format
+        # the UI's ``_StageCap`` already watches for.
+        total_refs = len(tasks)
+        for done_count, fut in enumerate(asyncio.as_completed(tasks), 1):
+            try:
+                result = await fut
+            except Exception as e:
+                log.warning(f"Passage retrieval task raised: {e}")
+                result = None
+            if result is not None:
+                ref_id, ft, ref_passages = result
+                if ft is not None:
+                    fulltext_by_ref[ref_id] = ft
+                if ref_passages is not None:
+                    passages_by_ref[ref_id] = ref_passages
+            timing_log_progress.info(
+                "STAGE agentic_pre_retrieve.progress seconds=0 "
+                "done=%d total=%d", done_count, total_refs,
+            )
 
     # Emit summed CPU cost across refs through the same logger that
     # stage() uses, so the post-run profile shows in-loop work alongside

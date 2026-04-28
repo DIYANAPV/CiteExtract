@@ -109,17 +109,17 @@ BASE_CSS = """
   --font-mono:  "JetBrains Mono", Consolas, Monaco, monospace;
 }
 
-/* ── Selective serif (Distill / arXiv academic feel) ──
-   Apply --font-serif to headings and research-prose surfaces only.
-   The universal sans rule below uses !important, so these overrides do too;
-   without it the cascade resets every descendant back to Inter. */
+/* ── Selective serif: real headings only ──
+   The serif (Distill / arXiv academic register) is reserved for headings.
+   Body copy — paragraphs, list items, feature-card titles, FAQ summaries —
+   uses Inter so the whole app reads in a single font, matching the hero
+   subtitle. The universal sans rule below uses !important, so this override
+   does too; without it the cascade resets every descendant back to Inter. */
 .gradio-container h1,
 .gradio-container h2,
 .gradio-container h3,
 .cc-hero h1,
-.cc-feature-title,
-.cc-about-section h3,
-.cc-about-section p {
+.cc-about-section h3 {
     font-family: var(--font-serif) !important;
     letter-spacing: -0.005em;
 }
@@ -147,7 +147,7 @@ button[aria-label="Settings"],
     min-height: 100vh !important;
     padding: 24px 32px 64px !important;
     font-family: var(--font-sans) !important;
-    font-size: 15px !important;
+    font-size: 17px !important;
     color: var(--text);
 }
 /* Gradio 6 wraps content in <main class="main"> and <div class="wrap contain">
@@ -193,7 +193,7 @@ gradio-app > main,
 }
 .cc-hero-text { flex: 1; min-width: 0; }
 .cc-hero h1 {
-    font-size: 32px; font-weight: 700; color: var(--text-strong);
+    font-size: 34px; font-weight: 700; color: var(--text-strong);
     letter-spacing: -0.015em; margin: 0 0 14px; line-height: 1.2;
 }
 .cc-hero h1 .cc-hero-accent {
@@ -202,7 +202,7 @@ gradio-app > main,
     color: var(--accent);
 }
 .cc-hero-sub {
-    font-size: 15.5px; color: var(--text); margin: 0; font-weight: 400;
+    font-size: 17.5px; color: var(--text); margin: 0; font-weight: 400;
     line-height: 1.65;
 }
 
@@ -243,29 +243,29 @@ gradio-app > main,
 .cc-feature-icon svg .duo-fill { opacity: 0.20; }
 .cc-feature-step {
     position: absolute; top: 18px; right: 20px;
-    font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+    font-size: 13px; font-weight: 700; letter-spacing: 0.08em;
     color: var(--text-muted);
     font-family: var(--font-mono);
 }
 .cc-feature-title {
-    font-size: 18px; font-weight: 700; color: var(--text-strong);
+    font-size: 20px; font-weight: 700; color: var(--text-strong);
     margin: 0 0 10px; letter-spacing: 0; line-height: 1.3;
 }
 .cc-feature-body {
-    font-size: 14px; color: var(--text-muted); line-height: 1.6; margin: 0;
+    font-size: 16px; color: var(--text-muted); line-height: 1.6; margin: 0;
 }
 
 /* ── File status chip (post-upload summary + size-limit warning) ── */
 .cc-file-status {
     margin: 8px 0 4px; min-height: 0;
-    font-size: 13px; line-height: 1.4;
+    font-size: 15px; line-height: 1.4;
     display: none;          /* hidden until JS populates it */
 }
 .cc-file-status.cc-has-content { display: block; }
 .cc-file-chip {
     display: inline-flex; align-items: center; gap: 8px;
     padding: 6px 12px; border-radius: 999px;
-    font-size: 12.5px; font-weight: 500;
+    font-size: 14.5px; font-weight: 500;
     background: #F0F7F1; color: #2F6B33; border: 1px solid #A3C6A6;
 }
 .cc-file-chip.cc-file-over {
@@ -280,7 +280,7 @@ gradio-app > main,
 
 /* ── Discoverability hint under Claim Verification checkbox ── */
 .cc-hint {
-    font-size: 12.5px; color: #5B6D78; line-height: 1.5;
+    font-size: 14.5px; color: #5B6D78; line-height: 1.5;
     padding: 10px 12px; margin: 4px 0 12px;
     background: #F2F5F7; border: 1px solid #E7E9EA;
     border-radius: 10px;
@@ -298,7 +298,7 @@ gradio-app > main,
 }
 .cc-drop-overlay.cc-active { display: flex; }
 .cc-drop-overlay-msg {
-    font-size: 20px; font-weight: 700; color: var(--accent);
+    font-size: 22px; font-weight: 700; color: var(--accent);
     background: var(--surface); padding: 20px 32px; border-radius: 20px;
     border: 2px dashed var(--accent);
     box-shadow: 0 8px 48px rgba(0, 66, 118, 0.18);
@@ -333,14 +333,14 @@ body.cc-dragging .gradio-container .gr-file {
    Inline <strong> stays bold + near-black; we never repeat the accent
    colour inside body copy. */
 .cc-about-section h3 {
-    font-size: 20px; font-weight: 700; color: var(--accent);
+    font-size: 22px; font-weight: 700; color: var(--accent);
     letter-spacing: -0.01em; margin: 0 0 14px;
 }
 .cc-about-section p,
 .cc-about-section ul,
 .cc-about-section ol,
 .cc-about-section li {
-    font-size: 15px;
+    font-size: 17px;
     font-weight: 400;
     color: var(--text-strong);
     line-height: 1.7;
@@ -366,7 +366,7 @@ body.cc-dragging .gradio-container .gr-file {
 .cc-faq:last-of-type { border-bottom: 1px solid var(--border); }
 .cc-faq summary {
     cursor: pointer;
-    font-size: 15px;
+    font-size: 17px;
     font-weight: 600;
     color: var(--text-strong);
     list-style: none;
@@ -386,7 +386,7 @@ body.cc-dragging .gradio-container .gr-file {
 .cc-faq summary:hover { color: var(--accent); }
 .cc-faq p {
     margin: 10px 0 0 16px;
-    font-size: 14px;
+    font-size: 16px;
     color: var(--text);
     line-height: 1.65;
 }
@@ -404,7 +404,7 @@ body.cc-dragging .gradio-container .gr-file {
     border-top: 1px solid var(--border);
     margin: 64px 12px 0;
     padding: 20px 0 8px;
-    font-size: 12.5px;
+    font-size: 14.5px;
     color: var(--text-muted);
     line-height: 1.5;
     font-family: var(--font-sans);
@@ -431,12 +431,12 @@ pre.cc-bibtex {
     background: #F2F5F7; border: 1px solid #E7E9EA; border-radius: 12px;
     padding: 16px 20px; margin: 0; overflow-x: auto;
     font-family: ui-monospace, 'JetBrains Mono', 'SF Mono', Menlo, monospace;
-    font-size: 12.5px; line-height: 1.55; color: #1e293b;
+    font-size: 14.5px; line-height: 1.55; color: #1e293b;
     white-space: pre;
 }
 .cc-bibtex-copy {
     position: absolute; top: 10px; right: 10px;
-    font-family: inherit; font-size: 11px; font-weight: 600;
+    font-family: inherit; font-size: 13px; font-weight: 600;
     padding: 4px 10px; border-radius: 8px;
     background: #ffffff; border: 1px solid #C7D6E1; color: #5B6D78;
     cursor: pointer; transition: all 0.15s ease;
@@ -452,18 +452,18 @@ pre.cc-bibtex {
     border-bottom: 1px solid #E7E9EA;
 }
 .cc-tabpage-header h2 {
-    font-size: 24px; font-weight: 700; color: #0f172a;
+    font-size: 26px; font-weight: 700; color: #0f172a;
     letter-spacing: -0.02em; line-height: 1.2; margin: 0 0 8px;
 }
 .cc-tabpage-header p {
-    font-size: 14px; color: #334155; line-height: 1.6; margin: 0 0 6px;
+    font-size: 16px; color: #334155; line-height: 1.6; margin: 0 0 6px;
 }
 .cc-tabpage-header .cc-tabpage-meta {
-    font-size: 13px; color: #5B6D78;
+    font-size: 15px; color: #5B6D78;
 }
 .cc-tabpage-header code {
     background: var(--bg-alt); padding: 1px 6px; border-radius: 6px;
-    font-size: 12px; color: var(--accent); border: 1px solid var(--border);
+    font-size: 14px; color: var(--accent); border: 1px solid var(--border);
     font-family: var(--font-mono);
 }
 
@@ -473,7 +473,7 @@ pre.cc-bibtex {
     background: #ffffff; border: 1px solid #E7E9EA; border-radius: 14px;
     padding: 10px 16px; margin: 0 0 12px;
     display: flex; align-items: center; justify-content: space-between;
-    gap: 12px; font-size: 13px;
+    gap: 12px; font-size: 15px;
     box-shadow: 0 4px 18px rgba(12, 63, 94, 0.08);
     backdrop-filter: saturate(1.1);
 }
@@ -488,13 +488,13 @@ pre.cc-bibtex {
 .cc-ctxbar-sep { color: #C7D6E1; }
 .cc-ctxbar-chip {
     display: inline-block; padding: 2px 10px; border-radius: 999px;
-    font-size: 12px; font-weight: 600;
+    font-size: 14px; font-weight: 600;
 }
 /* Semantic — "this citation is flagged" reads as error, stays red. */
 .cc-ctxbar-flagged { background: var(--verdict-err-bg); color: var(--verdict-err); border: 1px solid var(--verdict-err-border); }
 .cc-ctxbar-clean   { background: #F0F7F1; color: #2F6B33; border: 1px solid #A3C6A6; }
 .cc-ctxbar-btn {
-    font-size: 12px; font-weight: 600; color: #5B6D78;
+    font-size: 14px; font-weight: 600; color: #5B6D78;
     padding: 6px 12px; border-radius: 10px;
     background: #F2F5F7; border: 1px solid #C7D6E1;
     text-decoration: none; white-space: nowrap;
@@ -523,11 +523,11 @@ pre.cc-bibtex {
     margin-bottom: 18px;
 }
 .cc-pipeline-title {
-    font-size: 15px; font-weight: 600; color: var(--text-strong);
+    font-size: 17px; font-weight: 600; color: var(--text-strong);
     letter-spacing: -0.005em;
 }
 .cc-pipeline-elapsed {
-    font-size: 13px; color: var(--text-muted);
+    font-size: 15px; color: var(--text-muted);
     font-variant-numeric: tabular-nums;
     font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
 }
@@ -538,7 +538,7 @@ pre.cc-bibtex {
 .cc-step {
     display: flex; align-items: center; gap: 14px;
     padding: 10px 4px;
-    font-size: 14px;
+    font-size: 16px;
     transition: color 0.18s ease;
 }
 .cc-step + .cc-step {
@@ -562,6 +562,15 @@ pre.cc-bibtex {
 }
 @keyframes cc-spin { to { transform: rotate(360deg); } }
 .cc-step-label { flex: 1; }
+/* Sub-progress counter ("15 / 41") shown next to long-running stage
+   labels. Lighter weight + tabular numerals so the count animating
+   upward doesn't shift the row width as digits change. */
+.cc-step-progress {
+    color: var(--text-muted);
+    font-weight: 400;
+    font-variant-numeric: tabular-nums;
+    margin-left: 6px;
+}
 .cc-step-done   { color: var(--text); }
 .cc-step-done .cc-step-icon { color: var(--verdict-ok); }
 .cc-step-active {
@@ -580,7 +589,7 @@ pre.cc-bibtex {
    per-reference cards. */
 .cc-retry-hint {
     flex: 1; min-width: 0;
-    font-size: 13px; color: var(--text-muted);
+    font-size: 15px; color: var(--text-muted);
     line-height: 1.5;
     align-self: center;
 }
@@ -598,11 +607,11 @@ pre.cc-bibtex {
     animation: cc-fadeIn 0.3s ease-out both;
 }
 .cc-resume-title {
-    font-size: 16px; font-weight: 700; color: #0f172a;
+    font-size: 18px; font-weight: 700; color: #0f172a;
     letter-spacing: -0.01em; margin: 0 0 12px;
 }
 .cc-resume-facts {
-    font-size: 14px; color: #334155; line-height: 1.7;
+    font-size: 16px; color: #334155; line-height: 1.7;
     margin: 0 0 16px;
 }
 .cc-resume-file {
@@ -613,7 +622,7 @@ pre.cc-bibtex {
     display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap;
 }
 .cc-resume-btn {
-    font-family: inherit; font-size: 13px; font-weight: 600;
+    font-family: inherit; font-size: 15px; font-weight: 600;
     padding: 8px 18px; border-radius: 10px; cursor: pointer;
     border: 1px solid transparent; transition: all 0.15s ease;
 }
@@ -628,7 +637,7 @@ pre.cc-bibtex {
 .cc-resume-hint {
     margin-top: 12px; padding: 10px 14px;
     background: #FBF5E8; border: 1px solid #E0B678; border-radius: 10px;
-    font-size: 13px; color: #9A6609; line-height: 1.5;
+    font-size: 15px; color: #9A6609; line-height: 1.5;
     animation: cc-fadeIn 0.25s ease-out both;
 }
 
@@ -639,7 +648,7 @@ pre.cc-bibtex {
 
 /* ── Section labels ── */
 .cc-section-label {
-    font-size: 11px; font-weight: 700; color: #5B6D78;
+    font-size: 13px; font-weight: 700; color: #5B6D78;
     text-transform: uppercase; letter-spacing: 0.08em;
     margin: 16px 0 10px; padding-bottom: 6px;
     border-bottom: 1px solid #E7E9EA;
@@ -664,7 +673,7 @@ pre.cc-bibtex {
     margin-left: 8px;
     padding: 2px 9px;
     border-radius: 999px;
-    font-size: 11.5px;
+    font-size: 13.5px;
     font-weight: 600;
     letter-spacing: 0.02em;
     vertical-align: middle;
@@ -682,7 +691,7 @@ pre.cc-bibtex {
 }
 .cc-context-panel + .cc-context-panel { margin-top: 14px; }
 .cc-context-label {
-    font-size: 11px; font-weight: 700;
+    font-size: 13px; font-weight: 700;
     color: var(--text-muted);
     text-transform: uppercase; letter-spacing: 0.08em;
     margin-bottom: 12px;
@@ -702,7 +711,7 @@ pre.cc-bibtex {
     margin-bottom: 10px;
 }
 .cc-citing-text {
-    font-size: 14px;
+    font-size: 16px;
     color: var(--text-strong);
     line-height: 1.6;
 }
@@ -714,7 +723,7 @@ pre.cc-bibtex {
     margin-bottom: 10px;
 }
 .cc-claim-empty {
-    font-size: 13px;
+    font-size: 15px;
     color: var(--text-muted);
     background: var(--bg-alt);
     border: 1px dashed var(--border);
@@ -753,7 +762,7 @@ pre.cc-bibtex {
     list-style: none;
     cursor: pointer;
     padding: 8px 14px;
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 600;
     color: var(--text);
     display: flex;
@@ -764,16 +773,16 @@ pre.cc-bibtex {
 .cc-evidence-chip > summary::after {
     content: "▸";
     margin-left: auto;
-    font-size: 11px;
+    font-size: 13px;
     color: var(--text-muted);
     transition: transform 0.15s ease;
 }
 .cc-evidence-chip[open] > summary::after { transform: rotate(90deg); }
 .cc-evidence-chip > summary::-webkit-details-marker { display: none; }
-.cc-chip-icon { font-size: 14px; opacity: 0.7; }
+.cc-chip-icon { font-size: 16px; opacity: 0.7; }
 .cc-chip-body {
     padding: 0 14px 14px;
-    font-size: 13.5px;
+    font-size: 15.5px;
     line-height: 1.6;
     color: var(--text);
     border-top: 1px dashed var(--border-muted);
@@ -785,23 +794,23 @@ pre.cc-bibtex {
 
 /* Small uppercase mini-label used inside each section. */
 .cc-section-mini-label {
-    font-size: 10.5px;
+    font-size: 12.5px;
     font-weight: 700;
     color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.08em;
     margin-bottom: 6px;
 }
-.card summary { cursor: pointer; font-weight: 600; font-size: 15px; line-height: 1.5; }
+.card summary { cursor: pointer; font-weight: 600; font-size: 17px; line-height: 1.5; }
 
 /* Better empty state */
 .cc-empty {
     background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
     padding: 48px 24px; text-align: center; color: var(--text-muted);
 }
-.cc-empty-icon { font-size: 40px; margin-bottom: 12px; opacity: 0.4; }
-.cc-empty-title { font-size: 17px; font-weight: 600; color: #334155; margin-bottom: 6px; }
-.cc-empty-sub { font-size: 13px; color: #5B6D78; line-height: 1.5; max-width: 380px; margin: 0 auto; }
+.cc-empty-icon { font-size: 42px; margin-bottom: 12px; opacity: 0.4; }
+.cc-empty-title { font-size: 19px; font-weight: 600; color: #334155; margin-bottom: 6px; }
+.cc-empty-sub { font-size: 15px; color: #5B6D78; line-height: 1.5; max-width: 380px; margin: 0 auto; }
 
 /* ── Skeleton shimmer for loading state ── */
 @keyframes cc-shimmer {
@@ -829,7 +838,7 @@ pre.cc-bibtex {
 .cc-stage-list { display: flex; flex-direction: column; gap: 8px; margin: 14px 0 4px; }
 .cc-stage {
     display: flex; align-items: center; gap: 10px;
-    font-size: 14px; color: #5B6D78;
+    font-size: 16px; color: #5B6D78;
 }
 .cc-stage .cc-stage-dot {
     display: inline-block; width: 10px; height: 10px; border-radius: 50%;
@@ -857,11 +866,11 @@ pre.cc-bibtex {
 @keyframes cc-spin { to { transform: rotate(360deg); } }
 
 /* ── Metadata table ── */
-.meta-table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 13px; }
+.meta-table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 15px; }
 .meta-table th, .meta-table td { text-align: left; padding: 7px 10px; border-bottom: 1px solid #f1f5f9; }
 .meta-table th {
     background: #f8fafc; font-weight: 600; color: #475569;
-    font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em;
+    font-size: 13px; text-transform: uppercase; letter-spacing: 0.04em;
 }
 .meta-table tr:hover td { background: #F2F5F7; }
 .meta-table td { max-width: 300px; word-break: break-word; }
@@ -884,9 +893,9 @@ pre.cc-bibtex {
     box-shadow: 0 2px 12px rgba(12, 63, 94, 0.04);
 }
 .stat-card:hover { box-shadow: 0 2px 18px rgba(12, 63, 94, 0.08); }
-.stat-card .num { font-size: 26px; font-weight: 700; line-height: 1.2; }
+.stat-card .num { font-size: 28px; font-weight: 700; line-height: 1.2; }
 .stat-card .lbl {
-    font-size: 11px; color: #64748b; margin-top: 2px;
+    font-size: 13px; color: #64748b; margin-top: 2px;
     font-weight: 500; text-transform: uppercase; letter-spacing: 0.03em;
 }
 .progress-bar { height: 6px; border-radius: 6px; background: #e5e7eb; overflow: hidden; margin: 6px 0; }
@@ -895,9 +904,9 @@ pre.cc-bibtex {
 /* ── Claims & passages ── */
 .claim-box {
     background: #fff; border: 1px solid #E7E9EA; border-radius: 12px;
-    padding: 12px 14px; margin: 6px 0; font-size: 13px; line-height: 1.6;
+    padding: 12px 14px; margin: 6px 0; font-size: 15px; line-height: 1.6;
 }
-.claim-arrow { text-align: center; font-size: 18px; margin: 4px 0; color: #C7D6E1; }
+.claim-arrow { text-align: center; font-size: 20px; margin: 4px 0; color: #C7D6E1; }
 .claim-section {
     background: #F2F5F7; border: 1px solid #E7E9EA;
     border-radius: 12px; padding: 12px 14px; margin: 8px 0;
@@ -907,28 +916,28 @@ pre.cc-bibtex {
     padding: 12px 14px; margin: 6px 0;
 }
 .passage-card:hover { border-color: #AEC5CB; }
-.passage-header { font-size: 11px; color: #64748b; margin-bottom: 4px; font-weight: 500; }
-.passage-text { font-size: 13px; line-height: 1.65; color: #1e293b; }
+.passage-header { font-size: 13px; color: #64748b; margin-bottom: 4px; font-weight: 500; }
+.passage-text { font-size: 15px; line-height: 1.65; color: #1e293b; }
 
 /* ── Links & pills ── */
 .link-pill {
     display: inline-block; background: #F2F5F7; color: #5B6D78;
-    padding: 2px 10px; border-radius: 12px; font-size: 11px;
+    padding: 2px 10px; border-radius: 12px; font-size: 13px;
     text-decoration: none; margin-right: 4px; font-weight: 500;
     border: 1px solid #E1E9EF;
 }
 .link-pill:hover { background: #E1E9EF; color: #4D5B62; }
 
 /* ── Coverage ── */
-.coverage-bar { display: flex; gap: 8px; align-items: center; margin: 5px 0; font-size: 12px; }
+.coverage-bar { display: flex; gap: 8px; align-items: center; margin: 5px 0; font-size: 14px; }
 .coverage-fill { height: 6px; border-radius: 3px; }
-.info-row { font-size: 12px; color: #64748b; margin-top: 8px; }
+.info-row { font-size: 14px; color: #64748b; margin-top: 8px; }
 
 /* ── Empty state ── */
 .cc-empty { text-align: center; padding: 48px 20px; color: #94a3b8; }
-.cc-empty-icon { font-size: 36px; margin-bottom: 8px; opacity: 0.35; }
-.cc-empty-title { font-size: 14px; font-weight: 600; color: #64748b; margin-bottom: 4px; }
-.cc-empty-sub { font-size: 12px; color: #94a3b8; }
+.cc-empty-icon { font-size: 38px; margin-bottom: 8px; opacity: 0.35; }
+.cc-empty-title { font-size: 16px; font-weight: 600; color: #64748b; margin-bottom: 4px; }
+.cc-empty-sub { font-size: 14px; color: #94a3b8; }
 
 /* ── Tab styling ──
    Bottom-border underline (Distill / arXiv style) instead of rounded chips.
@@ -944,7 +953,7 @@ pre.cc-bibtex {
 }
 .tab-nav button,
 .tab-container button {
-    font-weight: 500 !important; font-size: 14px !important;
+    font-weight: 500 !important; font-size: 16px !important;
     background: transparent !important;
     border: none !important;
     border-bottom: 2px solid transparent !important;
@@ -1003,7 +1012,7 @@ pre.cc-bibtex {
     /* Sentence-case + thin border: less shouty than the all-caps tracking
        version. Reads as a section label in a research paper, not a
        form-section header in a SaaS dashboard. */
-    font-size: 13px; font-weight: 600; color: var(--text-muted);
+    font-size: 15px; font-weight: 600; color: var(--text-muted);
     margin: 0 0 14px; padding-bottom: 8px;
     border-bottom: 1px solid var(--border);
 }
@@ -1155,7 +1164,7 @@ button.lg.primary,
 }
 .gradio-container [data-testid="checkbox"] label,
 .gradio-container [data-testid="checkbox"] span {
-    font-size: 14px !important;
+    font-size: 16px !important;
     color: var(--text) !important;
     line-height: 1.5 !important;
 }
@@ -1171,7 +1180,7 @@ button.lg.primary,
     border: 1px solid var(--border) !important;
     box-shadow: none !important;
     font-family: var(--font-sans) !important;
-    font-size: 14px !important;
+    font-size: 16px !important;
     padding: 10px 14px !important;
 }
 .toast-body.error, .toast.error, .error[class*="toast"] {
@@ -1425,7 +1434,7 @@ def format_dashboard(report: PaperReport, selected_mode: str = "", elapsed: floa
     if selected_mode and selected_mode != report.mode:
         mode_html = (
             f"<b>{_esc(report.mode)}</b> "
-            f'<span style="font-size:11px;color:#9ca3af;">'
+            f'<span style="font-size:13px;color:#9ca3af;">'
             f"(selected: {_esc(selected_mode)}"
             f"{' &rarr; resolved based on input' if selected_mode == 'auto' else ' &rarr; adjusted based on input'})"
             f"</span>"
@@ -1435,11 +1444,11 @@ def format_dashboard(report: PaperReport, selected_mode: str = "", elapsed: floa
     <div class="dashboard">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
             <div>
-                <div style="font-size:14px; color:#6b7280;">Integrity Score</div>
-                <div style="font-size:36px; font-weight:800; color:{bar_color};">{score_pct}%</div>
+                <div style="font-size:16px; color:#6b7280;">Integrity Score</div>
+                <div style="font-size:38px; font-weight:800; color:{bar_color};">{score_pct}%</div>
             </div>
             <div style="text-align:right;">
-                <span style="display:inline-block; background:{risk_color}; color:white; padding:4px 14px; border-radius:20px; font-weight:600; font-size:14px;">
+                <span style="display:inline-block; background:{risk_color}; color:white; padding:4px 14px; border-radius:20px; font-weight:600; font-size:16px;">
                     {s.risk_level} RISK
                 </span>
             </div>
@@ -1555,17 +1564,17 @@ def _format_claim_verdict(cv) -> str:
     st = CLAIM_VERDICT_STYLES.get(cv.verdict, CLAIM_VERDICT_STYLES["NEUTRAL"])
     evidence = ""
     if cv.evidence_quote:
-        evidence = f'<div style="margin-top:8px;font-size:13px;color:{st["color"]};font-style:italic;opacity:0.85;">"{_esc(cv.evidence_quote)}"</div>'
+        evidence = f'<div style="margin-top:8px;font-size:15px;color:{st["color"]};font-style:italic;opacity:0.85;">"{_esc(cv.evidence_quote)}"</div>'
     return f'''
     <div style="background:{st['bg']};border:1px solid {st['border']};border-left:4px solid {st['color']};
                 border-radius:10px;padding:14px 16px;margin:10px 0;">
         <div style="display:flex;align-items:center;gap:8px;">
             <span style="display:inline-block;background:{st['color']};color:white;
-                         padding:3px 12px;border-radius:14px;font-size:12px;font-weight:700;letter-spacing:0.03em;">
+                         padding:3px 12px;border-radius:14px;font-size:14px;font-weight:700;letter-spacing:0.03em;">
                 {st['label'].upper()}
             </span>
         </div>
-        <div style="margin-top:8px;font-size:13px;color:#374151;line-height:1.6;">
+        <div style="margin-top:8px;font-size:15px;color:#374151;line-height:1.6;">
             {_esc(cv.explanation)}
         </div>
         {evidence}
@@ -1620,7 +1629,7 @@ def _format_passages_for_ref(comp_results: list, abstract: str | None = None) ->
                 <div class="passage-text">{_esc(sc.chunk.text)}</div>
             </div>'''
         if not r.top_passages:
-            passages_inner = '<div style="font-size:13px;color:#6b7280;padding:8px;">No passages retrieved.</div>'
+            passages_inner = '<div style="font-size:15px;color:#6b7280;padding:8px;">No passages retrieved.</div>'
 
         label = f"Citing context {idx} of {n}" if n > 1 else "Citing context"
         # Per-citation block, ordered by what the human actually audits:
@@ -1666,9 +1675,9 @@ def _format_passages_for_ref(comp_results: list, abstract: str | None = None) ->
 
     return f'''
     <details style="margin-top:10px;" open>
-        <summary style="font-size:13px;color:#6b7280;cursor:pointer;">
+        <summary style="font-size:15px;color:#6b7280;cursor:pointer;">
             Claim Verification &nbsp;
-            <span style="font-size:11px;">Source: {source} &middot; {ft_icon} {ft_label}</span>
+            <span style="font-size:13px;">Source: {source} &middot; {ft_icon} {ft_label}</span>
         </summary>
         {inner}
     </details>'''
@@ -1723,7 +1732,7 @@ def format_unified_cards(
             year = f" ({ref.year})" if ref.year else ""
             venue = _esc(ref.venue) if ref.venue else ""
             authors_line = (
-                f'<div style="font-size:13px;color:#6b7280;margin-top:2px;">{authors}{year}</div>'
+                f'<div style="font-size:15px;color:#6b7280;margin-top:2px;">{authors}{year}</div>'
                 if (authors or year) else ""
             )
             cards += f'''
@@ -1733,7 +1742,7 @@ def format_unified_cards(
                 </summary>
                 <div style="margin-top:8px;">
                     {authors_line}
-                    {"<div style='font-size:13px;color:#6b7280;'>" + venue + "</div>" if venue else ""}
+                    {"<div style='font-size:15px;color:#6b7280;'>" + venue + "</div>" if venue else ""}
                     {passages_html}
                 </div>
             </details>'''
@@ -1763,7 +1772,7 @@ def _render_verdict_card(v, ref, passages_html: str = "") -> str:
     if fmt:
         fmt_badge = (
             f'<span style="display:inline-block;background:#f0f4ff;color:#4b5563;'
-            f'padding:1px 8px;border-radius:10px;font-size:11px;margin-left:6px;'
+            f'padding:1px 8px;border-radius:10px;font-size:13px;margin-left:6px;'
             f'border:1px solid #d1d5db;">{_esc(fmt.upper())}</span>'
         )
 
@@ -1773,23 +1782,23 @@ def _render_verdict_card(v, ref, passages_html: str = "") -> str:
     if v.existence and v.existence.status == "FOUND":
         src = _esc(v.existence.source or "")
         sim = f" &middot; similarity: {v.existence.title_similarity:.0%}" if v.existence.title_similarity else ""
-        source_info = f'<div style="font-size:12px;color:#6b7280;margin-top:4px;">Found via: <b>{src}</b>{sim}</div>'
+        source_info = f'<div style="font-size:14px;color:#6b7280;margin-top:4px;">Found via: <b>{src}</b>{sim}</div>'
     elif v.existence and v.existence.status == "NOT_FOUND":
         dbs = ", ".join(v.existence.databases_checked) if v.existence.databases_checked else "none"
-        source_info = f'<div style="font-size:12px;color:#dc2626;margin-top:4px;">Not found in: {_esc(dbs)}</div>'
+        source_info = f'<div style="font-size:14px;color:#dc2626;margin-top:4px;">Not found in: {_esc(dbs)}</div>'
 
     action_html = ""
     if v.action == "remove_citation":
-        action_html = '<span style="display:inline-block;background:#fef2f2;color:#dc2626;padding:2px 10px;border-radius:12px;font-size:12px;font-weight:600;margin-top:6px;">Remove Citation</span>'
+        action_html = '<span style="display:inline-block;background:#fef2f2;color:#dc2626;padding:2px 10px;border-radius:12px;font-size:14px;font-weight:600;margin-top:6px;">Remove Citation</span>'
     elif v.action == "verify_claim":
-        action_html = '<span style="display:inline-block;background:#fffbeb;color:#d97706;padding:2px 10px;border-radius:12px;font-size:12px;font-weight:600;margin-top:6px;">Verify Claim</span>'
+        action_html = '<span style="display:inline-block;background:#fffbeb;color:#d97706;padding:2px 10px;border-radius:12px;font-size:14px;font-weight:600;margin-top:6px;">Verify Claim</span>'
 
     meta_table = format_metadata_table(v) or format_agentic_metadata_table(v, ref)
     meta_section = ""
     if meta_table:
         meta_section = f'''
         <details style="margin-top:10px;">
-            <summary style="font-size:13px;color:#6b7280;cursor:pointer;">Metadata Comparison</summary>
+            <summary style="font-size:15px;color:#6b7280;cursor:pointer;">Metadata Comparison</summary>
             {meta_table}
         </details>'''
 
@@ -1812,7 +1821,7 @@ def _render_verdict_card(v, ref, passages_html: str = "") -> str:
     authors_line = ""
     if authors or year:
         authors_line = (
-            f'<div style="font-size:13px;color:#6b7280;margin-top:2px;">'
+            f'<div style="font-size:15px;color:#6b7280;margin-top:2px;">'
             f'{authors}{year}'
             f'</div>'
         )
@@ -1829,7 +1838,7 @@ def _render_verdict_card(v, ref, passages_html: str = "") -> str:
         </summary>
         <div style="margin-top:8px;">
             {authors_line}
-            {"<div style='font-size:13px;color:#6b7280;'>" + venue + fmt_badge + "</div>" if venue else (fmt_badge if fmt_badge else "")}
+            {"<div style='font-size:15px;color:#6b7280;'>" + venue + fmt_badge + "</div>" if venue else (fmt_badge if fmt_badge else "")}
             {links_html}
             {source_info}
             {action_html}
@@ -1862,8 +1871,8 @@ def format_comprehension_coverage(report) -> str:
 
     return f'''
     <div class="dashboard">
-        <div style="font-size:14px;color:#6b7280;">Coverage</div>
-        <div style="font-size:28px;font-weight:800;color:#1f2937;">{report.total_citations} <span style="font-size:14px;font-weight:400;color:#6b7280;">citations analyzed</span></div>
+        <div style="font-size:16px;color:#6b7280;">Coverage</div>
+        <div style="font-size:30px;font-weight:800;color:#1f2937;">{report.total_citations} <span style="font-size:16px;font-weight:400;color:#6b7280;">citations analyzed</span></div>
         {bar(ft, "#22c55e", "Full text")}
         {bar(ab, "#f59e0b", "Abstract only")}
         {bar(nf, "#ef4444", "Not found")}
@@ -2092,6 +2101,14 @@ _STAGE_ALIASES: dict[str, tuple[str, ...]] = {
 _FINALIZE_STAGE_ID = "__finalize__"
 
 _STAGE_RE = re.compile(r"STAGE (\S+) seconds=")
+# Sub-progress events look like
+#   ``STAGE agentic_pre_retrieve.progress seconds=0 done=15 total=41``
+# and let long-running stages report intermediate motion. The UI strips
+# the ``.progress`` suffix to match against the stage IDs in
+# ``PIPELINE_STAGES_DEF`` and renders ``(K / N)`` next to the active label.
+_STAGE_PROGRESS_RE = re.compile(
+    r"STAGE (\S+)\.progress\s+seconds=\S+\s+done=(\d+)\s+total=(\d+)"
+)
 
 
 def _applicable_stages(existence: bool, claims: bool) -> list[tuple[str, str]]:
@@ -2103,10 +2120,19 @@ def _applicable_stages(existence: bool, claims: bool) -> list[tuple[str, str]]:
 
 def _render_pipeline(applicable: list[tuple[str, str]],
                      seen: set[str],
-                     elapsed: float | None = None) -> str:
+                     elapsed: float | None = None,
+                     progress: dict[str, tuple[int, int]] | None = None) -> str:
     """Render the in-page progress card. The first stage that hasn't been
     seen yet is marked active; everything before it is done; everything
-    after, pending."""
+    after, pending.
+
+    ``progress`` is an optional ``{stage_id: (done, total)}`` map for
+    long-running stages that emit sub-progress events (currently
+    ``agentic_pre_retrieve``). When the active stage has progress info,
+    the label is suffixed with ``(K / N)`` so the user sees forward
+    motion instead of a single opaque spinner.
+    """
+    progress = progress or {}
     items = []
     active_marked = False
     for stage_id, label in applicable:
@@ -2125,10 +2151,19 @@ def _render_pipeline(applicable: list[tuple[str, str]],
         else:
             cls = "pending"
             icon = '<span class="cc-step-dot" aria-hidden="true"></span>'
+        # Append " (K / N)" when the active stage has sub-progress info.
+        if cls == "active" and stage_id in progress:
+            done_n, total_n = progress[stage_id]
+            label_html = (
+                f'{label} '
+                f'<span class="cc-step-progress">({done_n} / {total_n})</span>'
+            )
+        else:
+            label_html = label
         items.append(
             f'<li class="cc-step cc-step-{cls}">'
             f'<span class="cc-step-icon">{icon}</span>'
-            f'<span class="cc-step-label">{label}</span>'
+            f'<span class="cc-step-label">{label_html}</span>'
             f'</li>'
         )
     elapsed_html = (
@@ -2172,12 +2207,19 @@ def run_analyze(file, ref_pdfs, check_existence, check_claims, retry_failed,
 
     applicable = _applicable_stages(check_existence, check_claims)
     seen_stages: set[str] = set()
+    # ``stage_id`` → (done, total) for long-running stages that emit
+    # sub-progress events. Used by ``_render_pipeline`` to show "(K / N)"
+    # next to the active stage label so the UI shows forward motion
+    # during pre_retrieve / dispatch loops instead of one opaque spinner.
+    stage_progress: dict[str, tuple[int, int]] = {}
 
     def _progress_update(elapsed: float | None = None):
         return (
             gr.update(),                                       # dashboard
             gr.update(),                                       # coverage
-            _render_pipeline(applicable, seen_stages, elapsed),  # cards
+            _render_pipeline(
+                applicable, seen_stages, elapsed, stage_progress,
+            ),                                                  # cards
             gr.update(), gr.update(), gr.update(),             # json, dl, bib
             gr.update(), gr.update(),                          # pdf, ann_status
             gr.update(), gr.update(),                          # json_acc, dl_row
@@ -2210,6 +2252,10 @@ def run_analyze(file, ref_pdfs, check_existence, check_claims, retry_failed,
     # process-wide ``checkcitation.timing`` logger and one user's progress
     # display would tick from the other user's pipeline stages.
     stage_events: list[str] = []
+    # ``stage_id`` → (done, total) updates from ``*.progress`` events.
+    # Cleared between events; the worker loop reads and copies into
+    # ``stage_progress`` so the UI can render fractional motion.
+    stage_progress_updates: dict[str, tuple[int, int]] = {}
     event_lock = threading.Lock()
 
     class _StageCap(logging.Handler):
@@ -2224,7 +2270,17 @@ def run_analyze(file, ref_pdfs, check_existence, check_claims, retry_failed,
         def emit(self, record: logging.LogRecord) -> None:
             if self.allowed_thread is None or record.thread != self.allowed_thread:
                 return
-            m = _STAGE_RE.search(record.getMessage())
+            msg = record.getMessage()
+            # Sub-progress events first (they share a STAGE prefix with
+            # the regular stage events but carry done/total fields).
+            pm = _STAGE_PROGRESS_RE.search(msg)
+            if pm:
+                with event_lock:
+                    stage_progress_updates[pm.group(1)] = (
+                        int(pm.group(2)), int(pm.group(3))
+                    )
+                return
+            m = _STAGE_RE.search(msg)
             if m:
                 with event_lock:
                     stage_events.append(m.group(1))
@@ -2261,6 +2317,11 @@ def run_analyze(file, ref_pdfs, check_existence, check_claims, retry_failed,
             worker.join(timeout=0.4)
             with event_lock:
                 current = list(stage_events)
+                # Snapshot + clear progress updates so the next tick starts
+                # fresh. Multiple updates between ticks collapse to the
+                # latest reading, which is exactly what the UI wants.
+                progress_updates = dict(stage_progress_updates)
+                stage_progress_updates.clear()
             new_seen = False
             for stage_name in current:
                 # Expand stage aliases (e.g. agentic_both_dispatch ticks both
@@ -2272,10 +2333,20 @@ def run_analyze(file, ref_pdfs, check_existence, check_claims, retry_failed,
                         continue
                     seen_stages.add(ui_id)
                     new_seen = True
+            # Apply per-stage sub-progress (e.g. ``agentic_pre_retrieve``
+            # → "(15 / 41)"). Treat any progress update as motion so the
+            # UI ticks immediately rather than waiting for the 1s timer.
+            new_progress = False
+            for sid, (done_n, total_n) in progress_updates.items():
+                old = stage_progress.get(sid)
+                if old != (done_n, total_n):
+                    stage_progress[sid] = (done_n, total_n)
+                    new_progress = True
             now = time.time()
-            # Yield on every stage flip (instant feedback) and otherwise once a
-            # second so the elapsed counter still advances during long stages.
-            if new_seen or (now - last_yield) > 1.0:
+            # Yield on every stage flip OR sub-progress tick (instant
+            # feedback) and otherwise once a second so the elapsed counter
+            # still advances during long stages.
+            if new_seen or new_progress or (now - last_yield) > 1.0:
                 yield _progress_update(elapsed=now - start)
                 last_yield = now
     finally:
@@ -2410,7 +2481,7 @@ def _format_batch_summary(per_paper: list[dict], elapsed: float, mode: str) -> s
     def pill(label, count, bg, fg):
         return (
             f'<span style="display:inline-block;background:{bg};color:{fg};'
-            f'padding:4px 12px;border-radius:14px;font-size:13px;'
+            f'padding:4px 12px;border-radius:14px;font-size:15px;'
             f'font-weight:600;margin:0 6px 6px 0;">'
             f'{count} {label}</span>'
         )
@@ -2432,9 +2503,9 @@ def _format_batch_summary(per_paper: list[dict], elapsed: float, mode: str) -> s
 
     return (
         f'<div class="dashboard" style="padding:16px 20px;">'
-        f'<div style="font-size:14px;color:#6b7280;margin-bottom:8px;">'
+        f'<div style="font-size:16px;color:#6b7280;margin-bottom:8px;">'
         f'Batch results · mode: <b>{_esc(mode)}</b> · elapsed: <b>{elapsed:.1f}s</b></div>'
-        f'<div style="display:flex;gap:18px;margin-bottom:12px;flex-wrap:wrap;font-size:14px;">'
+        f'<div style="display:flex;gap:18px;margin-bottom:12px;flex-wrap:wrap;font-size:16px;">'
         f'<div><b>{len(ok)}</b> papers analyzed</div>'
         f'<div><b>{total_refs}</b> total references</div>'
         f'{"<div>" + str(len(failed)) + " failed</div>" if failed else ""}'
@@ -2484,7 +2555,7 @@ def _format_batch_rollup(per_paper: list[dict]) -> str:
     # Metadata-dimension columns only — claim outcomes (Misrep.) live in
     # the per-paper detail view, not the rollup table.
     header = (
-        '<tr style="background:#f9fafb;font-size:12px;color:#6b7280;text-align:left;">'
+        '<tr style="background:#f9fafb;font-size:14px;color:#6b7280;text-align:left;">'
         '<th style="padding:6px 10px;">Paper</th>'
         '<th style="padding:6px 10px;text-align:right;">Refs</th>'
         '<th style="padding:6px 10px;text-align:right;">Fabr.</th>'
@@ -2495,7 +2566,7 @@ def _format_batch_rollup(per_paper: list[dict]) -> str:
     return (
         '<div style="margin-top:16px;">'
         '<div class="cc-section-label">Per-paper rollup</div>'
-        f'<table style="width:100%;border-collapse:collapse;font-size:13px;">'
+        f'<table style="width:100%;border-collapse:collapse;font-size:15px;">'
         f'{header}{"".join(rows)}</table>'
         '</div>'
     )
@@ -2518,10 +2589,10 @@ def _format_batch_per_paper(per_paper: list[dict], has_passages: bool) -> str:
         )
         chunks.append(
             f'<details style="margin-top:10px;">'
-            f'<summary style="font-size:14px;font-weight:600;cursor:pointer;'
+            f'<summary style="font-size:16px;font-weight:600;cursor:pointer;'
             f'padding:8px 12px;background:#f8fafc;border-radius:8px;">'
             f'{_esc(p["name"])} &nbsp;'
-            f'<span style="font-weight:400;color:#6b7280;font-size:12px;">'
+            f'<span style="font-weight:400;color:#6b7280;font-size:14px;">'
             f'{p.get("total_refs", 0)} refs</span>'
             f'</summary>'
             f'<div style="padding:10px 4px;">{cards}</div>'
@@ -2553,7 +2624,7 @@ def _try_annotate_pdf(
         bg = {"info": "#f3f4f6", "warn": "#fef3c7"}.get(tone, "#f3f4f6")
         fg = {"info": "#4b5563", "warn": "#92400e"}.get(tone, "#4b5563")
         return (
-            f'<div style="font-size:12px;color:{fg};background:{bg};'
+            f'<div style="font-size:14px;color:{fg};background:{bg};'
             f'padding:6px 10px;border-radius:6px;display:inline-block;">'
             f'{_esc(msg)}</div>'
         )
@@ -3441,9 +3512,9 @@ body{{font-family:-apple-system,system-ui,sans-serif;background:#f8fafc;color:#3
     display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;}}
 .box{{max-width:420px;padding:32px;background:#fff;border-radius:12px;
     box-shadow:0 4px 24px rgba(0,0,0,0.06);text-align:center;}}
-h1{{margin:0 0 12px;font-size:20px;}}
-p{{margin:8px 0;font-size:14px;line-height:1.5;}}
-code{{background:#f1f5f9;padding:2px 6px;border-radius:4px;font-size:13px;}}
+h1{{margin:0 0 12px;font-size:22px;}}
+p{{margin:8px 0;font-size:16px;line-height:1.5;}}
+code{{background:#f1f5f9;padding:2px 6px;border-radius:4px;font-size:15px;}}
 </style></head><body>
 <div class="box">
 <h1>Access required</h1>
