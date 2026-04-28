@@ -326,20 +326,31 @@ body.cc-dragging .gradio-container .gr-file {
        matches the docs-site convention used by MDN / GitHub / Notion. */
     max-width: 960px;
 }
+/* Headings are the only piece that inherits the navy accent. Everything
+   else inside an about card — paragraphs, list items, FAQ summaries —
+   shares one type ramp (15px / 1.7 line-height / near-black) so the page
+   reads as a single document rather than a stack of mismatched widgets.
+   Inline <strong> stays bold + near-black; we never repeat the accent
+   colour inside body copy. */
 .cc-about-section h3 {
     font-size: 20px; font-weight: 700; color: var(--accent);
     letter-spacing: -0.01em; margin: 0 0 14px;
 }
-.cc-about-section p {
-    font-size: 16px; color: var(--text); line-height: 1.7;
-    margin: 0 0 12px;
-}
+.cc-about-section p,
 .cc-about-section ul,
-.cc-about-section ol {
-    font-size: 16px; color: var(--text); line-height: 1.75;
+.cc-about-section ol,
+.cc-about-section li {
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--text-strong);
+    line-height: 1.7;
 }
-.cc-about-section li { margin: 0 0 6px; }
-.cc-about-section li strong { color: var(--text-strong); }
+.cc-about-section p   { margin: 0 0 12px; }
+.cc-about-section li  { margin: 0 0 6px; }
+.cc-about-section strong {
+    font-weight: 700;
+    color: var(--text-strong);
+}
 .cc-about-section a {
     color: var(--accent); text-decoration: none; font-weight: 500;
     border-bottom: 1px dashed #F07979; padding-bottom: 1px;
