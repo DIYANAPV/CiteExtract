@@ -648,7 +648,8 @@ def matches_any_known_id(
 
 
 def compare_year(
-    ref_year: Optional[int], db_year: Optional[int]
+    ref_year: Optional[int], db_year: Optional[int],
+    *, strong_match: bool = False,
 ) -> dict:
     """Compare years with awareness of preprint-vs-publication date patterns.
 
@@ -661,10 +662,19 @@ def compare_year(
     (e.g. arXiv 2015, CVPR 2016 for the same paper). This is not an error
     but a legitimate date discrepancy across sources.
 
+    When ``strong_match`` is True (caller has independently confirmed
+    title and authors agree), a 2-year difference is also treated as a
+    close match — this catches versioned arXiv reposts (e.g. v1 in 2020,
+    v2 in 2022) and slow journal pipelines where the same paper has its
+    preprint and publication separated by ~2 years. Without this signal,
+    diff==2 stays a hard mismatch because two papers with similar titles
+    that genuinely differ by 2 years are common enough that we can't
+    relax it unconditionally.
+
     Returns:
         {
             'match': bool,
-            'close_match': bool,   # True if years differ by exactly 1
+            'close_match': bool,   # True for diff in {1, or 2 if strong_match}
             'ref_year': ...,
             'db_year': ...,
             'flag': Optional[str],
@@ -699,6 +709,19 @@ def compare_year(
             "flag": (
                 f"year_close_match: paper says {ref_year}, database says {db_year} "
                 f"(likely preprint-vs-publication date difference)"
+            ),
+        }
+
+    if diff == 2 and strong_match:
+        return {
+            "match": True,
+            "close_match": True,
+            "ref_year": ref_year,
+            "db_year": db_year,
+            "flag": (
+                f"year_close_match: paper says {ref_year}, database says {db_year} "
+                f"(2-year gap accepted because title and authors agree — "
+                f"likely versioned arXiv repost or slow journal pipeline)"
             ),
         }
 

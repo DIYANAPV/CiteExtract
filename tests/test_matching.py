@@ -263,6 +263,41 @@ class TestCompareYear:
         assert result["match"] is True
         assert result["flag"] is None
 
+    def test_diff_two_default_is_mismatch(self):
+        """Without strong_match signal, diff==2 stays a hard mismatch —
+        two similar-titled papers 2 years apart are common enough that
+        we can't relax this by default."""
+        result = compare_year(2020, 2022)
+        assert result["match"] is False
+        assert result["close_match"] is False
+        assert "year_mismatch" in result["flag"]
+
+    def test_diff_two_strong_match_relaxes_to_close(self):
+        """With strong_match=True (title + authors confirmed by caller),
+        diff==2 becomes a close match — versioned arXiv repost pattern."""
+        result = compare_year(2020, 2022, strong_match=True)
+        assert result["match"] is True
+        assert result["close_match"] is True
+        assert "year_close_match" in result["flag"]
+        assert "2-year gap" in result["flag"]
+
+    def test_diff_one_strong_match_unchanged(self):
+        """diff==1 is already a close match regardless of strong_match —
+        the strong_match knob only widens to 2, doesn't narrow."""
+        result = compare_year(2023, 2024, strong_match=True)
+        assert result["match"] is True
+        assert result["close_match"] is True
+        assert "year_close_match" in result["flag"]
+        assert "preprint-vs-publication" in result["flag"]
+
+    def test_diff_three_strong_match_still_mismatch(self):
+        """strong_match relaxes by 1 year, not arbitrarily — diff>=3
+        stays a mismatch even with strong title + author agreement."""
+        result = compare_year(2020, 2023, strong_match=True)
+        assert result["match"] is False
+        assert result["close_match"] is False
+        assert "year_mismatch" in result["flag"]
+
 
 # ---------------------------------------------------------------------------
 # Composite candidate scoring (Commit #1: stop matching the wrong paper)

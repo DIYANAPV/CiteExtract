@@ -50,13 +50,37 @@ class TestFieldComparison:
         assert any("year_close_match" in f for f in result.flags)
 
     def test_year_hard_mismatch_flagged(self):
-        """Year diff of 2+ is a hard MISMATCH."""
+        """Year diff of 3+ is a hard MISMATCH even with strong title + authors."""
         ref = _make_ref(year=2015)
         exist = _make_exist(matched_year=2018)
         result = validate_metadata(ref, exist)
         year_cmp = next(c for c in result.comparisons if c.field == "year")
         assert year_cmp.status == "MISMATCH"
         assert any("year_mismatch" in f for f in result.flags)
+
+    def test_year_diff_two_with_strong_match_is_close(self):
+        """When title and authors both agree, a 2-year gap relaxes from
+        MISMATCH to CLOSE_MATCH — versioned arXiv repost or slow journal
+        pipeline pattern. Without this, the verdict would flag a real
+        citation as broken just because v1 and v2 of the same arXiv
+        paper crossed a year boundary."""
+        ref = _make_ref(year=2020)  # title + authors match defaults
+        exist = _make_exist(matched_year=2022)
+        result = validate_metadata(ref, exist)
+        year_cmp = next(c for c in result.comparisons if c.field == "year")
+        assert year_cmp.status == "CLOSE_MATCH"
+        assert any("2-year gap" in f for f in result.flags)
+
+    def test_year_diff_two_without_strong_match_stays_mismatch(self):
+        """Same 2-year gap but authors disagree → still a MISMATCH.
+        The leniency is gated on strong title + author agreement so that
+        two genuinely different papers with similar titles can't sneak
+        through just because they're 2 years apart."""
+        ref = _make_ref(year=2020, authors=["Completely Different Author"])
+        exist = _make_exist(matched_year=2022)
+        result = validate_metadata(ref, exist)
+        year_cmp = next(c for c in result.comparisons if c.field == "year")
+        assert year_cmp.status == "MISMATCH"
 
     def test_year_none_is_missing(self):
         ref = _make_ref(year=None)

@@ -136,7 +136,20 @@ def validate_metadata(reference: Reference, existence: ExistenceResult) -> Metad
         ))
 
     # --- Year (context-aware: preprint vs publication dates) ---
-    year_cmp = compare_year(reference.year, existence.matched_year)
+    # When title and authors both agree strongly with the DB record we
+    # treat a 2-year gap as a close match (versioned arXiv repost or slow
+    # journal pipeline). Without that signal, diff==2 would flag the
+    # citation as broken even though the title+author evidence already
+    # made it clear the paper is the same.
+    strong_year_match = (
+        title_sim >= thresholds_cfg["title_match"]
+        and reference.authors and existence.matched_authors
+        and author_sim >= thresholds_cfg["author_match"]
+    )
+    year_cmp = compare_year(
+        reference.year, existence.matched_year,
+        strong_match=strong_year_match,
+    )
     if reference.year is None or existence.matched_year is None:
         comparisons.append(FieldComparison(
             field="year",
