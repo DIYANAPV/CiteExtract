@@ -213,6 +213,58 @@ class TestVenuePreprint:
         assert result.has_metadata_mismatch is True
 
 
+class TestVenueAbbreviationExpansion:
+    """Abbreviated venue names should match their expanded equivalents.
+
+    Citations frequently use abbreviations like 'Int. J. Comput. Vis.'
+    while the DB record holds the full 'International Journal of
+    Computer Vision'. Without the expander, these look like a venue
+    mismatch and the verdict falsely flags a correct citation."""
+
+    def test_int_econ_matches_international_economics(self):
+        ref = _make_ref(venue="Int. Econ.")
+        exist = _make_exist(matched_venue="International Economics")
+        result = validate_metadata(ref, exist)
+        venue_cmp = next(c for c in result.comparisons if c.field == "venue")
+        assert venue_cmp.status == "MATCH"
+
+    def test_j_econ_matches_journal_of_economics(self):
+        ref = _make_ref(venue="J. Econ.")
+        exist = _make_exist(matched_venue="Journal of Economics")
+        result = validate_metadata(ref, exist)
+        venue_cmp = next(c for c in result.comparisons if c.field == "venue")
+        assert venue_cmp.status == "MATCH"
+
+    def test_ieee_trans_pattern_anal_matches_full_form(self):
+        """The famous IEEE TPAMI: Trans. Pattern Anal. Mach. Intell."""
+        ref = _make_ref(venue="IEEE Trans. Pattern Anal. Mach. Intell.")
+        exist = _make_exist(
+            matched_venue="IEEE Transactions on Pattern Analysis and Machine Intelligence",
+        )
+        result = validate_metadata(ref, exist)
+        venue_cmp = next(c for c in result.comparisons if c.field == "venue")
+        assert venue_cmp.status == "MATCH"
+
+    def test_proc_natl_acad_sci_matches_full_form(self):
+        """PNAS: Proc. Natl. Acad. Sci. → Proceedings of the National
+        Academy of Sciences."""
+        ref = _make_ref(venue="Proc. Natl. Acad. Sci.")
+        exist = _make_exist(
+            matched_venue="Proceedings of the National Academy of Sciences",
+        )
+        result = validate_metadata(ref, exist)
+        venue_cmp = next(c for c in result.comparisons if c.field == "venue")
+        assert venue_cmp.status == "MATCH"
+
+    def test_unrelated_venues_still_mismatch(self):
+        """Expansion shouldn't cause false matches between unrelated venues."""
+        ref = _make_ref(venue="Int. J. Comput. Vis.")
+        exist = _make_exist(matched_venue="Nature")
+        result = validate_metadata(ref, exist)
+        venue_cmp = next(c for c in result.comparisons if c.field == "venue")
+        assert venue_cmp.status == "MISMATCH"
+
+
 class TestMetadataScore:
     def test_perfect_score(self):
         result = validate_metadata(_make_ref(), _make_exist())

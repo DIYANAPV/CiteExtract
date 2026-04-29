@@ -481,14 +481,98 @@ def _canonical_id_match(
     return bool(ref_ids & db_ids)
 
 
+# Common academic-venue abbreviations expanded to their full form.
+#
+# Citations frequently abbreviate venue names to save space — "Int. J.
+# Comput. Vis." stands for "International Journal of Computer Vision".
+# The DB record may hold the full form, the abbreviation, or a mix, so
+# the metadata layer normalizes both sides through this expansion before
+# any string-based comparison. Without it, "Int. Econ." vs
+# "International Economics" looks like a venue mismatch and the verdict
+# falsely flags a correct citation.
+#
+# Keys are matched as whole words (with an optional trailing period)
+# and replaced with the expanded form. Order doesn't matter — the
+# regex is built once with alternation so each token is replaced in
+# a single pass.
+_VENUE_ABBREVIATIONS = {
+    "int": "international",
+    "intl": "international",
+    "natl": "national",
+    "j": "journal",
+    "trans": "transactions",
+    "proc": "proceedings",
+    "conf": "conference",
+    "symp": "symposium",
+    "rev": "review",
+    "bull": "bulletin",
+    "mag": "magazine",
+    "ann": "annual",
+    "annu": "annual",
+    "econ": "economics",
+    "comp": "computing",
+    "comput": "computing",
+    "sci": "science",
+    "tech": "technology",
+    "eng": "engineering",
+    "engr": "engineering",
+    "math": "mathematics",
+    "stat": "statistics",
+    "phys": "physics",
+    "chem": "chemistry",
+    "biol": "biology",
+    "med": "medicine",
+    "soc": "society",
+    "acad": "academy",
+    "assoc": "association",
+    "appl": "applied",
+    "anal": "analysis",
+    "vis": "vision",
+    "intell": "intelligence",
+    "mach": "machine",
+    "lang": "language",
+    "ling": "linguistics",
+    "lett": "letters",
+    "res": "research",
+    "syst": "systems",
+    "softw": "software",
+    "inf": "information",
+    "commun": "communications",
+    "netw": "networks",
+}
+
+# Built once so per-call normalization is regex-substitution-fast.
+_VENUE_ABBREV_RE = re.compile(
+    r"\b(" + "|".join(re.escape(k) for k in _VENUE_ABBREVIATIONS) + r")\.?\b",
+    re.IGNORECASE,
+)
+
+
+def _expand_venue_abbreviations(venue: str) -> str:
+    """Replace academic abbreviations with their full form.
+
+    Operates token-by-token with whole-word boundaries so unrelated
+    substrings (e.g. "international" already containing "int") aren't
+    double-expanded — ``re.sub`` only fires on standalone matches.
+    A trailing period is allowed and consumed by the pattern.
+    """
+    return _VENUE_ABBREV_RE.sub(
+        lambda m: _VENUE_ABBREVIATIONS[m.group(1).lower()], venue,
+    )
+
+
 def _normalize_venue(venue: str) -> str:
     """Normalize a venue name for alias comparison.
 
     Strips common prefixes, suffixes, ordinals, publisher info,
-    and generic terms to expose the core venue identity.
+    and generic terms to expose the core venue identity. Expands
+    common abbreviations (Int. → International, J. → Journal,
+    Trans. → Transactions, …) up front so abbreviated and full
+    forms collapse to the same normalized string.
     """
     v = venue.lower().strip()
     v = unidecode(v)
+    v = _expand_venue_abbreviations(v)
     # Strip common prefixes
     v = re.sub(r"^proceedings of (the )?([\d]+(st|nd|rd|th) )?", "", v)
     v = re.sub(r"^proc\.?\s+", "", v)
@@ -529,8 +613,14 @@ def _normalized_venue_match(ref_venue: str, db_venue: str) -> bool:
         return False
     if norm_ref == norm_db:
         return True
-    # Check if one is a substring of the other
-    return norm_ref in norm_db or norm_db in norm_ref
+    if norm_ref in norm_db or norm_db in norm_ref:
+        return True
+    # Token-level near-match for normalized forms — catches cases like
+    # "national academy science" vs "national academy of sciences"
+    # where neither is a substring of the other but token overlap is
+    # near-complete. Threshold deliberately strict (0.85) so we don't
+    # paper over genuine venue mismatches.
+    return title_similarity(norm_ref, norm_db) >= 0.85
 
 
 
