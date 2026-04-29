@@ -28,6 +28,14 @@ class ExistenceResult(BaseModel):
     matched_arxiv_id: Optional[str] = Field(
         default=None, description="arXiv ID from DB (used to bridge arXiv vs publisher DOIs)"
     )
+    anthology_id: Optional[str] = Field(
+        default=None,
+        description=(
+            "ACL Anthology ID from DB. Used to bridge cross-system "
+            "aliases — e.g. a citation that includes the anthology URL "
+            "vs a DB record that holds the publisher DOI separately."
+        ),
+    )
     abstract: Optional[str] = Field(default=None, description="Cached abstract from DB")
     oa_url: Optional[str] = Field(
         default=None, description="Open-access URL from Semantic Scholar"

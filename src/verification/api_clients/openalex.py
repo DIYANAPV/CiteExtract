@@ -17,9 +17,19 @@ BASE_URL = "https://api.openalex.org/works"
 
 
 async def search_by_title(
-    title: str, client: httpx.AsyncClient
+    title: str, client: httpx.AsyncClient,
+    *,
+    ref_authors: Optional[list[str]] = None,
+    ref_year: Optional[int] = None,
 ) -> Optional[dict]:
-    """Search OpenAlex by title. Returns best matching paper or None."""
+    """Search OpenAlex by title and pick the best candidate.
+
+    Uses :func:`matching.pick_best_candidate` for two-pass scoring —
+    composite (title + authors + year) first, title-only fallback when
+    nothing strong matches. The returned dict carries
+    ``match_strategy`` + ``match_score`` so downstream verdicts can
+    flag title-only matches as low-author-confidence.
+    """
     if not title or len(title.strip()) < 5:
         return None
 
@@ -51,20 +61,23 @@ async def search_by_title(
     if not results:
         return None
 
-    # Find best title match
-    best_match: Optional[dict] = None
-    best_sim = 0.0
-    for work in results:
-        work_title = work.get("title", "")
-        sim = title_similarity(title, work_title)
-        if sim > best_sim:
-            best_sim = sim
-            best_match = work
+    # Pre-parse so the picker scores against structured fields.
+    parsed = [_parse_work(w, similarity=0.0) for w in results]
 
-    if best_match is None or best_sim < config.thresholds()["title_match"]:
+    from src.verification.matching import pick_best_candidate
+
+    chosen, strategy, score = pick_best_candidate(
+        title, ref_authors or [], ref_year, parsed,
+    )
+    if chosen is None:
         return None
 
-    return _parse_work(best_match, best_sim)
+    chosen["title_similarity"] = title_similarity(
+        title, chosen.get("title", ""),
+    )
+    chosen["match_strategy"] = strategy
+    chosen["match_score"] = score
+    return chosen
 
 
 def _parse_work(work: dict, similarity: float) -> dict:

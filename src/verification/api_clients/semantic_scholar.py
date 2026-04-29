@@ -30,11 +30,23 @@ def _headers() -> dict:
 
 
 async def search_by_title(
-    title: str, client: httpx.AsyncClient
+    title: str, client: httpx.AsyncClient,
+    *,
+    ref_authors: Optional[list[str]] = None,
+    ref_year: Optional[int] = None,
 ) -> Optional[dict]:
-    """Search Semantic Scholar by title. Returns best matching paper or None.
+    """Search Semantic Scholar by title and pick the best candidate.
 
-    The returned dict includes 'abstract' which is cached for L4 reuse.
+    Uses :func:`matching.pick_best_candidate` for two-pass scoring —
+    composite (title + authors + year) first, title-only fallback when
+    nothing strong matches. The returned dict carries a
+    ``match_strategy`` key so downstream knows whether the match was
+    composite-strong or title-only (i.e. authors didn't agree, possibly
+    because they're hallucinated in the citing paper).
+
+    Author and year are optional: passing them raises match precision
+    (rejects vocabulary-overlap false-positives), omitting them falls
+    back gracefully to title-only behavior.
     """
     if not title or len(title.strip()) < 5:
         return None
@@ -65,20 +77,29 @@ async def search_by_title(
     if not data:
         return None
 
-    # Find best title match
-    best_match: Optional[dict] = None
-    best_sim = 0.0
-    for paper in data:
-        paper_title = paper.get("title", "")
-        sim = title_similarity(title, paper_title)
-        if sim > best_sim:
-            best_sim = sim
-            best_match = paper
+    # Pre-parse every candidate so the picker sees structured fields
+    # (title, authors, year) instead of raw S2 dicts. The
+    # ``title_similarity`` is rewritten after the picker chooses.
+    parsed = [_parse_paper(p, similarity=0.0) for p in data]
 
-    if best_match is None or best_sim < config.thresholds()["title_match"]:
+    from src.verification.matching import pick_best_candidate
+
+    chosen, strategy, score = pick_best_candidate(
+        title, ref_authors or [], ref_year, parsed,
+    )
+    if chosen is None:
         return None
 
-    return _parse_paper(best_match, best_sim)
+    # Stamp the chosen candidate with both ``title_similarity`` (for
+    # back-compat with legacy display code) and the new ``match_strategy``
+    # / ``match_score`` fields so downstream verdicts can flag a
+    # title-only fallback as low-author-confidence.
+    chosen["title_similarity"] = (
+        title_similarity(title, chosen.get("title", ""))
+    )
+    chosen["match_strategy"] = strategy
+    chosen["match_score"] = score
+    return chosen
 
 
 async def lookup_by_id(
@@ -120,6 +141,11 @@ def _parse_paper(paper: dict, similarity: float) -> dict:
     ext_ids = paper.get("externalIds", {}) or {}
     doi = ext_ids.get("DOI")
     arxiv_id = ext_ids.get("ArXiv")
+    # ACL Anthology ID — let the metadata layer's canonical-id matcher
+    # bridge ``aclanthology.org/Q16-1026`` (cited) with the publisher
+    # DOI ``10.1162/tacla00104`` (DB), since the ACL ID is what S2 holds
+    # in common.
+    anthology_id = ext_ids.get("ACL")
 
     # Extract venue aliases from publicationVenue (structured, disambiguated)
     venue_aliases: list[str] = []
@@ -137,6 +163,7 @@ def _parse_paper(paper: dict, similarity: float) -> dict:
         "abstract": paper.get("abstract"),
         "doi": doi,
         "arxiv_id": arxiv_id,
+        "anthology_id": anthology_id,
         "s2_id": paper.get("paperId"),
         "openAccessPdf": paper.get("openAccessPdf"),
         "venue_aliases": venue_aliases,

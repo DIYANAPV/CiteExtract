@@ -253,6 +253,16 @@ def validate_metadata(reference: Reference, existence: ExistenceResult) -> Metad
             field="doi", ref_value=ref_doi, db_value=db_doi, status="MATCH",
             flag="doi_matched_via_arxiv_id: different DOI registrations for same paper",
         ))
+    elif _canonical_id_match(ref_doi, db_doi, reference, existence):
+        # Canonical-ID bridge catches cross-system aliasing the simple
+        # string comparison misses: ACL anthology URL ↔ ACL DOI ↔ ACL
+        # ID, arXiv URL ↔ arXiv ID, and the case where the DB has a
+        # secondary identifier (anthology_id) that matches the ref's
+        # primary ID (DOI URL).
+        comparisons.append(FieldComparison(
+            field="doi", ref_value=ref_doi, db_value=db_doi, status="MATCH",
+            flag="doi_matched_via_canonical_id: same paper, different identifier system",
+        ))
     else:
         flag = f"DOI mismatch. Ref: {ref_doi}; DB: {db_doi}"
         flags.append(flag)
@@ -406,6 +416,56 @@ def _doi_prefix_match(doi_a: str, doi_b: str) -> bool:
     if len(shorter) < 15:
         return False
     return longer.startswith(shorter)
+
+
+def _canonical_id_match(
+    ref_doi: str, db_doi: str,
+    reference: "Reference", existence: "ExistenceResult",
+) -> bool:
+    """Detect cross-system identifier equivalence the string compare misses.
+
+    Three patterns this catches that ``ref_doi == db_doi`` misses:
+
+    1. **URL ↔ bare DOI** —
+       ``https://doi.org/10.1234/foo`` vs ``10.1234/foo``.
+    2. **arXiv DOI ↔ arXiv ID** —
+       ``10.48550/arxiv.2407.21783`` vs the arXiv ID ``2407.21783``
+       stored on the DB record.
+    3. **ACL anthology URL ↔ ACL DOI** —
+       ``aclanthology.org/Q16-1026`` (ref) vs
+       ``10.18653/v1/Q16-1026`` (DB), or vs an anthology ID stored as
+       a secondary identifier on the DB record.
+
+    Each "side" contributes every identifier we have for the paper —
+    DOI, arXiv ID, and any other identifier the DB exposed. If ANY
+    canonical form on the ref side equals ANY canonical form on the DB
+    side, we accept the match. Comparing single fields would miss the
+    cross-system case where two valid identifier systems describe the
+    same paper.
+    """
+    from src.verification.matching import canonical_id
+
+    def _all_canonicals(*raws):
+        seen: set = set()
+        for r in raws:
+            if not r:
+                continue
+            cid = canonical_id(r)
+            if cid is not None:
+                seen.add(cid)
+        return seen
+
+    ref_ids = _all_canonicals(ref_doi, getattr(reference, "arxiv_id", None))
+    db_ids = _all_canonicals(
+        db_doi,
+        getattr(existence, "matched_arxiv_id", None),
+        # Anthology and other secondary identifiers will surface here
+        # once the DB clients are updated to populate these fields on
+        # ``ExistenceResult``. Until then ``getattr`` quietly falls back
+        # to ``None`` and the canonical set just won't contain them.
+        getattr(existence, "anthology_id", None),
+    )
+    return bool(ref_ids & db_ids)
 
 
 def _normalize_venue(venue: str) -> str:

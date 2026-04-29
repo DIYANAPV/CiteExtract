@@ -175,7 +175,10 @@ async def _check_existence_cascade(
         s2_id = f"DOI:{reference.doi}" if reference.doi else f"ARXIV:{reference.arxiv_id}"
         s2_record = await semantic_scholar.lookup_by_id(s2_id, client)
     if s2_record is None and reference.title:
-        s2_record = await semantic_scholar.search_by_title(reference.title, client)
+        s2_record = await semantic_scholar.search_by_title(
+            reference.title, client,
+            ref_authors=reference.authors, ref_year=reference.year,
+        )
     databases_checked.append("semantic_scholar")
 
     if s2_record:
@@ -199,7 +202,10 @@ async def _check_existence_cascade(
 
     # --- Step 3: OpenAlex ---
     if reference.title:
-        oa_record = await openalex.search_by_title(reference.title, client)
+        oa_record = await openalex.search_by_title(
+            reference.title, client,
+            ref_authors=reference.authors, ref_year=reference.year,
+        )
         databases_checked.append("openalex")
 
         if oa_record:
@@ -226,7 +232,10 @@ async def _check_existence_cascade(
     # source for retraction signals, so a hit here gives the verdict
     # better grounding even when the title was already matched elsewhere.
     if reference.title and "crossref" not in databases_checked:
-        cr_record = await crossref.search_by_title(reference.title, client)
+        cr_record = await crossref.search_by_title(
+            reference.title, client,
+            ref_authors=reference.authors, ref_year=reference.year,
+        )
         databases_checked.append("crossref")
         if cr_record:
             matched, sim, flags = is_title_match(reference.title, cr_record["title"])
@@ -605,6 +614,24 @@ def _build_found(
     if retraction_status is None and source != "crossref":
         flags.append(f"retraction_not_checked: found via {source} (no retraction data)")
 
+    # Surface the match strategy when the DB client used the title-only
+    # fallback. Composite matches (title + authors + year aligned) need
+    # no flag; title-only matches mean the picker couldn't find a
+    # candidate whose authors agreed with the ref, so the verdict layer
+    # should treat the metadata-vs-DB comparison with extra skepticism
+    # (the citing paper's authors might be hallucinated, OR we matched
+    # a different paper that shares words with the title).
+    from src.verification.matching import MATCH_STRATEGY_TITLE_ONLY
+
+    if db_record.get("match_strategy") == MATCH_STRATEGY_TITLE_ONLY:
+        score = db_record.get("match_score")
+        flags.append(
+            f"matched_by_title_only: authors did not align with the "
+            f"chosen DB candidate (composite_score={score:.2f}). "
+            f"The cited paper's authors may be hallucinated, OR a "
+            f"different paper with a similar title was matched."
+        )
+
     # Extract open-access URL if available (S2 openAccessPdf, OA landing page)
     oa_url = None
     oa_pdf = db_record.get("openAccessPdf")
@@ -624,6 +651,7 @@ def _build_found(
         venue_aliases=db_record.get("venue_aliases", []),
         matched_doi=db_record.get("doi"),
         matched_arxiv_id=db_record.get("arxiv_id"),
+        anthology_id=db_record.get("anthology_id"),
         abstract=db_record.get("abstract"),
         oa_url=oa_url,
         retraction_status=retraction_status,

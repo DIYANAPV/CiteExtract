@@ -99,29 +99,35 @@ async def lookup_doi(
 
 
 async def search_by_title(
-    title: str, client: httpx.AsyncClient
+    title: str, client: httpx.AsyncClient,
+    *,
+    ref_authors: Optional[list[str]] = None,
+    ref_year: Optional[int] = None,
 ) -> Optional[dict]:
-    """Search CrossRef by title. Returns best matching paper or None.
+    """Search CrossRef by title and pick the best candidate.
 
-    Endpoint: ``GET /works?query.bibliographic=<title>&rows=5``.
+    Two-axis selection:
 
-    Skips ``reference-entry`` / ``component`` / ``dataset`` types when a
-    higher-quality match is available — these are the encyclopedia-entry
-    false-positives that punish short titles like "Perceptron". Falls
-    back to them only if nothing else cleared the threshold.
-
-    Threshold is the global ``thresholds.title_match`` so the cascade
-    behaves consistently across DBs.
+    1. **Type-quality bucketing.** Encyclopedia / dataset / reference-entry
+       types are demoted to a fallback bucket so they don't beat real
+       articles for short titles like "Perceptron".
+    2. **Composite scoring within each bucket** (see
+       :func:`matching.pick_best_candidate`). High-quality bucket runs
+       first; only when it has no match do we try the low-quality
+       bucket. Inside each bucket the picker prefers candidates whose
+       authors and year align with the reference, falling back to
+       title-only when nothing strong matches (with
+       ``match_strategy="title_only"`` so verdicts can flag low
+       author confidence).
     """
     if not title or len(title.strip()) < 5:
         return None
 
-    from src.verification.matching import title_similarity
+    from src.verification.matching import title_similarity, pick_best_candidate
 
     cfg = config.api("crossref")
     mailto = config.crossref_mailto()
     timeout = cfg.get("timeout", 15)
-    threshold = config.thresholds()["title_match"]
 
     # ``query.bibliographic`` is CrossRef's recommended scoring field for
     # general bibliographic queries — better than ``query.title`` for
@@ -149,29 +155,36 @@ async def search_by_title(
     if not items:
         return None
 
-    # Score each candidate, prefer non-low-quality types.
-    best_high: Optional[tuple[float, dict]] = None
-    best_low: Optional[tuple[float, dict]] = None
+    # Split into quality buckets, parsing each item to the structured
+    # record shape the picker expects.
+    high_quality: list[dict] = []
+    low_quality: list[dict] = []
     for item in items:
         item_title = (item.get("title") or [""])[0]
         if not item_title:
             continue
-        sim = title_similarity(title, item_title)
-        if sim < threshold:
+        parsed = _parse_works_item(item, similarity=0.0)
+        if item.get("type") in _LOW_QUALITY_CROSSREF_TYPES:
+            low_quality.append(parsed)
+        else:
+            high_quality.append(parsed)
+
+    # Try high-quality first; fall back to low-quality only when it's empty.
+    for bucket in (high_quality, low_quality):
+        if not bucket:
             continue
-        bucket = best_low if item.get("type") in _LOW_QUALITY_CROSSREF_TYPES else best_high
-        if bucket is None or sim > bucket[0]:
-            if item.get("type") in _LOW_QUALITY_CROSSREF_TYPES:
-                best_low = (sim, item)
-            else:
-                best_high = (sim, item)
+        chosen, strategy, score = pick_best_candidate(
+            title, ref_authors or [], ref_year, bucket,
+        )
+        if chosen is not None:
+            chosen["title_similarity"] = title_similarity(
+                title, chosen.get("title", ""),
+            )
+            chosen["match_strategy"] = strategy
+            chosen["match_score"] = score
+            return chosen
 
-    chosen = best_high or best_low
-    if chosen is None:
-        return None
-
-    sim, item = chosen
-    return _parse_works_item(item, sim)
+    return None
 
 
 def _parse_works_item(data: dict, similarity: float) -> dict:

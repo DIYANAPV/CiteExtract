@@ -308,6 +308,342 @@ def is_author_truncation(ref_authors: list[str], db_authors: list[str]) -> bool:
     return containment >= 0.80
 
 
+# ---------------------------------------------------------------------------
+# Composite candidate scoring
+# ---------------------------------------------------------------------------
+#
+# Single-axis "best title similarity wins" picks the wrong paper when titles
+# share vocabulary. Two real examples we hit:
+#
+#   ref:  "Natural Language Processing with Python" (Bird/Klein/Loper, 2009)
+#   pick: "Python for Natural Language Processing"  (Sarkar, 2019)
+#         token_sort_ratio ≈ 0.88 → "matched", but it's a different book.
+#
+#   ref:  "The Semantic Web" (Berners-Lee, 2001)
+#   pick: a 2011 Lecture Notes book of the same name (Goos/Hartmanis et al.)
+#         identical normalized title → matched, but completely different paper.
+#
+# The discriminator in both cases is **authors** (and to a lesser extent
+# year). Composite scoring blends all three so a high title score that
+# contradicts authors gets dragged down below the accept bar.
+
+
+# Weights for the composite. Title still dominates (it's the user's
+# primary search anchor) but authors carry meaningful weight, and year
+# breaks ties between same-title-different-paper candidates.
+_W_TITLE = 0.5
+_W_AUTHOR = 0.3
+_W_YEAR = 0.2
+
+# Composite score required to accept a candidate. Calibrated so that
+# title >= 0.80 + authors-disjoint never reaches the bar (max would be
+# 0.5*0.80 + 0.3*0 + 0.2*1 = 0.60 — and we additionally hard-reject the
+# disjoint-author case).
+COMPOSITE_MATCH_THRESHOLD = 0.65
+
+
+def _year_score(ref_year: Optional[int], cand_year: Optional[int]) -> float:
+    """Year similarity in [0, 1]. Lenient about ±1 (preprint vs proceedings)
+    and ±2 (versioned arXiv reposts), strict about larger gaps."""
+    if ref_year is None or cand_year is None:
+        # Missing on either side — neutral signal so we don't penalize.
+        return 0.5
+    diff = abs(ref_year - cand_year)
+    if diff == 0:
+        return 1.0
+    if diff == 1:
+        return 0.8
+    if diff <= 2:
+        return 0.5
+    if diff <= 5:
+        return 0.2
+    return 0.0
+
+
+def composite_match_score(
+    ref_title: Optional[str], ref_authors: list[str], ref_year: Optional[int],
+    cand_title: Optional[str], cand_authors: list[str], cand_year: Optional[int],
+) -> float:
+    """Weighted blend of title + author + year similarity.
+
+    Returns a score in ``[0, 1]``. Used by DB clients to pick the best
+    candidate from a result list when more than one share a similar
+    title — without authors as a tiebreaker, the picker grabs the
+    wrong paper for vocabulary-overlapping titles.
+
+    Authors and year contribute neutrally (0.5) when missing on one
+    side, so refs without explicit author lists don't get penalized
+    relative to those that have them.
+    """
+    title_s = title_similarity(ref_title or "", cand_title or "") if (
+        ref_title and cand_title
+    ) else 0.0
+    if ref_authors and cand_authors:
+        author_s = author_similarity(ref_authors, cand_authors)
+    else:
+        author_s = 0.5
+    year_s = _year_score(ref_year, cand_year)
+    return _W_TITLE * title_s + _W_AUTHOR * author_s + _W_YEAR * year_s
+
+
+def is_authors_disjoint(
+    ref_authors: list[str], cand_authors: list[str],
+) -> bool:
+    """Hard-reject signal: both sides have authors, zero surnames overlap.
+
+    Two papers can't share zero authors AND be the same paper. When
+    this holds we ignore title similarity entirely — title alone is
+    not a strong enough signal to overrule complete author divergence.
+    """
+    if not ref_authors or not cand_authors:
+        return False
+    return author_similarity(ref_authors, cand_authors) == 0.0
+
+
+# Match strategy labels used in returned records so downstream layers
+# can flag low-author-confidence matches in the verdict / UI.
+MATCH_STRATEGY_COMPOSITE = "composite"   # title + authors + year all aligned
+MATCH_STRATEGY_TITLE_ONLY = "title_only"  # title-only fallback (authors hallucinated?)
+
+
+def pick_best_candidate(
+    ref_title: Optional[str], ref_authors: list[str], ref_year: Optional[int],
+    candidates: list[dict], title_threshold: Optional[float] = None,
+) -> tuple[Optional[dict], str, float]:
+    """Pick the best candidate using the two-pass strategy.
+
+    Pass 1 (composite): score every candidate by title+authors+year.
+    Reject any with disjoint author lists (hard signal of "different
+    paper that happens to share words"). Best composite score >=
+    :data:`COMPOSITE_MATCH_THRESHOLD` wins.
+
+    Pass 2 (title-only): if Pass 1 found nothing, fall back to the
+    classical title-only pick — but flag the result as
+    ``MATCH_STRATEGY_TITLE_ONLY`` so callers can mark the match as
+    low-author-confidence in the verdict.
+
+    The fallback exists because the citing paper's authors might be
+    *hallucinated* — a fabricated citation may attach made-up names to
+    a real-paper title. Refusing the title-only match would mean we
+    can't even surface the wrong-author finding.
+
+    Args:
+        ref_title / ref_authors / ref_year: the local Reference's fields.
+        candidates: list of DB-record dicts each with "title",
+            "authors", "year" keys.
+        title_threshold: minimum title similarity for the fallback pass.
+            Defaults to ``config.thresholds()["title_match"]``.
+
+    Returns:
+        ``(candidate_or_None, match_strategy, similarity_score)``.
+        ``similarity_score`` is the composite score for Pass 1 wins,
+        the title similarity for Pass 2 wins, or 0.0 when nothing
+        cleared either bar.
+    """
+    if title_threshold is None:
+        title_threshold = config.thresholds()["title_match"]
+
+    # --- Pass 1: composite scoring with author-disjoint hard reject ---
+    best_composite: Optional[tuple[float, dict]] = None
+    for cand in candidates:
+        cand_authors = cand.get("authors") or []
+        if is_authors_disjoint(ref_authors or [], cand_authors):
+            continue
+        score = composite_match_score(
+            ref_title, ref_authors or [], ref_year,
+            cand.get("title"), cand_authors, cand.get("year"),
+        )
+        if score >= COMPOSITE_MATCH_THRESHOLD:
+            if best_composite is None or score > best_composite[0]:
+                best_composite = (score, cand)
+
+    if best_composite is not None:
+        return best_composite[1], MATCH_STRATEGY_COMPOSITE, best_composite[0]
+
+    # --- Pass 2: title-only fallback (hallucinated-author tolerant) ---
+    best_title: Optional[tuple[float, dict]] = None
+    for cand in candidates:
+        sim = title_similarity(ref_title or "", cand.get("title") or "")
+        if sim < title_threshold:
+            continue
+        if best_title is None or sim > best_title[0]:
+            best_title = (sim, cand)
+
+    if best_title is not None:
+        return best_title[1], MATCH_STRATEGY_TITLE_ONLY, best_title[0]
+
+    return None, MATCH_STRATEGY_TITLE_ONLY, 0.0
+
+
+# ---------------------------------------------------------------------------
+# Canonical paper identifiers
+# ---------------------------------------------------------------------------
+#
+# Same paper, multiple identifier shapes the user might cite:
+#
+#     URL form           bare form            cross-system DOI
+#     -------------      -----------------    -----------------------------
+#     doi.org/10.X/Y     10.X/Y               (DOI is canonical)
+#     arxiv.org/abs/Z    Z (e.g. 2407.21783)  10.48550/arxiv.Z
+#     aclanthology.org/X X (e.g. Q16-1026)    10.18653/v1/X
+#
+# The metadata-comparison layer needs to recognize that a citation
+# carrying ``aclanthology.org/q16-1026`` and a DB record holding
+# DOI ``10.18653/v1/Q16-1026`` refer to the same paper. Without that,
+# users see "DOI mismatch" verdicts on entirely correct citations.
+#
+# ``canonical_id`` parses a raw identifier string into a ``(system, value)``
+# pair where ``value`` is normalized (lowercased, stripped of URL prefix
+# and ``vN`` suffix). Two identifiers refer to the same paper iff their
+# canonical forms are equal, OR if cross-record matching finds the
+# user's identifier in any of the DB's other identifier fields.
+
+
+# Identifier system labels surfaced by ``canonical_id``. Stable enums
+# so callers can pattern-match without parsing the string.
+ID_SYSTEM_DOI = "doi"
+ID_SYSTEM_ARXIV = "arxiv"
+ID_SYSTEM_ACL = "acl"
+
+
+# arXiv ID — modern format (4 digits + "." + 4-5 digits, optional vN suffix)
+_ARXIV_ID_RE = re.compile(r"\b(\d{4}\.\d{4,5})(?:v\d+)?\b")
+# arXiv URL: https://arxiv.org/abs/2407.21783[v2] or .../pdf/2407.21783[v2]
+_ARXIV_URL_RE = re.compile(
+    r"(?:https?://)?arxiv\.org/(?:abs|pdf|html)/(\d{4}\.\d{4,5})(?:v\d+)?",
+    re.IGNORECASE,
+)
+# arXiv DOI: 10.48550/arxiv.<id>
+_ARXIV_DOI_RE = re.compile(
+    r"10\.48550/arxiv\.(\d{4}\.\d{4,5})", re.IGNORECASE,
+)
+
+# ACL Anthology — both legacy ("Q16-1026") and modern
+# ("2020.acl-main.123") IDs.
+_ACL_ID_RE = re.compile(
+    r"\b([A-Z]\d{2}-\d{4}|\d{4}\.[a-z]+(?:-[a-z]+)?\.\d+)\b",
+    re.IGNORECASE,
+)
+_ACL_URL_RE = re.compile(
+    r"(?:https?://)?aclanthology\.org/"
+    r"([A-Z]\d{2}-\d{4}|\d{4}\.[a-z]+(?:-[a-z]+)?\.\d+)/?",
+    re.IGNORECASE,
+)
+# ACL DOI: 10.18653/v1/<acl-id>  (used by ACL since 2017 or so)
+_ACL_DOI_RE = re.compile(
+    r"10\.18653/v\d+/([A-Z]\d{2}-\d{4}|\d{4}\.[a-z]+(?:-[a-z]+)?\.\d+)",
+    re.IGNORECASE,
+)
+
+# Generic DOI (last-ditch — must come AFTER the system-specific patterns
+# above, otherwise ``10.48550/arxiv.X`` would canonicalize as a DOI).
+_DOI_RE = re.compile(r"10\.\d{4,9}/[\w\.\-/;:()<>]+", re.IGNORECASE)
+
+
+def canonical_id(raw: str) -> Optional[tuple[str, str]]:
+    """Parse an identifier into ``(system, normalized_value)`` or ``None``.
+
+    Recognizes URLs, bare IDs, ``doi:`` prefix, arXiv DOIs, and ACL DOIs.
+    Lowercases and strips version suffixes so two equivalent identifiers
+    return the exact same tuple.
+
+    Examples:
+        >>> canonical_id("https://doi.org/10.1234/foo")
+        ('doi', '10.1234/foo')
+        >>> canonical_id("arXiv:2407.21783v2")
+        ('arxiv', '2407.21783')
+        >>> canonical_id("10.48550/arxiv.2407.21783")
+        ('arxiv', '2407.21783')
+        >>> canonical_id("aclanthology.org/Q16-1026")
+        ('acl', 'q16-1026')
+        >>> canonical_id("10.18653/v1/Q16-1026")
+        ('acl', 'q16-1026')
+    """
+    if not raw:
+        return None
+    s = raw.strip().rstrip(".,;)/").lstrip("(")
+    # Strip known URL/scheme + ``doi:`` prefixes before pattern matching.
+    s = re.sub(r"^(?:https?://(?:dx\.)?doi\.org/|doi:\s*)", "", s, flags=re.IGNORECASE)
+
+    # Order matters: arXiv-DOI before generic DOI; ACL-DOI before generic DOI.
+    m = _ARXIV_DOI_RE.search(s)
+    if m:
+        return (ID_SYSTEM_ARXIV, m.group(1).lower())
+
+    m = _ACL_DOI_RE.search(s)
+    if m:
+        return (ID_SYSTEM_ACL, m.group(1).lower())
+
+    m = _ARXIV_URL_RE.search(s)
+    if m:
+        return (ID_SYSTEM_ARXIV, m.group(1).lower())
+
+    m = _ACL_URL_RE.search(s)
+    if m:
+        return (ID_SYSTEM_ACL, m.group(1).lower())
+
+    m = _DOI_RE.search(s)
+    if m:
+        return (ID_SYSTEM_DOI, m.group().lower().rstrip(".,;)"))
+
+    # Bare arXiv ID and ACL ID (no scheme, no prefix). ArXiv is checked
+    # before ACL because the ID shapes don't overlap; ordering is for
+    # readability.
+    m = _ARXIV_ID_RE.fullmatch(s)
+    if m:
+        return (ID_SYSTEM_ARXIV, m.group(1).lower())
+
+    m = _ACL_ID_RE.fullmatch(s)
+    if m:
+        return (ID_SYSTEM_ACL, m.group(1).lower())
+
+    return None
+
+
+def ids_equivalent(a: Optional[str], b: Optional[str]) -> bool:
+    """True iff two raw identifier strings refer to the same paper.
+
+    Equivalent means: canonicalize both, compare the resulting
+    ``(system, value)`` tuples. Returns ``False`` when either input is
+    empty or unrecognizable — never raises.
+    """
+    if not a or not b:
+        return False
+    ca = canonical_id(a)
+    cb = canonical_id(b)
+    return ca is not None and ca == cb
+
+
+# Fields on a DB record (or ExistenceResult) where alternate identifiers
+# may live. Order matters only for log-readability; lookup is set-like.
+_DB_ID_FIELDS = ("doi", "arxiv_id", "anthology_id", "acl_id")
+
+
+def matches_any_known_id(
+    user_id: Optional[str], db_record: dict,
+) -> bool:
+    """True iff ``user_id`` matches ANY identifier the DB has for the paper.
+
+    Checks every field in ``_DB_ID_FIELDS`` (DOI, arXiv ID, ACL ID, …).
+    Lets us recognize that ``aclanthology.org/q16-1026`` (ref) and
+    ``10.1162/tacla00104`` + ``Q16-1026`` (DB record with both DOI and
+    anthology ID stored) refer to the same paper, even though the DOI
+    strings differ — they share the ACL anthology key when canonicalized.
+    """
+    if not user_id:
+        return False
+    user = canonical_id(user_id)
+    if user is None:
+        return False
+    for field in _DB_ID_FIELDS:
+        v = db_record.get(field) if isinstance(db_record, dict) else getattr(db_record, field, None)
+        if not v:
+            continue
+        if canonical_id(v) == user:
+            return True
+    return False
+
+
 # --- Year comparison (context-aware: preprint vs publication dates) ---
 
 
