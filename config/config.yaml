@@ -97,6 +97,14 @@ comprehension:
   # converges on a strong candidate set; the marginal value of reranking
   # positions 11–15 is small. Bump to 15 if eval shows otherwise.
   rerank_pool: 10
+  # Per-ref hard cap for full-text fetch (waterfall: oa_url → unpaywall
+  # → arxiv → s2 fallback → arxiv-by-title → abstract). On a paper with
+  # weak OA coverage the waterfall can spend 20-40s per ref before
+  # falling through to abstract_only — wasted time when the paper has
+  # no full text available. 10s catches the vast majority of refs that
+  # WILL find OA (95% complete in <5s in our profile) and short-circuits
+  # the doomed ones. Set higher to favor recall over latency.
+  per_ref_fetch_timeout_s: 10
 
 # Agentic verification mode (rule-based triage + focused agents for ambiguous cases)
 agentic:
@@ -123,7 +131,14 @@ agentic:
     # 26.9% baseline at 95.8% precision. See claim_3class_v3.txt for the
     # framing rationale.
     prompt_variant: "v3"
-    enable_multiquery: true         # decompose claim + retrieve per sub-claim at pre-retrieval
+    # Multi-query expands each citing sentence into N+1 retrievals (full
+    # claim + N LLM-decomposed sub-claims). Adds one decompose LLM call
+    # per citation (~1.5s) plus a wider rerank pool. A/B on paper1 (58
+    # refs, 62 substantive citations) showed +3 SUPPORTS recall vs 0
+    # SUPPORTS recall but +155s wall (-39% with it off). Default off
+    # because the wall cost dominates for most users; flip on if you
+    # need the recall on compound / quantitative citing sentences.
+    enable_multiquery: false
     multiquery:
       n_sub_claims: 2               # number of sub-claims to decompose into
       full_top_k: 3                 # passages retrieved for the full claim

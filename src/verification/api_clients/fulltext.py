@@ -171,10 +171,54 @@ async def get_full_text(
     cache: APICache,
     user_pdf_path: Optional[str] = None,
 ) -> FullTextResult:
-    """Retrieve full text of a cited paper via waterfall strategy.
+    """Retrieve full text with a per-ref wall-time budget.
+
+    Wraps the underlying waterfall in :func:`asyncio.wait_for` so a
+    single ref can't burn more than ``comprehension.per_ref_fetch_timeout_s``
+    seconds. On timeout we abandon any in-flight downloads and return an
+    abstract-only result — the user-visible signal that the OA path took
+    too long, plus a ``fetch_budget`` attempt entry for the audit trail.
+    A timed-out result is NOT cached; the next run gets a fresh chance
+    in case the slowness was transient (network, slow OA mirror).
+    """
+    timeout_s = float(
+        config.comprehension().get("per_ref_fetch_timeout_s", 10)
+    )
+    try:
+        return await asyncio.wait_for(
+            _run_waterfall(existence_result, client, cache, user_pdf_path),
+            timeout=timeout_s,
+        )
+    except asyncio.TimeoutError:
+        log.warning(
+            "get_full_text: ref_id=%s exceeded %.0fs fetch budget; "
+            "returning abstract_only.",
+            existence_result.ref_id, timeout_s,
+        )
+        return FullTextResult(
+            source="abstract_only",
+            abstract=existence_result.abstract,
+            attempts=[FetchAttempt(
+                source="fetch_budget",
+                status="timeout",
+                detail=f"per_ref_fetch_timeout_s={timeout_s:g}",
+            )],
+        )
+
+
+async def _run_waterfall(
+    existence_result: ExistenceResult,
+    client: httpx.AsyncClient,
+    cache: APICache,
+    user_pdf_path: Optional[str] = None,
+) -> FullTextResult:
+    """Underlying waterfall: user_pdf → oa_url → unpaywall → arxiv →
+    s2_fallback → arxiv_fallback → abstract_only.
 
     Uses information from L2 ExistenceResult (oa_url, doi, arxiv_id,
-    abstract) to avoid redundant API lookups.
+    abstract) to avoid redundant API lookups. Wrapped by
+    :func:`get_full_text` for the per-ref budget; tests can call this
+    directly to bypass the timeout layer.
 
     Args:
         existence_result: L2 result for this reference (contains oa_url, doi, etc.)

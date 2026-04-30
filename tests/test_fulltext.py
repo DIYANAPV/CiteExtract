@@ -293,3 +293,59 @@ class TestGrobidConcurrency:
         assert call_count == 1, (
             f"health probe ran {call_count} times — lock is not serializing first-callers"
         )
+
+
+class TestPerRefFetchBudget:
+    """The per-ref fetch budget short-circuits a slow waterfall so a single
+    ref can't burn arbitrary time. Configurable via
+    ``comprehension.per_ref_fetch_timeout_s`` (default 10s)."""
+
+    def test_timeout_returns_abstract_only_with_budget_attempt(self):
+        from src.verification.api_clients import fulltext as ft
+
+        async def _slow_waterfall(*args, **kwargs):
+            # Hang well past the test's tiny budget. wait_for cancels us.
+            await asyncio.sleep(5)
+            raise AssertionError("waterfall should have been cancelled")
+
+        er = _make_existence(abstract="Abstract text of the paper.")
+
+        # Override the waterfall + the config-driven budget to a very small
+        # value so the test runs fast. Both patches scoped to this case.
+        with patch.object(ft, "_run_waterfall", side_effect=_slow_waterfall), \
+             patch("src.config.comprehension",
+                   return_value={"per_ref_fetch_timeout_s": 0.05}):
+            client = MagicMock()
+            cache = _make_cache()
+            result = _run(get_full_text(er, client, cache))
+
+        assert result.source == "abstract_only"
+        assert result.abstract == "Abstract text of the paper."
+        assert any(
+            a.source == "fetch_budget" and a.status == "timeout"
+            for a in (result.attempts or [])
+        ), "expected a fetch_budget timeout attempt entry on the result"
+
+    def test_fast_path_returns_underlying_result_unchanged(self):
+        """When the waterfall finishes within budget, get_full_text should
+        return its result verbatim — the wrapper is invisible on the
+        success path."""
+        from src.verification.api_clients import fulltext as ft
+
+        expected = FullTextResult(
+            source="oa_url",
+            full_text="The full body text.",
+            abstract="abstract",
+        )
+
+        async def _quick_waterfall(*args, **kwargs):
+            return expected
+
+        er = _make_existence()
+
+        with patch.object(ft, "_run_waterfall", side_effect=_quick_waterfall):
+            client = MagicMock()
+            cache = _make_cache()
+            result = _run(get_full_text(er, client, cache))
+
+        assert result is expected
