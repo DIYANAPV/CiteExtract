@@ -1,51 +1,21 @@
 """Open-weight model benchmark runner — semantic + metadata.
 
-Self-contained, single-process runner using HuggingFace ``transformers``
-to load a model directly and run the benchmark inline. No server, no
-HTTP, no Ollama, no port juggling — just one Python invocation.
+Self-contained, single-process runner using HuggingFace ``transformers``.
+Designed for a SLURM/GPU compute node. Reads JSONLs from
+``experiment/paper/data/`` and writes per-cell CSVs to
+``experiment/paper/results/``, matching the OpenAI runners' schemas so
+the aggregators pick them up uniformly.
 
-Designed to run on a SLURM/GPU compute node with the model weights
-loaded onto the GPU. Reads bundled benchmark JSONLs from
-``experiment/openweight/data/`` (no scp needed). Writes per-cell CSVs
-into ``experiment/results/`` matching the schema used by
-``experiment/semantic_table/make_table.py`` and
-``experiment/metadata_table/make_table.py`` so the laptop-side
-aggregator picks them up directly.
+CLI:
+    python -m experiment.paper.openweight.runner --model Qwen/Qwen3-8B --task semantic --smoke
+    python -m experiment.paper.openweight.runner --model Qwen/Qwen3-8B --task semantic --full
+    python -m experiment.paper.openweight.runner --model Qwen/Qwen3-8B --task metadata --full
+    python -m experiment.paper.openweight.runner --model meta-llama/Llama-3.1-8B-Instruct --task semantic --full
+    # Llama is gated: huggingface-cli login first.
 
-Tasks
------
-
-    --task semantic   3 conditions × 1 model:
-                      title_only, title_abstract, title_abstract_passages
-
-    --task metadata   1 condition × 1 model:
-                      llm_only (open-weight models lack a native web
-                      search tool; that column stays OpenAI-only)
-
-CLI
----
-
-    # smoke (10 instances per cell)
-    python -m experiment.openweight.runner --model Qwen/Qwen3-8B --task semantic --smoke
-    python -m experiment.openweight.runner --model Qwen/Qwen3-8B --task metadata --smoke
-
-    # full
-    python -m experiment.openweight.runner --model Qwen/Qwen3-8B --task semantic --full
-    python -m experiment.openweight.runner --model Qwen/Qwen3-8B --task metadata --full
-
-    # llama (gated — set HF_TOKEN first or run huggingface-cli login)
-    python -m experiment.openweight.runner --model meta-llama/Llama-3.1-8B-Instruct --task semantic --full
-
-Notes
------
-
-* Model loads once at startup and stays resident on the GPU. fp16
-  by default (~16 GB VRAM for an 8B-class model — fits 24 GB).
-* Generation is greedy (temperature=0) so results are deterministic.
-* For Qwen 3 models, thinking mode is suppressed via the chat
-  template's ``enable_thinking=False`` parameter, with a /no_think
-  prefix and a ``<think>...</think>`` parser-side scrub as fallbacks
-  for older transformers versions that don't expose the kwarg.
+Generation is greedy (deterministic). Qwen 3 thinking mode is suppressed
+three ways: ``enable_thinking=False`` chat-template kwarg, a ``/no_think``
+user-message prefix, and a ``<think>...</think>`` parser scrub.
 """
 
 from __future__ import annotations
@@ -55,7 +25,6 @@ import asyncio
 import csv
 import json
 import logging
-import os
 import random
 import sys
 import time
@@ -63,32 +32,16 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 
 THIS_FILE = Path(__file__).resolve()
-REPO_ROOT = THIS_FILE.parent.parent.parent
+PAPER_ROOT = THIS_FILE.parent.parent
+REPO_ROOT = PAPER_ROOT.parent.parent
 
-PROMPTS_DIR = THIS_FILE.parent / "prompts"
-DATA_DIR = THIS_FILE.parent / "data"
-RESULTS_DIR = REPO_ROOT / "experiment" / "results"
+PROMPTS_DIR = PAPER_ROOT / "prompts"
+DATA_DIR = PAPER_ROOT / "data"
+RESULTS_DIR = PAPER_ROOT / "results"
 
-# Benchmark JSONLs are bundled with this folder so the whole open-weight
-# experiment is self-carrying after a fresh ``git clone`` — no scp needed.
-# Fall back to the laptop's authoritative paths if running from a checkout
-# that didn't include the bundle yet.
-_LAPTOP_SEMANTIC = REPO_ROOT / "experiment" / "baselines" / "benchmark_data" / "benchmark_enriched.jsonl"
-_LAPTOP_METADATA = REPO_ROOT / "data" / "metadata_benchmark.jsonl"
-SEMANTIC_DATA = (
-    DATA_DIR / "benchmark_enriched.jsonl"
-    if (DATA_DIR / "benchmark_enriched.jsonl").exists()
-    else _LAPTOP_SEMANTIC
-)
-METADATA_DATA = (
-    DATA_DIR / "metadata_benchmark.jsonl"
-    if (DATA_DIR / "metadata_benchmark.jsonl").exists()
-    else _LAPTOP_METADATA
-)
+SEMANTIC_DATA = DATA_DIR / "benchmark_semantic.jsonl"
+METADATA_DATA = DATA_DIR / "benchmark_metadata.jsonl"
 
-# Schema mirrors experiment/semantic_table/runner.py and
-# experiment/metadata_table/runner.py so the existing make_table.py
-# aggregators pick these CSVs up without modification.
 CSV_COLUMNS_SEMANTIC = [
     "instance_id", "source", "gold_label", "predicted_verdict", "raw_verdict",
     "explanation", "evidence_quote", "raw_response",
@@ -166,28 +119,17 @@ class CallResult:
     error: str | None = None
 
 
-# ── transformers client ──────────────────────────────────────────────
-
-
 class TransformersClient:
-    """Loads a HuggingFace model and runs greedy generation in-process.
-
-    Model + tokenizer load once at construction and stay resident on the
-    GPU. ``call()`` is async-compatible (wraps the sync generate call in
-    a thread) so the existing async runner code is unchanged.
-    """
+    """Loads a HuggingFace model and runs greedy generation in-process."""
 
     def __init__(self, model_id: str, dtype: str = "auto"):
-        # Imports inside to keep module-level import cheap (and to surface
-        # any heavy-deps install error at construction with a clearer
-        # message than at random pre-flight time).
         try:
             import torch
             from transformers import AutoModelForCausalLM, AutoTokenizer
         except ImportError as e:
             raise RuntimeError(
                 "transformers / torch are required. Install with:\n"
-                "  pip install -r experiment/openweight/requirements.txt"
+                "  pip install -r experiment/paper/openweight/requirements.txt"
             ) from e
 
         self.model_id = model_id
@@ -197,11 +139,6 @@ class TransformersClient:
         log.info(f"loading tokenizer {model_id}")
         self.tokenizer = AutoTokenizer.from_pretrained(model_id, trust_remote_code=True)
 
-        # Resolve dtype:
-        #   "auto"  → let transformers pick (usually bfloat16/float16 if the
-        #             checkpoint defines it; falls back to float32 otherwise)
-        #   "bf16"  → torch.bfloat16
-        #   "fp16"  → torch.float16
         torch_dtype = "auto"
         if dtype == "bf16":
             torch_dtype = torch.bfloat16
@@ -210,8 +147,7 @@ class TransformersClient:
         elif dtype != "auto":
             raise ValueError(f"unsupported dtype: {dtype} (use auto / bf16 / fp16)")
 
-        log.info(f"loading model weights ({dtype}); this can take 1-5 min on first run "
-                 "(also downloads from HuggingFace if not cached)")
+        log.info(f"loading model weights ({dtype}); first run downloads from HuggingFace")
         t0 = time.perf_counter()
         self.model = AutoModelForCausalLM.from_pretrained(
             model_id,
@@ -224,38 +160,25 @@ class TransformersClient:
                  f"device={next(self.model.parameters()).device}; "
                  f"dtype={next(self.model.parameters()).dtype}")
 
-        # Some models don't define a pad token; use eos as the pad to keep
-        # generate() happy.
         if self.tokenizer.pad_token_id is None:
             self.tokenizer.pad_token_id = self.tokenizer.eos_token_id
 
         self._torch = torch
 
     def _format_prompt(self, system: str, user: str) -> str:
-        """Apply the model's chat template with role messages.
-
-        For Qwen 3 we pass ``enable_thinking=False`` to suppress the
-        ``<think>...</think>`` chain-of-thought wrap. Older transformers
-        without the Qwen-3-aware template will quietly ignore the kwarg
-        — the parser also strips ``<think>...</think>`` blocks as a
-        safety net.
-        """
         messages = [
             {"role": "system", "content": system},
             {"role": "user", "content": user},
         ]
-        template_kwargs = {
-            "tokenize": False,
-            "add_generation_prompt": True,
-        }
+        kwargs = {"tokenize": False, "add_generation_prompt": True}
         if self.is_qwen3:
-            template_kwargs["enable_thinking"] = False
+            kwargs["enable_thinking"] = False
         try:
-            return self.tokenizer.apply_chat_template(messages, **template_kwargs)
+            return self.tokenizer.apply_chat_template(messages, **kwargs)
         except TypeError:
-            # Older tokenizers don't accept enable_thinking — drop it and retry.
-            template_kwargs.pop("enable_thinking", None)
-            return self.tokenizer.apply_chat_template(messages, **template_kwargs)
+            # Older tokenizers reject enable_thinking; drop it and retry.
+            kwargs.pop("enable_thinking", None)
+            return self.tokenizer.apply_chat_template(messages, **kwargs)
 
     def _generate_sync(self, system: str, user: str, max_tokens: int) -> CallResult:
         prompt = self._format_prompt(system, user)
@@ -280,15 +203,14 @@ class TransformersClient:
         return CallResult(text, prompt_tok, out_tok, latency)
 
     async def call(self, system: str, user: str, max_tokens: int = 512,
-                   want_json: bool = True) -> CallResult:
-        # `want_json` is unused — transformers has no native JSON mode.
-        # The prompt itself instructs JSON output; our parser tolerates
-        # fences / extra prose / stray <think> blocks.
+                   _want_json: bool = True) -> CallResult:
+        # ``_want_json`` matches the OpenAI/Gemini client signatures for
+        # drop-in compatibility but has no effect — transformers has no
+        # native JSON mode. The prompt itself enforces JSON output, and
+        # the parser tolerates fences / leaked <think> blocks.
         return await asyncio.to_thread(self._generate_sync, system, user, max_tokens)
 
     def aclose(self) -> None:
-        # Free GPU memory at the end of the run (mostly for tidiness;
-        # the SLURM allocation will reclaim it anyway).
         try:
             del self.model
             del self.tokenizer
@@ -299,9 +221,6 @@ class TransformersClient:
 
 def _is_qwen3(model_id: str) -> bool:
     return "qwen3" in model_id.lower()
-
-
-# ── prompt + parsing ──────────────────────────────────────────────────
 
 
 def _load_prompt(name: str) -> str:
@@ -318,8 +237,7 @@ def build_user_message_semantic(record: dict, condition: str, *, qwen3: bool) ->
     title = (record.get("cited_paper_title") or "").strip()
     parts: list[str] = []
     if qwen3:
-        # Belt-and-suspenders alongside the chat template's enable_thinking=False:
-        # /no_think is the user-message-level Qwen 3 control for thinking mode.
+        # Belt-and-suspenders alongside the chat template's enable_thinking=False.
         parts.append("/no_think")
     parts.append(f'Citing sentence: "{citing}"')
     parts.append(f"Cited paper title: {title}")
@@ -367,7 +285,7 @@ def build_user_message_metadata(record: dict, *, qwen3: bool) -> str:
 
 
 def parse_semantic(raw: str) -> tuple[str, str, str, str, str | None]:
-    """Returns (verdict_VALID_or_MISREPRESENTED, raw_verdict, reasoning, evidence, error)."""
+    """Returns (mapped_verdict, raw_verdict, reasoning, evidence, error)."""
     verdict, reason, evidence, err = _parse_two_class(
         raw, ("SUPPORTED", "NOT_SUPPORTED"), evidence_key="evidence_quote",
     )
@@ -378,7 +296,7 @@ def parse_semantic(raw: str) -> tuple[str, str, str, str, str | None]:
 
 
 def parse_metadata(raw: str) -> tuple[str, str, str, str, str | None]:
-    """Returns (verdict_valid_or_fabricated, raw_verdict, reasoning, confidence, error)."""
+    """Returns (verdict, raw_verdict, reasoning, confidence, error)."""
     verdict, reason, conf, err = _parse_two_class(
         raw, ("valid", "fabricated"), evidence_key="confidence",
     )
@@ -394,8 +312,7 @@ def _parse_two_class(
     if not raw:
         return ("", "", "", "empty_response")
     s = raw
-    # Strip any <think>...</think> chain-of-thought blocks from Qwen 3
-    # that leak past the chat-template's enable_thinking=False.
+    # Strip Qwen 3 <think>...</think> blocks that leak past enable_thinking=False.
     if "<think>" in s:
         end = s.find("</think>")
         if end >= 0:
@@ -409,7 +326,6 @@ def _parse_two_class(
     try:
         data = json.loads(s)
     except json.JSONDecodeError:
-        # Last-ditch: extract the largest balanced JSON object substring.
         start, end = s.find("{"), s.rfind("}")
         if 0 <= start < end:
             try:
@@ -438,15 +354,9 @@ def _parse_two_class(
     )
 
 
-# ── data loading ──────────────────────────────────────────────────────
-
-
 def load_semantic_records() -> list[dict]:
     if not SEMANTIC_DATA.exists():
-        raise FileNotFoundError(
-            f"{SEMANTIC_DATA} not found. The bundled JSONL should ship with the "
-            "repo at experiment/openweight/data/."
-        )
+        raise FileNotFoundError(SEMANTIC_DATA)
     out: list[dict] = []
     with open(SEMANTIC_DATA, encoding="utf-8") as f:
         for line in f:
@@ -458,10 +368,7 @@ def load_semantic_records() -> list[dict]:
 
 def load_metadata_records() -> list[dict]:
     if not METADATA_DATA.exists():
-        raise FileNotFoundError(
-            f"{METADATA_DATA} not found. The bundled JSONL should ship with the "
-            "repo at experiment/openweight/data/."
-        )
+        raise FileNotFoundError(METADATA_DATA)
     return [json.loads(l) for l in open(METADATA_DATA, encoding="utf-8")]
 
 
@@ -498,12 +405,8 @@ def stratified_sample(records: list[dict], n: int, seed: int,
     return picked
 
 
-# ── output paths + resume ─────────────────────────────────────────────
-
-
 def _safe_model_name(model: str) -> str:
-    """Filesystem-safe model id: drops org prefix, swaps colon/slash for dash."""
-    # Use the trailing component (after last "/") so "Qwen/Qwen3-8B" → "Qwen3-8B"
+    # "Qwen/Qwen3-8B" → "Qwen3-8B"
     base = model.rsplit("/", 1)[-1]
     return base.replace(":", "-").replace("/", "_")
 
@@ -564,9 +467,6 @@ def _write_csv(p: Path, rows, columns: list[str]) -> None:
             w.writerow(asdict(r))
 
 
-# ── cell runners ──────────────────────────────────────────────────────
-
-
 _PARSE_RETRY_SUFFIX = (
     "\n\nReturn ONLY a single JSON object matching the schema in the system "
     "prompt. No prose, no fences, no commentary."
@@ -592,8 +492,7 @@ async def run_semantic_cell(client: TransformersClient, condition: str,
     qwen3 = _is_qwen3(client.model_id)
     t0 = time.perf_counter()
 
-    # Sequential — generation is GPU-bound and one model instance can't
-    # truly parallelize without batched generate(), which we keep simple.
+    # Sequential: generation is GPU-bound; one model instance can't usefully parallelize.
     for i, rec in enumerate(todo, start=1):
         user = build_user_message_semantic(rec, condition, qwen3=qwen3)
         res = await client.call(system, user, max_tokens=512)
@@ -701,9 +600,6 @@ async def run_metadata_cell(client: TransformersClient, records: list[dict],
     return rows
 
 
-# ── cell summary ──────────────────────────────────────────────────────
-
-
 def cell_summary_semantic(rows: list[SemanticRow]) -> dict:
     if not rows:
         return {"n": 0}
@@ -732,9 +628,6 @@ def cell_summary_metadata(rows: list[MetadataRow]) -> dict:
     return {"n": len(rows), "accuracy": correct / len(rows),
             "fab_precision": p, "fab_recall": r_, "fab_f1": f1,
             "errors": err, "total_latency_seconds": round(lat, 1)}
-
-
-# ── CLI ───────────────────────────────────────────────────────────────
 
 
 def parse_args() -> argparse.Namespace:

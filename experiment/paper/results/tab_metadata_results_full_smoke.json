@@ -1,0 +1,52 @@
+{
+  "gpt-4o-mini__llm_only": {
+    "n": 10,
+    "accuracy": 0.5,
+    "fab_precision": 0.5,
+    "fab_recall": 0.2,
+    "fab_f1": 0.28571428571428575,
+    "errors": 0,
+    "total_cost_usd": 0.0011,
+    "avg_searches_per_ref": 0.0
+  },
+  "gpt-4o-mini__llm_with_search": {
+    "n": 10,
+    "accuracy": 0.8,
+    "fab_precision": 1.0,
+    "fab_recall": 0.6,
+    "fab_f1": 0.7499999999999999,
+    "errors": 0,
+    "total_cost_usd": 0.4547,
+    "avg_searches_per_ref": 1.8
+  },
+  "gpt-4o__llm_only": {
+    "n": 10,
+    "accuracy": 0.6,
+    "fab_precision": 0.6,
+    "fab_recall": 0.6,
+    "fab_f1": 0.6,
+    "errors": 0,
+    "total_cost_usd": 0.0209,
+    "avg_searches_per_ref": 0.0
+  },
+  "gpt-4o__llm_with_search": {
+    "n": 10,
+    "accuracy": 0.9,
+    "fab_precision": 1.0,
+    "fab_recall": 0.8,
+    "fab_f1": 0.888888888888889,
+    "errors": 0,
+    "total_cost_usd": 0.2877,
+    "avg_searches_per_ref": 1.0
+  },
+  "our_system__production": {
+    "n": 10,
+    "accuracy": 1.0,
+    "fab_precision": 1.0,
+    "fab_recall": 1.0,
+    "fab_f1": 1.0,
+    "errors": 0,
+    "total_cost_usd": 0.0132,
+    "avg_searches_per_ref": 0.0
+  }
+}

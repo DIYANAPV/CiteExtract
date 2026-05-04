@@ -1,0 +1,122 @@
+{
+  "gpt-4o-mini__title_only": {
+    "n": 741,
+    "accuracy": 0.7273954116059379,
+    "macro_f1": 0.6974850037995763,
+    "valid": {
+      "precision": 0.9234449760765551,
+      "recall": 0.6942446043165468,
+      "f1": 0.7926078028747433,
+      "support": 556
+    },
+    "misrep": {
+      "precision": 0.47368421052631576,
+      "recall": 0.827027027027027,
+      "f1": 0.6023622047244094,
+      "support": 185
+    },
+    "errors": 0,
+    "total_cost_usd": 0.1674,
+    "total_latency_seconds": 1556.2
+  },
+  "gpt-4o-mini__title_abstract": {
+    "n": 741,
+    "accuracy": 0.7139001349527665,
+    "macro_f1": 0.6806813562078218,
+    "valid": {
+      "precision": 0.9056603773584906,
+      "recall": 0.6906474820143885,
+      "f1": 0.7836734693877552,
+      "support": 556
+    },
+    "misrep": {
+      "precision": 0.45741324921135645,
+      "recall": 0.7837837837837838,
+      "f1": 0.5776892430278884,
+      "support": 185
+    },
+    "errors": 0,
+    "total_cost_usd": 0.1882,
+    "total_latency_seconds": 1529.3
+  },
+  "gpt-4o-mini__title_abstract_passages": {
+    "n": 741,
+    "accuracy": 0.8380566801619433,
+    "macro_f1": 0.7781747061288842,
+    "valid": {
+      "precision": 0.8824561403508772,
+      "recall": 0.9046762589928058,
+      "f1": 0.8934280639431617,
+      "support": 556
+    },
+    "misrep": {
+      "precision": 0.6900584795321637,
+      "recall": 0.6378378378378379,
+      "f1": 0.6629213483146067,
+      "support": 185
+    },
+    "errors": 0,
+    "total_cost_usd": 0.2475,
+    "total_latency_seconds": 1829.7
+  },
+  "gpt-4o__title_only": {
+    "n": 741,
+    "accuracy": 0.8043184885290149,
+    "macro_f1": 0.7393256845900223,
+    "valid": {
+      "precision": 0.8702702702702703,
+      "recall": 0.8687050359712231,
+      "f1": 0.8694869486948694,
+      "support": 556
+    },
+    "misrep": {
+      "precision": 0.6075268817204301,
+      "recall": 0.6108108108108108,
+      "f1": 0.6091644204851753,
+      "support": 185
+    },
+    "errors": 0,
+    "total_cost_usd": 2.8305,
+    "total_latency_seconds": 972.7
+  },
+  "gpt-4o__title_abstract": {
+    "n": 741,
+    "accuracy": 0.7800269905533064,
+    "macro_f1": 0.731882304627235,
+    "valid": {
+      "precision": 0.8937875751503006,
+      "recall": 0.802158273381295,
+      "f1": 0.8454976303317535,
+      "support": 556
+    },
+    "misrep": {
+      "precision": 0.5454545454545454,
+      "recall": 0.7135135135135136,
+      "f1": 0.6182669789227165,
+      "support": 185
+    },
+    "errors": 0,
+    "total_cost_usd": 3.1805,
+    "total_latency_seconds": 1068.2
+  },
+  "gpt-4o__title_abstract_passages": {
+    "n": 741,
+    "accuracy": 0.8502024291497976,
+    "macro_f1": 0.7886018592529577,
+    "valid": {
+      "precision": 0.8803418803418803,
+      "recall": 0.9262589928057554,
+      "f1": 0.9027169149868537,
+      "support": 556
+    },
+    "misrep": {
+      "precision": 0.7371794871794872,
+      "recall": 0.6216216216216216,
+      "f1": 0.6744868035190617,
+      "support": 185
+    },
+    "errors": 0,
+    "total_cost_usd": 4.1919,
+    "total_latency_seconds": 1149.1
+  }
+}

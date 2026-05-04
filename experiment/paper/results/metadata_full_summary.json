@@ -1,0 +1,13 @@
+{
+  "our_system__production": {
+    "n": 302,
+    "accuracy": 0.9635761589403974,
+    "fab_precision": 0.9605263157894737,
+    "fab_recall": 0.9668874172185431,
+    "fab_f1": 0.9636963696369637,
+    "errors": 0,
+    "total_cost_usd": 0.0817,
+    "total_latency_seconds": 1197.0,
+    "avg_searches_per_ref": 0.0
+  }
+}

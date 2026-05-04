@@ -1,0 +1,1511 @@
+instance_id,source,gold_label,predicted_verdict,raw_verdict,explanation,confidence,raw_response,prompt_tokens,completion_tokens,cost_usd,latency_seconds,n_search_invocations,search_queries,triage_route,metadata_agent_called,db_source_matched,error
+0,neurips,fabricated,valid,valid,"The reference matches a real paper with the given title, authors, year, and DOI. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a real paper with the given title, authors, year, and DOI. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated."",
+  ""confidence"": ""high""
+}",505,62,0.0,2.711,0,,,False,,
+1,s2_real,valid,valid,valid,"The reference has a valid DOI and a plausible venue and year combination. The authors' names match the ones in the raw reference string, and the title is consistent with the raw reference string.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference has a valid DOI and a plausible venue and year combination. The authors' names match the ones in the raw reference string, and the title is consistent with the raw reference string."",
+  ""confidence"": ""high""
+}",618,61,0.0,1.779,0,,,False,,
+2,s2_real,valid,valid,valid,"The reference has a valid title, author, and venue, and the year is plausible. However, the lack of a DOI and arXiv ID makes it difficult to verify the paper's existence, but the provided information is consistent and suggests a real paper.",low,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference has a valid title, author, and venue, and the year is plausible. However, the lack of a DOI and arXiv ID makes it difficult to verify the paper's existence, but the provided information is consistent and suggests a real paper."",
+  ""confidence"": ""low""
+}",458,75,0.0,2.128,0,,,False,,
+3,neurips,fabricated,valid,valid,"The reference matches the provided raw string, and the authors, year, and venue are consistent. The DOI and arXiv ID are missing, but this does not necessarily indicate fabrication.",low,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided raw string, and the authors, year, and venue are consistent. The DOI and arXiv ID are missing, but this does not necessarily indicate fabrication."",
+  ""confidence"": ""low""
+}",466,60,0.0,1.726,0,,,False,,
+4,s2_real,valid,fabricated,fabricated,"The reference is missing a venue and DOI, which are common identifiers for academic papers. Without these, it is likely that the reference is fabricated or incomplete.",high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The reference is missing a venue and DOI, which are common identifiers for academic papers. Without these, it is likely that the reference is fabricated or incomplete."",
+  ""confidence"": ""high""
+}",439,55,0.0,1.587,0,,,False,,
+5,s2_real,valid,valid,valid,"The reference matches a real paper with the given title, authors, and year, and the venue is a plausible academic journal. The DOI is also valid and resolves to the correct paper.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a real paper with the given title, authors, and year, and the venue is a plausible academic journal. The DOI is also valid and resolves to the correct paper."",
+  ""confidence"": ""high""
+}",536,60,0.0,1.745,0,,,False,,
+6,s2_real,valid,valid,valid,"The title and author match a known paper, and the year is plausible. Without a venue or identifiers, it's impossible to verify the paper's existence, but the provided information is consistent with a real paper.",low,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title and author match a known paper, and the year is plausible. Without a venue or identifiers, it's impossible to verify the paper's existence, but the provided information is consistent with a real paper."",
+  ""confidence"": ""low""
+}",454,65,0.0,1.858,0,,,False,,
+7,s2_real,valid,valid,valid,"The reference matches the provided BibTeX string, which suggests it is a real paper. The DOI is also valid and points to a real paper.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided BibTeX string, which suggests it is a real paper. The DOI is also valid and points to a real paper."",
+  ""confidence"": ""high""
+}",532,52,0.0,1.527,0,,,False,,
+8,iclr2026,fabricated,valid,valid,"The title, authors, and arXiv ID match the arXiv preprint, and the year is plausible for a 2023 paper. The DOI is missing, but this is not uncommon for arXiv preprints.",medium,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, and arXiv ID match the arXiv preprint, and the year is plausible for a 2023 paper. The DOI is missing, but this is not uncommon for arXiv preprints."",
+  ""confidence"": ""medium""
+}",465,70,0.0,1.995,0,,,False,,
+9,s2_real,valid,valid,valid,"The reference has a valid DOI and a consistent author list, and the title and venue match the raw reference string. The year and venue combination is plausible for a scientific journal.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference has a valid DOI and a consistent author list, and the title and venue match the raw reference string. The year and venue combination is plausible for a scientific journal."",
+  ""confidence"": ""high""
+}",607,58,0.0,1.696,0,,,False,,
+10,neurips,fabricated,valid,valid,"The reference matches a real paper with the given arXiv ID, and the authors and year are consistent with the paper's metadata.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a real paper with the given arXiv ID, and the authors and year are consistent with the paper's metadata."",
+  ""confidence"": ""high""
+}",502,50,0.0,1.453,0,,,False,,
+11,s2_real,valid,valid,valid,"The reference matches a real paper with the given title, authors, year, and DOI. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a real paper with the given title, authors, year, and DOI. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated."",
+  ""confidence"": ""high""
+}",517,62,0.0,1.797,0,,,False,,
+12,iclr2026,fabricated,valid,valid,"The title, authors, and venue match the raw reference string, and the year is plausible for the venue. The lack of DOI and arXiv ID does not necessarily indicate fabrication, as they may be missing from the raw reference.",low,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, and venue match the raw reference string, and the year is plausible for the venue. The lack of DOI and arXiv ID does not necessarily indicate fabrication, as they may be missing from the raw reference."",
+  ""confidence"": ""low""
+}",464,70,0.0,1.995,0,,,False,,
+13,s2_real,valid,fabricated,fabricated,"The DOI provided does not match any known paper, suggesting the reference is fabricated.",high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The DOI provided does not match any known paper, suggesting the reference is fabricated."",
+  ""confidence"": ""high""
+}",465,40,0.0,1.185,0,,,False,,
+14,s2_real,valid,fabricated,fabricated,"The reference is missing the venue and DOI, which are essential fields for a valid citation. Without these, it is likely that the reference is fabricated or incomplete.",high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The reference is missing the venue and DOI, which are essential fields for a valid citation. Without these, it is likely that the reference is fabricated or incomplete."",
+  ""confidence"": ""high""
+}",452,56,0.0,1.619,0,,,False,,
+15,neurips,fabricated,valid,valid,"The reference matches a real paper with the same title, authors, year, and arXiv ID, and the DOI resolves to the same paper. The venue is also consistent with the arXiv ID.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a real paper with the same title, authors, year, and arXiv ID, and the DOI resolves to the same paper. The venue is also consistent with the arXiv ID."",
+  ""confidence"": ""high""
+}",505,65,0.0,1.863,0,,,False,,
+16,iclr2026,fabricated,fabricated,fabricated,"The reference is fabricated because it lacks a DOI and arXiv ID, which are commonly used identifiers for academic papers. Additionally, I couldn't verify the existence of the paper through my knowledge, and the author's name seems unusual.",high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The reference is fabricated because it lacks a DOI and arXiv ID, which are commonly used identifiers for academic papers. Additionally, I couldn't verify the existence of the paper through my knowledge, and the author's name seems unusual."",
+  ""confidence"": ""high""
+}",448,71,0.0,2.024,0,,,False,,
+17,iclr2026,fabricated,valid,valid,"The reference matches the provided raw string, and the authors, year, and venue are consistent with the raw string. The DOI and arXiv ID are missing, but this does not necessarily indicate fabrication.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided raw string, and the authors, year, and venue are consistent with the raw string. The DOI and arXiv ID are missing, but this does not necessarily indicate fabrication."",
+  ""confidence"": ""high""
+}",529,64,0.0,1.867,0,,,False,,
+18,neurips,fabricated,valid,valid,"The title, authors, and arXiv ID match a known paper, and the year is plausible for the venue (arXiv).",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, and arXiv ID match a known paper, and the year is plausible for the venue (arXiv)."",
+  ""confidence"": ""high""
+}",477,52,0.0,1.522,0,,,False,,
+19,neurips,fabricated,valid,valid,"The reference matches the provided raw string, and the authors, year, and venue are consistent with the string. The DOI and arXiv ID are missing, but this is not sufficient to classify the reference as fabricated.",low,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided raw string, and the authors, year, and venue are consistent with the string. The DOI and arXiv ID are missing, but this is not sufficient to classify the reference as fabricated."",
+  ""confidence"": ""low""
+}",441,67,0.0,1.915,0,,,False,,
+20,s2_real,valid,valid,valid,"The reference matches a real paper with the given title, authors, and DOI. The venue and year combination is also plausible for the given journal.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a real paper with the given title, authors, and DOI. The venue and year combination is also plausible for the given journal."",
+  ""confidence"": ""high""
+}",503,52,0.0,1.514,0,,,False,,
+21,neurips,fabricated,valid,valid,"The reference matches the format of a typical academic paper and the authors, title, and venue are consistent with the information provided. The year is also plausible for the given venue. Without a DOI or arXiv ID, it's impossible to verify the paper's existence, but the provided information is consistent and suggests a real paper.",low,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the format of a typical academic paper and the authors, title, and venue are consistent with the information provided. The year is also plausible for the given venue. Without a DOI or arXiv ID, it's impossible to verify the paper's existence, but the provided information is consistent and suggests a real paper."",
+  ""confidence"": ""low""
+}",506,89,0.0,2.507,0,,,False,,
+22,neurips,fabricated,valid,valid,"The reference matches the provided raw string, and the authors, year, and venue are consistent with the information available. The DOI and arXiv ID are missing, but this does not necessarily indicate fabrication.",low,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided raw string, and the authors, year, and venue are consistent with the information available. The DOI and arXiv ID are missing, but this does not necessarily indicate fabrication."",
+  ""confidence"": ""low""
+}",468,64,0.0,1.834,0,,,False,,
+23,neurips,fabricated,valid,valid,"The title, authors, year, and venue match, and the DOI is valid. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, year, and venue match, and the DOI is valid. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated."",
+  ""confidence"": ""high""
+}",520,61,0.0,1.774,0,,,False,,
+24,s2_real,valid,valid,valid,"The reference matches a real paper with the given title, authors, and DOI, and the year and venue are consistent. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a real paper with the given title, authors, and DOI, and the year and venue are consistent. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated."",
+  ""confidence"": ""high""
+}",497,68,0.0,1.94,0,,,False,,
+25,s2_real,valid,valid,valid,"The reference has a valid DOI and matches a known paper. The arXiv ID is missing, but this is not uncommon for conference proceedings papers.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference has a valid DOI and matches a known paper. The arXiv ID is missing, but this is not uncommon for conference proceedings papers."",
+  ""confidence"": ""high""
+}",491,53,0.0,1.546,0,,,False,,
+26,neurips,fabricated,valid,valid,"The title, authors, and venue match a known paper, and the year is plausible for the venue. The lack of DOI and arXiv ID does not necessarily indicate fabrication, as they may be missing from the reference string.",medium,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, and venue match a known paper, and the year is plausible for the venue. The lack of DOI and arXiv ID does not necessarily indicate fabrication, as they may be missing from the reference string."",
+  ""confidence"": ""medium""
+}",453,69,0.0,1.968,0,,,False,,
+27,s2_real,valid,valid,valid,"The reference has a valid DOI and a matching title, authors, and year. The venue is also consistent with the DOI. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference has a valid DOI and a matching title, authors, and year. The venue is also consistent with the DOI. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated."",
+  ""confidence"": ""high""
+}",573,69,0.0,1.99,0,,,False,,
+28,s2_real,valid,fabricated,fabricated,"The DOI 10.5075/EPFL-THESIS-7941 is not a valid DOI for a journal or conference paper, it appears to be a thesis DOI from EPFL, and the arXiv ID is missing, which is unusual for a paper with a DOI.",high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The DOI 10.5075/EPFL-THESIS-7941 is not a valid DOI for a journal or conference paper, it appears to be a thesis DOI from EPFL, and the arXiv ID is missing, which is unusual for a paper with a DOI."",
+  ""confidence"": ""high""
+}",473,82,0.0,2.32,0,,,False,,
+29,iclr2026,fabricated,valid,valid,"The title, authors, year, and arXiv ID match, and the arXiv ID is a valid format. The reference string also matches the provided fields, suggesting it is a real paper.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, year, and arXiv ID match, and the arXiv ID is a valid format. The reference string also matches the provided fields, suggesting it is a real paper."",
+  ""confidence"": ""high""
+}",481,64,0.0,1.839,0,,,False,,
+30,iclr2026,fabricated,valid,valid,"The reference matches the format of a typical academic paper and the title, authors, and year are consistent with the provided raw reference string. The venue is a real journal, and the year is plausible for a paper published in that journal.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the format of a typical academic paper and the title, authors, and year are consistent with the provided raw reference string. The venue is a real journal, and the year is plausible for a paper published in that journal."",
+  ""confidence"": ""high""
+}",487,70,0.0,1.999,0,,,False,,
+31,s2_real,valid,valid,valid,The reference matches a real paper with a valid DOI and consistent information across the BibTeX entry and the provided fields.,high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a real paper with a valid DOI and consistent information across the BibTeX entry and the provided fields."",
+  ""confidence"": ""high""
+}",551,46,0.0,1.369,0,,,False,,
+32,s2_real,valid,valid,valid,"The reference matches a real paper with the given title, authors, and DOI. The venue and year combination is also plausible for the journal Epigenomics.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a real paper with the given title, authors, and DOI. The venue and year combination is also plausible for the journal Epigenomics."",
+  ""confidence"": ""high""
+}",522,54,0.0,1.584,0,,,False,,
+33,s2_real,valid,valid,valid,"The reference matches a real paper with the given title, authors, and DOI, and the venue and year combination is plausible. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a real paper with the given title, authors, and DOI, and the venue and year combination is plausible. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated."",
+  ""confidence"": ""high""
+}",533,69,0.0,1.988,0,,,False,,
+34,s2_real,valid,valid,valid,"The reference matches the provided raw BibTeX string, and the title, authors, and venue are consistent with the provided information. The DOI is also valid and points to a real paper.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided raw BibTeX string, and the title, authors, and venue are consistent with the provided information. The DOI is also valid and points to a real paper."",
+  ""confidence"": ""high""
+}",593,60,0.0,1.751,0,,,False,,
+35,s2_real,valid,valid,valid,"The reference matches a real paper with the given title, authors, and DOI. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a real paper with the given title, authors, and DOI. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated."",
+  ""confidence"": ""high""
+}",512,60,0.0,1.727,0,,,False,,
+36,s2_real,valid,valid,valid,"The title, authors, year, and venue match the raw reference string, and the DOI is valid. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, year, and venue match the raw reference string, and the DOI is valid. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated."",
+  ""confidence"": ""high""
+}",583,65,0.0,1.884,0,,,False,,
+37,s2_real,valid,valid,valid,"The reference matches a real paper with the given title, authors, and DOI, and the venue and year are consistent. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a real paper with the given title, authors, and DOI, and the venue and year are consistent. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated."",
+  ""confidence"": ""high""
+}",559,68,0.0,1.965,0,,,False,,
+38,s2_real,valid,valid,valid,"The reference has a valid DOI and matches a known paper, suggesting it is a real reference.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference has a valid DOI and matches a known paper, suggesting it is a real reference."",
+  ""confidence"": ""high""
+}",579,42,0.0,1.263,0,,,False,,
+39,neurips,fabricated,valid,valid,"The reference matches the provided raw string, and the authors, year, and venue are consistent with the information in the string. The DOI and arXiv ID are missing, but this does not necessarily indicate fabrication.",low,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided raw string, and the authors, year, and venue are consistent with the information in the string. The DOI and arXiv ID are missing, but this does not necessarily indicate fabrication."",
+  ""confidence"": ""low""
+}",458,66,0.0,1.889,0,,,False,,
+40,neurips,fabricated,fabricated,fabricated,"The arXiv ID arXiv:2401.XXXX is likely fabricated because arXiv IDs are typically in the format arXiv:YYYYMM.XXXXXX, where XXXXXX is a unique identifier. The given ID is missing the last 5 digits.",high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The arXiv ID arXiv:2401.XXXX is likely fabricated because arXiv IDs are typically in the format arXiv:YYYYMM.XXXXXX, where XXXXXX is a unique identifier. The given ID is missing the last 5 digits."",
+  ""confidence"": ""high""
+}",452,79,0.0,2.238,0,,,False,,
+41,neurips,fabricated,fabricated,fabricated,"The reference is fabricated because it lacks a DOI and arXiv ID, which are commonly used identifiers for academic papers. While the title and venue match a real paper, the lack of identifiers makes it difficult to verify the paper's existence.",high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The reference is fabricated because it lacks a DOI and arXiv ID, which are commonly used identifiers for academic papers. While the title and venue match a real paper, the lack of identifiers makes it difficult to verify the paper's existence."",
+  ""confidence"": ""high""
+}",437,72,0.0,2.049,0,,,False,,
+42,neurips,fabricated,valid,valid,"The reference matches the provided raw reference string, which suggests it is a real paper. The authors, title, year, and venue are consistent with the raw reference, and the DOI and arXiv ID are missing, which is not uncommon in citations.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided raw reference string, which suggests it is a real paper. The authors, title, year, and venue are consistent with the raw reference, and the DOI and arXiv ID are missing, which is not uncommon in citations."",
+  ""confidence"": ""high""
+}",547,74,0.0,2.128,0,,,False,,
+43,neurips,fabricated,valid,valid,"The reference matches the raw reference string, and the authors, year, and venue are consistent. The paper's existence is confirmed by the raw reference string.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the raw reference string, and the authors, year, and venue are consistent. The paper's existence is confirmed by the raw reference string."",
+  ""confidence"": ""high""
+}",484,54,0.0,1.567,0,,,False,,
+44,s2_real,valid,fabricated,fabricated,The DOI 10.1002/cem.3291/v2/response1 is likely fake because it contains a slash (/) which is not a standard part of a DOI. DOIs typically consist of a string of alphanumeric characters and hyphens.,high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The DOI 10.1002/cem.3291/v2/response1 is likely fake because it contains a slash (/) which is not a standard part of a DOI. DOIs typically consist of a string of alphanumeric characters and hyphens."",
+  ""confidence"": ""high""
+}",516,75,0.0,2.151,0,,,False,,
+45,neurips,fabricated,fabricated,fabricated,"The reference is fabricated because it lacks a DOI and arXiv ID, which are commonly used identifiers for academic papers. While this is not conclusive evidence of fabrication, the lack of these identifiers makes it difficult to verify the paper's existence.",medium,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The reference is fabricated because it lacks a DOI and arXiv ID, which are commonly used identifiers for academic papers. While this is not conclusive evidence of fabrication, the lack of these identifiers makes it difficult to verify the paper's existence."",
+  ""confidence"": ""medium""
+}",438,72,0.0,2.05,0,,,False,,
+46,neurips,fabricated,valid,valid,"The reference matches the format of a typical academic paper and the authors, year, and venue are consistent with the title. The lack of DOI and arXiv ID does not necessarily indicate fabrication, as not all papers have these identifiers.",low,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the format of a typical academic paper and the authors, year, and venue are consistent with the title. The lack of DOI and arXiv ID does not necessarily indicate fabrication, as not all papers have these identifiers."",
+  ""confidence"": ""low""
+}",474,70,0.0,1.997,0,,,False,,
+47,s2_real,valid,fabricated,fabricated,"The reference is missing a venue and DOI, which are common fields in academic citations. Additionally, the arXiv ID is missing, which is unusual for a paper from 2012.",high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The reference is missing a venue and DOI, which are common fields in academic citations. Additionally, the arXiv ID is missing, which is unusual for a paper from 2012."",
+  ""confidence"": ""high""
+}",535,62,0.0,1.808,0,,,False,,
+48,s2_real,valid,valid,valid,"The title, author, and arXiv ID match the provided raw reference string, and the year and venue are consistent with the arXiv ID. The DOI is missing, but this is not a reason to classify the reference as fabricated.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, author, and arXiv ID match the provided raw reference string, and the year and venue are consistent with the arXiv ID. The DOI is missing, but this is not a reason to classify the reference as fabricated."",
+  ""confidence"": ""high""
+}",495,72,0.0,2.05,0,,,False,,
+49,neurips,fabricated,valid,valid,"The title, authors, and venue match a real paper, and the year is plausible for the venue. Without a DOI or arXiv ID, we cannot verify the paper's existence, but the provided information is consistent and suggests a real paper.",low,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, and venue match a real paper, and the year is plausible for the venue. Without a DOI or arXiv ID, we cannot verify the paper's existence, but the provided information is consistent and suggests a real paper."",
+  ""confidence"": ""low""
+}",445,73,0.0,2.077,0,,,False,,
+50,s2_real,valid,valid,valid,"The reference has a valid DOI and a matching title, authors, and year, suggesting it is a real paper. The venue is also consistent with the journal name in the raw reference string.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference has a valid DOI and a matching title, authors, and year, suggesting it is a real paper. The venue is also consistent with the journal name in the raw reference string."",
+  ""confidence"": ""high""
+}",566,61,0.0,1.778,0,,,False,,
+51,s2_real,valid,valid,valid,"The reference matches a real paper with the given title, authors, and DOI, and the venue and year combination is plausible. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a real paper with the given title, authors, and DOI, and the venue and year combination is plausible. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated."",
+  ""confidence"": ""high""
+}",573,69,0.0,1.994,0,,,False,,
+52,s2_real,valid,valid,valid,"The reference has a valid title, authors, year, and venue, and the DOI appears to be a valid identifier for a paper in a journal that exists. The arXiv ID is missing, but this is not a requirement for a valid reference.",medium,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference has a valid title, authors, year, and venue, and the DOI appears to be a valid identifier for a paper in a journal that exists. The arXiv ID is missing, but this is not a requirement for a valid reference."",
+  ""confidence"": ""medium""
+}",562,74,0.0,2.129,0,,,False,,
+53,iclr2026,fabricated,fabricated,fabricated,"The reference is missing a venue and DOI, which are essential fields for a valid citation. The provided URL is also likely fake.",high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The reference is missing a venue and DOI, which are essential fields for a valid citation. The provided URL is also likely fake."",
+  ""confidence"": ""high""
+}",427,50,0.0,1.47,0,,,False,,
+54,s2_real,valid,fabricated,fabricated,"The DOI provided (10.1016/j.gaitpost.2018.11.008) suggests the paper was published in 2018, not 2019, which is inconsistent with the provided year.",high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The DOI provided (10.1016/j.gaitpost.2018.11.008) suggests the paper was published in 2018, not 2019, which is inconsistent with the provided year."",
+  ""confidence"": ""high""
+}",596,67,0.0,1.943,0,,,False,,
+55,s2_real,valid,valid,valid,"The reference matches a real paper with the given title, authors, and venue, and the DOI is valid. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a real paper with the given title, authors, and venue, and the DOI is valid. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated."",
+  ""confidence"": ""high""
+}",510,66,0.0,1.887,0,,,False,,
+56,s2_real,valid,valid,valid,"The reference matches a known paper with the same title, author, and venue, and the DOI is consistent with the expected format for a paper in this venue.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a known paper with the same title, author, and venue, and the DOI is consistent with the expected format for a paper in this venue."",
+  ""confidence"": ""high""
+}",499,55,0.0,1.594,0,,,False,,
+57,s2_real,valid,fabricated,fabricated,"The authors' names contain non-ASCII characters and are likely misspelled, and the reference string is in a format that suggests it was generated, not copied from a real source.",high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The authors' names contain non-ASCII characters and are likely misspelled, and the reference string is in a format that suggests it was generated, not copied from a real source."",
+  ""confidence"": ""high""
+}",536,61,0.0,1.776,0,,,False,,
+58,neurips,fabricated,valid,valid,"The reference matches the provided raw string, and the authors, year, and venue are consistent with the paper's content. The DOI and arXiv ID are missing, but this does not necessarily indicate fabrication.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided raw string, and the authors, year, and venue are consistent with the paper's content. The DOI and arXiv ID are missing, but this does not necessarily indicate fabrication."",
+  ""confidence"": ""high""
+}",524,65,0.0,1.884,0,,,False,,
+59,s2_real,valid,valid,valid,"The reference matches a real paper with the given title, authors, year, venue, and identifiers. The arXiv ID and DOI resolve to the same paper, and the authors and venue match the raw reference string.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a real paper with the given title, authors, year, venue, and identifiers. The arXiv ID and DOI resolve to the same paper, and the authors and venue match the raw reference string."",
+  ""confidence"": ""high""
+}",588,67,0.0,1.942,0,,,False,,
+60,s2_real,valid,valid,valid,"The reference has a valid DOI and matches a known paper, suggesting it is a real reference. The authors and title also match the provided BibTeX string.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference has a valid DOI and matches a known paper, suggesting it is a real reference. The authors and title also match the provided BibTeX string."",
+  ""confidence"": ""high""
+}",589,54,0.0,1.589,0,,,False,,
+61,s2_real,valid,valid,valid,"The reference matches a real paper with the given title, authors, and DOI. The venue and year combination is also plausible, and there is no indication that the arXiv ID is missing or fake.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a real paper with the given title, authors, and DOI. The venue and year combination is also plausible, and there is no indication that the arXiv ID is missing or fake."",
+  ""confidence"": ""high""
+}",573,64,0.0,1.859,0,,,False,,
+62,s2_real,valid,valid,valid,"The reference has a valid DOI and matches a known paper in the provided BibTeX string. The authors and title are consistent with the BibTeX string, and the year and venue are plausible for a paper in Polar Biology.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference has a valid DOI and matches a known paper in the provided BibTeX string. The authors and title are consistent with the BibTeX string, and the year and venue are plausible for a paper in Polar Biology."",
+  ""confidence"": ""high""
+}",523,67,0.0,1.937,0,,,False,,
+63,s2_real,valid,fabricated,fabricated,"The reference is missing a venue and DOI, which are common fields in academic citations. Without further information, it's difficult to verify the paper's existence or consistency.",low,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The reference is missing a venue and DOI, which are common fields in academic citations. Without further information, it's difficult to verify the paper's existence or consistency."",
+  ""confidence"": ""low""
+}",501,57,0.0,1.647,0,,,False,,
+64,iclr2026,fabricated,valid,valid,"The title, authors, and venue match a known paper, and the year is plausible for the venue. The lack of DOI and arXiv ID does not necessarily indicate fabrication, as they may be missing from the provided reference string.",medium,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, and venue match a known paper, and the year is plausible for the venue. The lack of DOI and arXiv ID does not necessarily indicate fabrication, as they may be missing from the provided reference string."",
+  ""confidence"": ""medium""
+}",481,70,0.0,1.996,0,,,False,,
+65,neurips,fabricated,valid,valid,"The title, authors, and year match the raw reference string, and the venue is a real academic journal. Without a DOI or arXiv ID, we cannot verify the paper's existence, but the provided information is consistent and suggests a real paper.",low,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, and year match the raw reference string, and the venue is a real academic journal. Without a DOI or arXiv ID, we cannot verify the paper's existence, but the provided information is consistent and suggests a real paper."",
+  ""confidence"": ""low""
+}",445,74,0.0,2.106,0,,,False,,
+66,neurips,fabricated,valid,valid,"The reference matches the provided raw string, and the authors, year, and venue are consistent with the string. The DOI and arXiv ID are missing, but this does not necessarily indicate fabrication.",low,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided raw string, and the authors, year, and venue are consistent with the string. The DOI and arXiv ID are missing, but this does not necessarily indicate fabrication."",
+  ""confidence"": ""low""
+}",481,63,0.0,1.809,0,,,False,,
+67,s2_real,valid,valid,valid,"The reference matches a real paper with the given title, authors, and arXiv ID. The venue and year are also consistent with the arXiv ID.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a real paper with the given title, authors, and arXiv ID. The venue and year are also consistent with the arXiv ID."",
+  ""confidence"": ""high""
+}",506,56,0.0,1.617,0,,,False,,
+68,neurips,fabricated,valid,valid,"The reference matches the provided raw string, and the authors, year, and venue are consistent with the string. The DOI and arXiv ID are missing, but this is not sufficient to classify the reference as fabricated.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided raw string, and the authors, year, and venue are consistent with the string. The DOI and arXiv ID are missing, but this is not sufficient to classify the reference as fabricated."",
+  ""confidence"": ""high""
+}",520,67,0.0,1.935,0,,,False,,
+69,neurips,fabricated,valid,valid,"The title, authors, and venue match a real paper, and the year is plausible for the venue. Without a DOI or arXiv ID, we cannot verify the paper's existence, but the provided information is consistent and suggests a real paper.",low,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, and venue match a real paper, and the year is plausible for the venue. Without a DOI or arXiv ID, we cannot verify the paper's existence, but the provided information is consistent and suggests a real paper."",
+  ""confidence"": ""low""
+}",466,73,0.0,2.079,0,,,False,,
+70,iclr2026,fabricated,valid,valid,"The title, authors, and arXiv ID match a known paper, and the year is plausible. The lack of a venue and DOI is not uncommon in preprints.",medium,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, and arXiv ID match a known paper, and the year is plausible. The lack of a venue and DOI is not uncommon in preprints."",
+  ""confidence"": ""medium""
+}",473,58,0.0,1.676,0,,,False,,
+71,s2_real,valid,valid,valid,"The reference matches a real paper with a valid DOI, and the authors and title are consistent with the paper's metadata.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a real paper with a valid DOI, and the authors and title are consistent with the paper's metadata."",
+  ""confidence"": ""high""
+}",554,47,0.0,1.4,0,,,False,,
+72,neurips,fabricated,valid,valid,"The reference matches the provided raw string, and the title, authors, and year are consistent. The venue is also plausible for a paper from 2015. Without a DOI or arXiv ID, we cannot verify their validity, but the other information is consistent and suggests a real paper.",medium,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided raw string, and the title, authors, and year are consistent. The venue is also plausible for a paper from 2015. Without a DOI or arXiv ID, we cannot verify their validity, but the other information is consistent and suggests a real paper."",
+  ""confidence"": ""medium""
+}",457,82,0.0,2.324,0,,,False,,
+73,s2_real,valid,valid,valid,"The reference matches a real paper with the given title, authors, year, venue, and identifiers. The arXiv ID and DOI are consistent with the paper's metadata.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a real paper with the given title, authors, year, venue, and identifiers. The arXiv ID and DOI are consistent with the paper's metadata."",
+  ""confidence"": ""high""
+}",551,58,0.0,1.695,0,,,False,,
+74,s2_real,valid,valid,valid,The reference has a valid DOI and matches a known paper in the provided BibTeX string. The authors and year also match the paper's metadata.,high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference has a valid DOI and matches a known paper in the provided BibTeX string. The authors and year also match the paper's metadata."",
+  ""confidence"": ""high""
+}",526,52,0.0,1.53,0,,,False,,
+75,s2_real,valid,valid,valid,"The reference matches a real paper with the given title, authors, and DOI, and the venue and year combination is plausible for the journal Marine Drugs.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a real paper with the given title, authors, and DOI, and the venue and year combination is plausible for the journal Marine Drugs."",
+  ""confidence"": ""high""
+}",510,53,0.0,1.537,0,,,False,,
+76,s2_real,valid,valid,valid,"The reference has a valid DOI and matches a known paper, and the authors and title are consistent with the raw reference string.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference has a valid DOI and matches a known paper, and the authors and title are consistent with the raw reference string."",
+  ""confidence"": ""high""
+}",585,48,0.0,1.425,0,,,False,,
+77,s2_real,valid,valid,valid,"The title, authors, and year match the provided BibTeX string, and the venue is a plausible academic journal. The DOI is also valid and points to a real paper.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, and year match the provided BibTeX string, and the venue is a plausible academic journal. The DOI is also valid and points to a real paper."",
+  ""confidence"": ""high""
+}",532,58,0.0,1.691,0,,,False,,
+78,neurips,fabricated,fabricated,fabricated,"The reference is fabricated because it does not provide a DOI or arXiv ID, which are common identifiers for academic papers. Without these identifiers, it is difficult to verify the existence of the paper.",high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The reference is fabricated because it does not provide a DOI or arXiv ID, which are common identifiers for academic papers. Without these identifiers, it is difficult to verify the existence of the paper."",
+  ""confidence"": ""high""
+}",454,64,0.0,1.834,0,,,False,,
+79,neurips,fabricated,valid,valid,"The title, authors, and venue match the given raw reference string, and the year is plausible for the venue. Without a DOI or arXiv ID, we cannot verify their validity, but the other information is consistent.",medium,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, and venue match the given raw reference string, and the year is plausible for the venue. Without a DOI or arXiv ID, we cannot verify their validity, but the other information is consistent."",
+  ""confidence"": ""medium""
+}",472,68,0.0,1.944,0,,,False,,
+80,neurips,fabricated,valid,valid,"The reference matches the provided raw reference string, and the authors, year, and venue are consistent with the string. The DOI and arXiv ID are missing, but this is not sufficient to classify the reference as fabricated.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided raw reference string, and the authors, year, and venue are consistent with the string. The DOI and arXiv ID are missing, but this is not sufficient to classify the reference as fabricated."",
+  ""confidence"": ""high""
+}",524,68,0.0,1.967,0,,,False,,
+81,neurips,fabricated,valid,valid,"The reference matches the provided raw string, which suggests it is a real paper. The authors, title, year, and venue are consistent with the raw string, and the paper's existence can be inferred from the provided information.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided raw string, which suggests it is a real paper. The authors, title, year, and venue are consistent with the raw string, and the paper's existence can be inferred from the provided information."",
+  ""confidence"": ""high""
+}",476,68,0.0,1.944,0,,,False,,
+82,s2_real,valid,fabricated,fabricated,"The arXiv ID 'abs/1907.09837' does not match the arXiv.org venue, and the raw reference string contains a DOI-less BibTeX entry which is unusual for arXiv papers.",high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The arXiv ID 'abs/1907.09837' does not match the arXiv.org venue, and the raw reference string contains a DOI-less BibTeX entry which is unusual for arXiv papers."",
+  ""confidence"": ""high""
+}",501,69,0.0,1.972,0,,,False,,
+83,s2_real,valid,valid,valid,"The reference has a valid DOI and matches a known paper in the provided BibTeX string, suggesting it is a real paper.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference has a valid DOI and matches a known paper in the provided BibTeX string, suggesting it is a real paper."",
+  ""confidence"": ""high""
+}",621,48,0.0,1.43,0,,,False,,
+84,iclr2026,fabricated,fabricated,fabricated,"The reference does not have a valid DOI or arXiv ID, and the URL provided in the raw reference string does not match the venue and year. This suggests that the reference is fabricated or at least not a standard academic paper.",high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The reference does not have a valid DOI or arXiv ID, and the URL provided in the raw reference string does not match the venue and year. This suggests that the reference is fabricated or at least not a standard academic paper."",
+  ""confidence"": ""high""
+}",485,71,0.0,2.025,0,,,False,,
+85,neurips,fabricated,fabricated,fabricated,"The reference is missing the venue and DOI, which are essential fields for a valid citation. Without these, it's impossible to verify the paper's existence or its consistency with the provided title and author.",high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The reference is missing the venue and DOI, which are essential fields for a valid citation. Without these, it's impossible to verify the paper's existence or its consistency with the provided title and author."",
+  ""confidence"": ""high""
+}",437,64,0.0,1.836,0,,,False,,
+86,neurips,fabricated,valid,valid,"The title, authors, and year match a real paper, and the venue 'preprint' is a plausible choice for a paper that does not have a DOI or arXiv ID. The authors' names and the title are consistent with a real paper, and the year is within the plausible range for a preprint.",medium,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, and year match a real paper, and the venue 'preprint' is a plausible choice for a paper that does not have a DOI or arXiv ID. The authors' names and the title are consistent with a real paper, and the year is within the plausible range for a preprint."",
+  ""confidence"": ""medium""
+}",460,88,0.0,2.484,0,,,False,,
+87,neurips,fabricated,valid,valid,"The title, authors, and arXiv ID match a known paper, and the year and venue are consistent with an arXiv preprint.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, and arXiv ID match a known paper, and the year and venue are consistent with an arXiv preprint."",
+  ""confidence"": ""high""
+}",470,53,0.0,1.537,0,,,False,,
+88,iclr2026,fabricated,fabricated,fabricated,"The reference is missing the year, which is a required field, and the authors are listed as 'J. Kuhn, et al.' but the single author 'J. Kuhn' is provided in the structured fields. This inconsistency suggests the reference was synthesised rather than transcribed from a real source.",high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The reference is missing the year, which is a required field, and the authors are listed as 'J. Kuhn, et al.' but the single author 'J. Kuhn' is provided in the structured fields. This inconsistency suggests the reference was synthesised rather than transcribed from a real source."",
+  ""confidence"": ""high""
+}",424,86,0.0,2.428,0,,,False,,
+89,s2_real,valid,fabricated,fabricated,"The reference is missing a venue and DOI, which are essential fields for a valid citation. Without these, it's impossible to verify the paper's existence or consistency.",high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The reference is missing a venue and DOI, which are essential fields for a valid citation. Without these, it's impossible to verify the paper's existence or consistency."",
+  ""confidence"": ""high""
+}",477,57,0.0,1.647,0,,,False,,
+90,s2_real,valid,valid,valid,"The reference matches a real paper with the same title, authors, year, venue, and identifiers. The arXiv ID and DOI resolve to the same paper, and the authors' names match the ones in the reference string.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a real paper with the same title, authors, year, venue, and identifiers. The arXiv ID and DOI resolve to the same paper, and the authors' names match the ones in the reference string."",
+  ""confidence"": ""high""
+}",526,69,0.0,1.992,0,,,False,,
+91,neurips,fabricated,valid,valid,"The reference matches the provided raw string, and the authors, year, and venue are consistent. The paper exists and matches the given information.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided raw string, and the authors, year, and venue are consistent. The paper exists and matches the given information."",
+  ""confidence"": ""high""
+}",530,51,0.0,1.507,0,,,False,,
+92,iclr2026,fabricated,fabricated,fabricated,"The authors Yvette Izza does not match the actual authors listed in the raw reference string, which is Yvette Izza is not listed in the raw reference string, but the actual authors are Tom Eccles, Jeffrey Tweedale, and another author, not Yvette Izza.",high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The authors Yvette Izza does not match the actual authors listed in the raw reference string, which is Yvette Izza is not listed in the raw reference string, but the actual authors are Tom Eccles, Jeffrey Tweedale, and another author, not Yvette Izza."",
+  ""confidence"": ""high""
+}",503,82,0.0,2.321,0,,,False,,
+93,neurips,fabricated,valid,valid,"The title, authors, and year match a known paper, and the venue is a plausible conference. The lack of DOI and arXiv ID does not necessarily indicate fabrication, as not all papers have these identifiers.",medium,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, and year match a known paper, and the venue is a plausible conference. The lack of DOI and arXiv ID does not necessarily indicate fabrication, as not all papers have these identifiers."",
+  ""confidence"": ""medium""
+}",457,66,0.0,1.888,0,,,False,,
+94,neurips,fabricated,valid,valid,"The title, authors, and year match a real paper, and the venue is a real conference. Without a DOI or arXiv ID, we cannot verify the paper's existence, but the provided information is consistent and suggests a real paper.",low,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, and year match a real paper, and the venue is a real conference. Without a DOI or arXiv ID, we cannot verify the paper's existence, but the provided information is consistent and suggests a real paper."",
+  ""confidence"": ""low""
+}",440,72,0.0,2.055,0,,,False,,
+95,neurips,fabricated,valid,valid,"The reference matches the arXiv ID, which is a unique identifier for academic papers. The arXiv ID is well-formed and matches the paper's title and authors.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the arXiv ID, which is a unique identifier for academic papers. The arXiv ID is well-formed and matches the paper's title and authors."",
+  ""confidence"": ""high""
+}",493,58,0.0,1.674,0,,,False,,
+96,s2_real,valid,valid,valid,"The title, authors, year, and venue match a real paper with a valid DOI, suggesting it is a genuine reference.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, year, and venue match a real paper with a valid DOI, suggesting it is a genuine reference."",
+  ""confidence"": ""high""
+}",498,48,0.0,1.4,0,,,False,,
+97,iclr2026,fabricated,valid,valid,"The reference matches the format of a typical academic paper and the title, authors, and year are consistent with the provided raw reference string. The venue and year combination is plausible for a conference paper.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the format of a typical academic paper and the title, authors, and year are consistent with the provided raw reference string. The venue and year combination is plausible for a conference paper."",
+  ""confidence"": ""high""
+}",441,62,0.0,1.781,0,,,False,,
+98,s2_real,valid,valid,valid,"The reference matches a real paper with the given title, authors, and DOI, and the venue and year combination is plausible for a journal.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a real paper with the given title, authors, and DOI, and the venue and year combination is plausible for a journal."",
+  ""confidence"": ""high""
+}",540,51,0.0,1.503,0,,,False,,
+99,neurips,fabricated,valid,valid,"The reference matches the format of a typical NeurIPS paper and the authors are listed in the correct order, suggesting it is a real paper. The lack of DOI and arXiv ID does not necessarily indicate fabrication, as not all papers have these identifiers.",medium,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the format of a typical NeurIPS paper and the authors are listed in the correct order, suggesting it is a real paper. The lack of DOI and arXiv ID does not necessarily indicate fabrication, as not all papers have these identifiers."",
+  ""confidence"": ""medium""
+}",485,75,0.0,2.132,0,,,False,,
+100,s2_real,valid,fabricated,fabricated,"The reference is missing the venue and DOI fields, which are essential for verifying the paper's existence and consistency. Without these fields, it's impossible to confirm the paper's validity.",high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The reference is missing the venue and DOI fields, which are essential for verifying the paper's existence and consistency. Without these fields, it's impossible to confirm the paper's validity."",
+  ""confidence"": ""high""
+}",475,60,0.0,1.728,0,,,False,,
+101,s2_real,valid,valid,valid,"The reference has a valid DOI and matches a known paper, and the authors and venue are consistent with the paper.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference has a valid DOI and matches a known paper, and the authors and venue are consistent with the paper."",
+  ""confidence"": ""high""
+}",563,46,0.0,1.371,0,,,False,,
+102,s2_real,valid,fabricated,fabricated,"The DOI provided (10.1007/s12652-011-0100-0) suggests the paper was published in 2011, not 2013, which is inconsistent with the provided year.",high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The DOI provided (10.1007/s12652-011-0100-0) suggests the paper was published in 2011, not 2013, which is inconsistent with the provided year."",
+  ""confidence"": ""high""
+}",505,66,0.0,1.892,0,,,False,,
+103,neurips,fabricated,valid,valid,"The title, authors, and venue match the raw reference string, and the year is plausible for a NeurIPS paper. Without a DOI or arXiv ID, we cannot verify the paper's existence, but the provided information is consistent.",low,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, and venue match the raw reference string, and the year is plausible for a NeurIPS paper. Without a DOI or arXiv ID, we cannot verify the paper's existence, but the provided information is consistent."",
+  ""confidence"": ""low""
+}",457,72,0.0,2.051,0,,,False,,
+104,neurips,fabricated,valid,valid,"The reference matches the format of a typical academic paper and the authors, year, and venue are consistent with the information provided. However, the lack of DOI and arXiv ID does not necessarily indicate fabrication, as not all papers have these identifiers.",low,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the format of a typical academic paper and the authors, year, and venue are consistent with the information provided. However, the lack of DOI and arXiv ID does not necessarily indicate fabrication, as not all papers have these identifiers."",
+  ""confidence"": ""low""
+}",466,73,0.0,2.079,0,,,False,,
+105,neurips,fabricated,valid,valid,"The reference matches the arXiv ID, which is a unique identifier for papers on the arXiv preprint server. The title and authors also match the raw reference string, and the year is consistent with the arXiv ID. This suggests that the reference is a real paper.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the arXiv ID, which is a unique identifier for papers on the arXiv preprint server. The title and authors also match the raw reference string, and the year is consistent with the arXiv ID. This suggests that the reference is a real paper."",
+  ""confidence"": ""high""
+}",490,81,0.0,2.293,0,,,False,,
+106,iclr2026,fabricated,valid,valid,"The reference matches the provided raw string, and the authors, year, and venue are consistent with the string. The DOI and arXiv ID are missing, but this does not necessarily indicate fabrication.",low,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided raw string, and the authors, year, and venue are consistent with the string. The DOI and arXiv ID are missing, but this does not necessarily indicate fabrication."",
+  ""confidence"": ""low""
+}",470,63,0.0,1.809,0,,,False,,
+107,iclr2026,fabricated,valid,valid,"The title, authors, and arXiv ID match the raw reference string, and the year is plausible for the arXiv ID. The venue is missing, but this is a common omission in citations.",medium,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, and arXiv ID match the raw reference string, and the year is plausible for the arXiv ID. The venue is missing, but this is a common omission in citations."",
+  ""confidence"": ""medium""
+}",459,65,0.0,1.862,0,,,False,,
+108,iclr2026,fabricated,valid,valid,"The reference matches the provided raw reference string, and the authors, year, and venue are consistent with a real paper. The DOI and arXiv ID are missing, but this is not sufficient to classify the reference as fabricated.",medium,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided raw reference string, and the authors, year, and venue are consistent with a real paper. The DOI and arXiv ID are missing, but this is not sufficient to classify the reference as fabricated."",
+  ""confidence"": ""medium""
+}",557,69,0.0,1.992,0,,,False,,
+109,s2_real,valid,valid,valid,"The reference matches a real paper with the correct title, authors, and year, and the venue is a real conference. The lack of DOI and arXiv ID does not affect the validity of the reference.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a real paper with the correct title, authors, and year, and the venue is a real conference. The lack of DOI and arXiv ID does not affect the validity of the reference."",
+  ""confidence"": ""high""
+}",506,65,0.0,1.86,0,,,False,,
+110,s2_real,valid,valid,valid,"The reference matches a real paper with the same title, authors, and DOI, and the venue and year combination is plausible. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a real paper with the same title, authors, and DOI, and the venue and year combination is plausible. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated."",
+  ""confidence"": ""high""
+}",545,69,0.0,1.989,0,,,False,,
+111,neurips,fabricated,valid,valid,"The reference matches the provided raw string, and the authors, year, and venue are consistent with the string. However, the DOI and arXiv ID are missing, but this does not necessarily indicate fabrication.",low,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided raw string, and the authors, year, and venue are consistent with the string. However, the DOI and arXiv ID are missing, but this does not necessarily indicate fabrication."",
+  ""confidence"": ""low""
+}",443,65,0.0,1.863,0,,,False,,
+112,s2_real,valid,valid,valid,"The reference has a valid DOI and a matching title, authors, and year. The venue is also consistent with the provided information.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference has a valid DOI and a matching title, authors, and year. The venue is also consistent with the provided information."",
+  ""confidence"": ""high""
+}",535,49,0.0,1.451,0,,,False,,
+113,s2_real,valid,valid,valid,"The reference matches the provided BibTeX string, which suggests it is a real paper. The authors, title, year, and venue are consistent with the provided information.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided BibTeX string, which suggests it is a real paper. The authors, title, year, and venue are consistent with the provided information."",
+  ""confidence"": ""high""
+}",538,56,0.0,1.641,0,,,False,,
+114,s2_real,valid,fabricated,fabricated,"The reference is missing the venue and DOI fields, which are essential for verifying the paper's existence and consistency. Without these fields, it's impossible to confirm the paper's validity.",high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The reference is missing the venue and DOI fields, which are essential for verifying the paper's existence and consistency. Without these fields, it's impossible to confirm the paper's validity."",
+  ""confidence"": ""high""
+}",507,60,0.0,1.727,0,,,False,,
+115,neurips,fabricated,valid,valid,"The reference matches the format of a typical academic paper and the authors, title, and venue are consistent. However, the lack of DOI and arXiv ID makes it difficult to verify the paper's existence, but the provided information is consistent and plausible.",low,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the format of a typical academic paper and the authors, title, and venue are consistent. However, the lack of DOI and arXiv ID makes it difficult to verify the paper's existence, but the provided information is consistent and plausible."",
+  ""confidence"": ""low""
+}",466,74,0.0,2.108,0,,,False,,
+116,iclr2026,fabricated,valid,valid,"The title, authors, and year match a known paper, and the venue is a well-known conference. The lack of DOI and arXiv ID does not necessarily indicate fabrication, as not all papers have these identifiers.",medium,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, and year match a known paper, and the venue is a well-known conference. The lack of DOI and arXiv ID does not necessarily indicate fabrication, as not all papers have these identifiers."",
+  ""confidence"": ""medium""
+}",470,67,0.0,1.92,0,,,False,,
+117,s2_real,valid,fabricated,fabricated,"The arXiv ID 1111.0029 does not match the venue arXiv: Group Theory, and the DOI 10.1090/conm/597/11762 does not resolve to a paper with the given title and authors.",high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The arXiv ID 1111.0029 does not match the venue arXiv: Group Theory, and the DOI 10.1090/conm/597/11762 does not resolve to a paper with the given title and authors."",
+  ""confidence"": ""high""
+}",472,75,0.0,2.132,0,,,False,,
+118,neurips,fabricated,valid,valid,"The reference matches the provided raw string, and the authors, year, and venue are consistent with the string. The paper appears to be a real publication in the ICASSP conference.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided raw string, and the authors, year, and venue are consistent with the string. The paper appears to be a real publication in the ICASSP conference."",
+  ""confidence"": ""high""
+}",512,60,0.0,1.727,0,,,False,,
+119,iclr2026,fabricated,valid,valid,"The reference matches the provided raw string, and the authors, year, and venue are consistent with a real paper. The DOI and arXiv ID are missing, but this does not necessarily indicate fabrication.",low,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided raw string, and the authors, year, and venue are consistent with a real paper. The DOI and arXiv ID are missing, but this does not necessarily indicate fabrication."",
+  ""confidence"": ""low""
+}",474,64,0.0,1.832,0,,,False,,
+120,s2_real,valid,valid,valid,"The reference matches a real paper with the given title, authors, and year, and the venue is a plausible academic journal. The DOI is also valid and resolves to the correct paper.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a real paper with the given title, authors, and year, and the venue is a plausible academic journal. The DOI is also valid and resolves to the correct paper."",
+  ""confidence"": ""high""
+}",523,60,0.0,1.746,0,,,False,,
+121,iclr2026,fabricated,valid,valid,"The reference has a valid arXiv ID and year, and the title matches the arXiv ID. The authors are also consistent with the arXiv ID. Without a venue or DOI, we cannot verify the paper's existence, but the arXiv ID is a strong indicator of a real paper.",medium,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference has a valid arXiv ID and year, and the title matches the arXiv ID. The authors are also consistent with the arXiv ID. Without a venue or DOI, we cannot verify the paper's existence, but the arXiv ID is a strong indicator of a real paper."",
+  ""confidence"": ""medium""
+}",474,86,0.0,2.429,0,,,False,,
+122,s2_real,valid,fabricated,fabricated,"The reference is missing a venue and DOI, which are common fields in academic citations. The arXiv ID is also missing, which is unusual for a paper from 2011.",high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The reference is missing a venue and DOI, which are common fields in academic citations. The arXiv ID is also missing, which is unusual for a paper from 2011."",
+  ""confidence"": ""high""
+}",503,61,0.0,1.752,0,,,False,,
+123,s2_real,valid,fabricated,fabricated,"The reference is missing a venue and DOI, which are essential fields for a valid citation. The arXiv ID is also missing, which is unusual for a conference paper.",high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The reference is missing a venue and DOI, which are essential fields for a valid citation. The arXiv ID is also missing, which is unusual for a conference paper."",
+  ""confidence"": ""high""
+}",454,59,0.0,1.701,0,,,False,,
+124,neurips,fabricated,valid,valid,The reference matches the format of a typical CVPR paper and the authors are consistent with the raw reference string. The year and venue are also consistent with the raw reference string.,high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the format of a typical CVPR paper and the authors are consistent with the raw reference string. The year and venue are also consistent with the raw reference string."",
+  ""confidence"": ""high""
+}",471,58,0.0,1.673,0,,,False,,
+125,s2_real,valid,valid,valid,"The reference matches a real paper with the same title, authors, year, and venue, and the DOI is valid. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a real paper with the same title, authors, year, and venue, and the DOI is valid. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated."",
+  ""confidence"": ""high""
+}",595,68,0.0,1.963,0,,,False,,
+126,s2_real,valid,valid,valid,"The reference matches a real paper with the given title, author, year, and venue, and the DOI is valid. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a real paper with the given title, author, year, and venue, and the DOI is valid. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated."",
+  ""confidence"": ""high""
+}",470,68,0.0,1.943,0,,,False,,
+127,neurips,fabricated,valid,valid,"The title, authors, and venue match the raw reference string, and the year is plausible for the venue. Without a DOI or arXiv ID, we cannot verify the paper's existence, but the provided information is consistent.",low,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, and venue match the raw reference string, and the year is plausible for the venue. Without a DOI or arXiv ID, we cannot verify the paper's existence, but the provided information is consistent."",
+  ""confidence"": ""low""
+}",484,69,0.0,1.97,0,,,False,,
+128,neurips,fabricated,valid,valid,"The title, authors, and arXiv ID match the raw reference string, and the year and venue are consistent with an arXiv preprint.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, and arXiv ID match the raw reference string, and the year and venue are consistent with an arXiv preprint."",
+  ""confidence"": ""high""
+}",462,54,0.0,1.566,0,,,False,,
+129,s2_real,valid,valid,valid,"The reference matches a real paper with the same title, authors, and year, and the DOI resolves to the correct paper. The venue and year combination is also plausible.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a real paper with the same title, authors, and year, and the DOI resolves to the correct paper. The venue and year combination is also plausible."",
+  ""confidence"": ""high""
+}",517,57,0.0,1.666,0,,,False,,
+130,s2_real,valid,valid,valid,"The reference matches the provided raw BibTeX string, and the authors, year, and venue are consistent with the paper's metadata. The DOI is also valid and resolves to the correct paper.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided raw BibTeX string, and the authors, year, and venue are consistent with the paper's metadata. The DOI is also valid and resolves to the correct paper."",
+  ""confidence"": ""high""
+}",512,61,0.0,1.753,0,,,False,,
+131,s2_real,valid,fabricated,fabricated,"The arXiv ID 'Алексеевна2013ИнновационноеРА' is likely fake, as it does not follow the standard arXiv ID format. Additionally, the title and author match a raw reference string, suggesting that the reference was synthesized rather than transcribed from a real source.",high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The arXiv ID 'Алексеевна2013ИнновационноеРА' is likely fake, as it does not follow the standard arXiv ID format. Additionally, the title and author match a raw reference string, suggesting that the reference was synthesized rather than transcribed from a real source."",
+  ""confidence"": ""high""
+}",492,90,0.0,2.536,0,,,False,,
+132,s2_real,valid,fabricated,fabricated,"The paper claims to have been published in 2012, but the title suggests it covers the period 1999-2011, implying it should have been published before 2012.",high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The paper claims to have been published in 2012, but the title suggests it covers the period 1999-2011, implying it should have been published before 2012."",
+  ""confidence"": ""high""
+}",524,62,0.0,1.801,0,,,False,,
+133,iclr2026,fabricated,valid,valid,"The title, authors, and venue match a real paper, and the year is plausible for the venue. The paper exists and matches the given information.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, and venue match a real paper, and the year is plausible for the venue. The paper exists and matches the given information."",
+  ""confidence"": ""high""
+}",523,53,0.0,1.558,0,,,False,,
+134,s2_real,valid,valid,valid,"The reference has a valid DOI and arXiv ID, and the title and authors match the raw reference string. The venue is a valid arXiv category.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference has a valid DOI and arXiv ID, and the title and authors match the raw reference string. The venue is a valid arXiv category."",
+  ""confidence"": ""high""
+}",492,56,0.0,1.619,0,,,False,,
+135,s2_real,valid,fabricated,fabricated,"The reference is missing the venue and DOI, which are essential fields for a valid citation. The arXiv ID is also missing, which is unusual for a paper that is otherwise formatted as an arXiv reference.",high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The reference is missing the venue and DOI, which are essential fields for a valid citation. The arXiv ID is also missing, which is unusual for a paper that is otherwise formatted as an arXiv reference."",
+  ""confidence"": ""high""
+}",449,68,0.0,1.945,0,,,False,,
+136,neurips,fabricated,valid,valid,"The title, authors, and venue match a real paper, and the year is plausible for the venue. Without a DOI or arXiv ID, we cannot verify the paper's existence, but the provided information is consistent and suggests a real paper.",low,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, and venue match a real paper, and the year is plausible for the venue. Without a DOI or arXiv ID, we cannot verify the paper's existence, but the provided information is consistent and suggests a real paper."",
+  ""confidence"": ""low""
+}",457,73,0.0,2.077,0,,,False,,
+137,neurips,fabricated,valid,valid,"The title, authors, and venue match the raw reference string, and the year is plausible for the venue. Without a DOI or arXiv ID, we cannot verify the paper's existence, but the provided information is consistent and suggests a real paper.",low,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, and venue match the raw reference string, and the year is plausible for the venue. Without a DOI or arXiv ID, we cannot verify the paper's existence, but the provided information is consistent and suggests a real paper."",
+  ""confidence"": ""low""
+}",468,74,0.0,2.104,0,,,False,,
+138,iclr2026,fabricated,valid,valid,"The title, authors, and year match a real paper, and the venue is a plausible conference. The lack of DOI and arXiv ID does not necessarily indicate fabrication, as they may be missing from the source.",low,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, and year match a real paper, and the venue is a plausible conference. The lack of DOI and arXiv ID does not necessarily indicate fabrication, as they may be missing from the source."",
+  ""confidence"": ""low""
+}",451,67,0.0,1.916,0,,,False,,
+139,s2_real,valid,valid,valid,"The title, authors, year, and venue match the provided BibTeX string, and the DOI resolves to a paper with the same title and authors. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, year, and venue match the provided BibTeX string, and the DOI resolves to a paper with the same title and authors. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated."",
+  ""confidence"": ""high""
+}",532,74,0.0,2.127,0,,,False,,
+140,neurips,fabricated,valid,valid,"The title, authors, and venue match the raw reference string, and the year is consistent with the venue. Without a DOI or arXiv ID, we cannot verify their validity, but the other fields are consistent and suggest a real paper.",medium,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, and venue match the raw reference string, and the year is consistent with the venue. Without a DOI or arXiv ID, we cannot verify their validity, but the other fields are consistent and suggest a real paper."",
+  ""confidence"": ""medium""
+}",473,72,0.0,2.049,0,,,False,,
+141,s2_real,valid,fabricated,fabricated,"The reference is missing the venue and DOI, which are essential fields for a valid citation. Without these, it's impossible to verify the paper's existence or consistency.",high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The reference is missing the venue and DOI, which are essential fields for a valid citation. Without these, it's impossible to verify the paper's existence or consistency."",
+  ""confidence"": ""high""
+}",473,57,0.0,1.646,0,,,False,,
+142,iclr2026,fabricated,valid,valid,"The reference matches the provided raw string, and the authors, year, and venue are consistent with the information in the string. The DOI and arXiv ID are missing, but this does not necessarily indicate fabrication.",low,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided raw string, and the authors, year, and venue are consistent with the information in the string. The DOI and arXiv ID are missing, but this does not necessarily indicate fabrication."",
+  ""confidence"": ""low""
+}",464,66,0.0,1.889,0,,,False,,
+143,neurips,fabricated,valid,valid,"The reference matches the provided raw string, and the authors, year, and venue are consistent with the string. The lack of DOI and arXiv ID does not affect the validity of the reference.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided raw string, and the authors, year, and venue are consistent with the string. The lack of DOI and arXiv ID does not affect the validity of the reference."",
+  ""confidence"": ""high""
+}",431,63,0.0,1.806,0,,,False,,
+144,s2_real,valid,valid,valid,"The title, authors, year, venue, and identifiers match a real paper, and the arXiv ID and DOI resolve to the same paper.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, year, venue, and identifiers match a real paper, and the arXiv ID and DOI resolve to the same paper."",
+  ""confidence"": ""high""
+}",498,53,0.0,1.539,0,,,False,,
+145,neurips,fabricated,valid,valid,"The reference matches the format of a real paper in Distill, and the DOI resolves to a real paper with the same title and authors. The arXiv ID is missing, but this is not uncommon for papers in Distill.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the format of a real paper in Distill, and the DOI resolves to a real paper with the same title and authors. The arXiv ID is missing, but this is not uncommon for papers in Distill."",
+  ""confidence"": ""high""
+}",503,70,0.0,1.994,0,,,False,,
+146,s2_real,valid,valid,valid,"The reference matches a real paper with the given DOI and arXiv ID, and the authors and title are consistent with the paper's metadata.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a real paper with the given DOI and arXiv ID, and the authors and title are consistent with the paper's metadata."",
+  ""confidence"": ""high""
+}",484,52,0.0,1.512,0,,,False,,
+147,neurips,fabricated,valid,valid,"The reference matches the provided raw string, and the authors, year, and venue are consistent with a real paper. The DOI and arXiv ID are missing, but this does not necessarily indicate fabrication.",low,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided raw string, and the authors, year, and venue are consistent with a real paper. The DOI and arXiv ID are missing, but this does not necessarily indicate fabrication."",
+  ""confidence"": ""low""
+}",467,64,0.0,1.834,0,,,False,,
+148,iclr2026,fabricated,valid,valid,"The title, authors, and arXiv ID match the raw reference string, and the year is plausible. The venue is missing, but this is a common omission in citations.",medium,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, and arXiv ID match the raw reference string, and the year is plausible. The venue is missing, but this is a common omission in citations."",
+  ""confidence"": ""medium""
+}",439,59,0.0,1.698,0,,,False,,
+149,iclr2026,fabricated,valid,valid,"The reference matches the provided raw string, and the authors, year, and venue are consistent with the string. The paper appears to be a real publication in the IEEE Transactions on Cybernetics journal.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided raw string, and the authors, year, and venue are consistent with the string. The paper appears to be a real publication in the IEEE Transactions on Cybernetics journal."",
+  ""confidence"": ""high""
+}",495,63,0.0,1.807,0,,,False,,
+150,s2_real,valid,valid,valid,"The reference matches the provided raw BibTeX string, which suggests it is a real paper. The DOI is also valid and resolves to a paper with the same title and authors.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided raw BibTeX string, which suggests it is a real paper. The DOI is also valid and resolves to a paper with the same title and authors."",
+  ""confidence"": ""high""
+}",486,58,0.0,1.674,0,,,False,,
+151,neurips,fabricated,valid,valid,"The reference matches the arXiv ID, which is a unique identifier for papers on the arXiv platform, and the DOI is correctly formatted. The authors and title match the arXiv page, and the venue and year are plausible for a paper in the arXiv ID's field.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the arXiv ID, which is a unique identifier for papers on the arXiv platform, and the DOI is correctly formatted. The authors and title match the arXiv page, and the venue and year are plausible for a paper in the arXiv ID's field."",
+  ""confidence"": ""high""
+}",479,83,0.0,2.349,0,,,False,,
+152,neurips,fabricated,valid,valid,"The reference matches the provided raw string, and the authors, year, and venue are consistent with the string. The DOI and arXiv ID are missing, but this does not necessarily indicate fabrication.",low,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided raw string, and the authors, year, and venue are consistent with the string. The DOI and arXiv ID are missing, but this does not necessarily indicate fabrication."",
+  ""confidence"": ""low""
+}",469,63,0.0,1.808,0,,,False,,
+153,iclr2026,fabricated,valid,valid,"The title, authors, and arXiv ID match a real paper, and the year is plausible. The missing DOI and venue are not uncommon in preprints, so this does not necessarily indicate fabrication.",medium,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, and arXiv ID match a real paper, and the year is plausible. The missing DOI and venue are not uncommon in preprints, so this does not necessarily indicate fabrication."",
+  ""confidence"": ""medium""
+}",533,64,0.0,1.853,0,,,False,,
+154,neurips,fabricated,fabricated,fabricated,The arXiv ID is incomplete and does not follow the standard format (YYYYMM.XXXXX).,high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The arXiv ID is incomplete and does not follow the standard format (YYYYMM.XXXXX)."",
+  ""confidence"": ""high""
+}",454,45,0.0,1.324,0,,,False,,
+155,neurips,fabricated,valid,valid,"The reference matches a real paper with the given arXiv ID, and the authors and year are consistent with the paper's metadata. The DOI is missing, but this is not a reason to classify the reference as fabricated.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a real paper with the given arXiv ID, and the authors and year are consistent with the paper's metadata. The DOI is missing, but this is not a reason to classify the reference as fabricated."",
+  ""confidence"": ""high""
+}",465,68,0.0,1.943,0,,,False,,
+156,s2_real,valid,valid,valid,"The reference matches the provided raw BibTeX string, which suggests it is a real paper. The title, authors, and year are consistent with the raw reference, and the venue is a plausible academic journal.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided raw BibTeX string, which suggests it is a real paper. The title, authors, and year are consistent with the raw reference, and the venue is a plausible academic journal."",
+  ""confidence"": ""high""
+}",538,64,0.0,1.857,0,,,False,,
+157,neurips,fabricated,fabricated,fabricated,"The reference is missing a venue, which is a required field for a valid reference. The presence of 'To appear' in the reference string suggests that the paper has not yet been published, which makes it difficult to verify the other fields.",high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The reference is missing a venue, which is a required field for a valid reference. The presence of 'To appear' in the reference string suggests that the paper has not yet been published, which makes it difficult to verify the other fields."",
+  ""confidence"": ""high""
+}",435,72,0.0,2.052,0,,,False,,
+158,s2_real,valid,valid,valid,"The reference has a valid DOI and a matching title, authors, and year, suggesting it is a real paper. The venue and year combination is also plausible, and there is no indication of fabrication.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference has a valid DOI and a matching title, authors, and year, suggesting it is a real paper. The venue and year combination is also plausible, and there is no indication of fabrication."",
+  ""confidence"": ""high""
+}",554,63,0.0,1.828,0,,,False,,
+159,s2_real,valid,valid,valid,"The reference matches the provided BibTeX string, which suggests it is a real paper. The DOI also resolves to a paper with the same title, authors, and year, which further supports its validity.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided BibTeX string, which suggests it is a real paper. The DOI also resolves to a paper with the same title, authors, and year, which further supports its validity."",
+  ""confidence"": ""high""
+}",521,63,0.0,1.84,0,,,False,,
+160,neurips,fabricated,fabricated,fabricated,"The arXiv ID is incomplete, which is unusual for a real arXiv reference. Typically, arXiv IDs are in the format arXiv:YYYYMM.XXXXX.",high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The arXiv ID is incomplete, which is unusual for a real arXiv reference. Typically, arXiv IDs are in the format arXiv:YYYYMM.XXXXX."",
+  ""confidence"": ""high""
+}",454,62,0.0,1.78,0,,,False,,
+161,s2_real,valid,valid,valid,The reference matches a real paper with a valid DOI and consistent information across the citation and raw reference string.,high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a real paper with a valid DOI and consistent information across the citation and raw reference string."",
+  ""confidence"": ""high""
+}",598,44,0.0,1.32,0,,,False,,
+162,neurips,fabricated,valid,valid,"The reference matches the provided raw string, and the authors, year, and venue are consistent with the string. The DOI and arXiv ID are missing, but this is not sufficient to classify the reference as fabricated.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided raw string, and the authors, year, and venue are consistent with the string. The DOI and arXiv ID are missing, but this is not sufficient to classify the reference as fabricated."",
+  ""confidence"": ""high""
+}",481,67,0.0,1.916,0,,,False,,
+163,s2_real,valid,valid,valid,"The reference has a valid DOI and a matching title, authors, and year, suggesting it is a real paper. The venue and year combination is also plausible, and the arXiv ID is missing but not required for validation.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference has a valid DOI and a matching title, authors, and year, suggesting it is a real paper. The venue and year combination is also plausible, and the arXiv ID is missing but not required for validation."",
+  ""confidence"": ""high""
+}",740,69,0.0,2.432,0,,,False,,
+164,s2_real,valid,valid,valid,"The reference matches the provided raw reference string, and the title, authors, and year are consistent with the paper's metadata. The venue is also consistent with the journal name in the raw reference string.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided raw reference string, and the title, authors, and year are consistent with the paper's metadata. The venue is also consistent with the journal name in the raw reference string."",
+  ""confidence"": ""high""
+}",572,63,0.0,1.829,0,,,False,,
+165,iclr2026,fabricated,valid,valid,"The reference matches a real paper with the given title, authors, year, and DOI. The venue and year combination is also plausible, as the Conference on Empirical Methods in Natural Language Processing (EMNLP) has been held annually since 2001 and the paper's year matches the conference's year.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a real paper with the given title, authors, year, and DOI. The venue and year combination is also plausible, as the Conference on Empirical Methods in Natural Language Processing (EMNLP) has been held annually since 2001 and the paper's year matches the conference's year."",
+  ""confidence"": ""high""
+}",605,85,0.0,2.422,0,,,False,,
+166,s2_real,valid,valid,valid,"The reference has a valid title, authors, year, and venue, and the DOI is valid. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference has a valid title, authors, year, and venue, and the DOI is valid. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated."",
+  ""confidence"": ""high""
+}",605,64,0.0,1.858,0,,,False,,
+167,s2_real,valid,valid,valid,"The reference matches a real paper with the given title, authors, and arXiv ID. The year and venue are also consistent with the arXiv ID.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a real paper with the given title, authors, and arXiv ID. The year and venue are also consistent with the arXiv ID."",
+  ""confidence"": ""high""
+}",499,56,0.0,1.617,0,,,False,,
+168,iclr2026,fabricated,valid,valid,"The reference matches the arXiv ID, which is a unique identifier for academic papers. The title and authors also match, and the year is consistent with the arXiv ID. The missing DOI and venue are not sufficient evidence to classify the reference as fabricated.",medium,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the arXiv ID, which is a unique identifier for academic papers. The title and authors also match, and the year is consistent with the arXiv ID. The missing DOI and venue are not sufficient evidence to classify the reference as fabricated."",
+  ""confidence"": ""medium""
+}",500,76,0.0,2.159,0,,,False,,
+169,neurips,fabricated,fabricated,fabricated,"The year is missing from the reference string, but is present in the structured fields. This inconsistency suggests that the reference was synthesised rather than transcribed from a real source.",high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The year is missing from the reference string, but is present in the structured fields. This inconsistency suggests that the reference was synthesised rather than transcribed from a real source."",
+  ""confidence"": ""high""
+}",487,59,0.0,1.7,0,,,False,,
+170,neurips,fabricated,valid,valid,The reference matches the format of a typical NeurIPS paper and the authors and title are consistent with the raw reference string. The year and venue are also consistent with the raw reference string.,high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the format of a typical NeurIPS paper and the authors and title are consistent with the raw reference string. The year and venue are also consistent with the raw reference string."",
+  ""confidence"": ""high""
+}",480,61,0.0,1.757,0,,,False,,
+171,neurips,fabricated,valid,valid,"The reference has a consistent title, author list, and arXiv ID, and the venue and year combination is plausible for an arXiv preprint. The lack of a DOI is not a reason to classify the reference as fabricated, as not all arXiv papers have a DOI.",medium,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference has a consistent title, author list, and arXiv ID, and the venue and year combination is plausible for an arXiv preprint. The lack of a DOI is not a reason to classify the reference as fabricated, as not all arXiv papers have a DOI."",
+  ""confidence"": ""medium""
+}",525,82,0.0,2.344,0,,,False,,
+172,neurips,fabricated,valid,valid,"The reference matches the provided raw string, and the authors, year, and venue are consistent with a real paper. The lack of DOI and arXiv ID does not necessarily indicate fabrication, as they may be missing from the raw string.",medium,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided raw string, and the authors, year, and venue are consistent with a real paper. The lack of DOI and arXiv ID does not necessarily indicate fabrication, as they may be missing from the raw string."",
+  ""confidence"": ""medium""
+}",463,71,0.0,2.029,0,,,False,,
+173,s2_real,valid,fabricated,fabricated,"The reference is missing the venue and DOI, which are essential fields for a valid citation. Without these, it is likely that the reference is fabricated or incomplete.",high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The reference is missing the venue and DOI, which are essential fields for a valid citation. Without these, it is likely that the reference is fabricated or incomplete."",
+  ""confidence"": ""high""
+}",447,56,0.0,1.62,0,,,False,,
+174,s2_real,valid,valid,valid,The reference matches a real paper with a valid DOI and consistent information across the reference string and the provided fields.,high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a real paper with a valid DOI and consistent information across the reference string and the provided fields."",
+  ""confidence"": ""high""
+}",603,45,0.0,1.348,0,,,False,,
+175,s2_real,valid,valid,valid,"The title, authors, and year match the raw reference string, and the DOI resolves to a paper in a known publisher (Springer).",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, and year match the raw reference string, and the DOI resolves to a paper in a known publisher (Springer)."",
+  ""confidence"": ""high""
+}",504,52,0.0,1.532,0,,,False,,
+176,s2_real,valid,fabricated,fabricated,"The reference is missing a venue and DOI, which are essential fields for a valid citation. Additionally, the title is in both English and Spanish, which is unusual for a single paper.",high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The reference is missing a venue and DOI, which are essential fields for a valid citation. Additionally, the title is in both English and Spanish, which is unusual for a single paper."",
+  ""confidence"": ""high""
+}",685,61,0.0,1.813,0,,,False,,
+177,neurips,fabricated,valid,valid,"The reference matches the provided raw string, and the authors, year, and venue are consistent with the information in the string. The DOI and arXiv ID are missing, but this does not necessarily indicate fabrication.",low,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided raw string, and the authors, year, and venue are consistent with the information in the string. The DOI and arXiv ID are missing, but this does not necessarily indicate fabrication."",
+  ""confidence"": ""low""
+}",505,66,0.0,1.888,0,,,False,,
+178,s2_real,valid,valid,valid,The reference matches a real paper with a valid DOI and consistent information across the reference string and the provided fields.,high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a real paper with a valid DOI and consistent information across the reference string and the provided fields."",
+  ""confidence"": ""high""
+}",565,45,0.0,1.341,0,,,False,,
+179,s2_real,valid,valid,valid,"The reference has a valid title, authors, and year, but is missing a venue and DOI. However, the arXiv ID is present and correctly formatted, suggesting it is a real paper. Without further information, we cannot confirm its existence, but the provided information is consistent and suggests it is a valid reference.",low,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference has a valid title, authors, and year, but is missing a venue and DOI. However, the arXiv ID is present and correctly formatted, suggesting it is a real paper. Without further information, we cannot confirm its existence, but the provided information is consistent and suggests it is a valid reference."",
+  ""confidence"": ""low""
+}",459,87,0.0,2.456,0,,,False,,
+180,neurips,fabricated,valid,valid,"The title, authors, and venue match a real paper, and the year is plausible for the venue. The lack of DOI and arXiv ID does not necessarily indicate fabrication, as they may be missing from the reference string.",medium,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, and venue match a real paper, and the year is plausible for the venue. The lack of DOI and arXiv ID does not necessarily indicate fabrication, as they may be missing from the reference string."",
+  ""confidence"": ""medium""
+}",465,69,0.0,1.972,0,,,False,,
+181,s2_real,valid,valid,valid,"The reference matches the provided raw BibTeX string, which suggests it is a real paper. The authors, title, and year are consistent with the provided information.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided raw BibTeX string, which suggests it is a real paper. The authors, title, and year are consistent with the provided information."",
+  ""confidence"": ""high""
+}",534,55,0.0,1.615,0,,,False,,
+182,s2_real,valid,valid,valid,"The reference has a valid DOI and a matching title, authors, and year, and the venue is a real journal. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference has a valid DOI and a matching title, authors, and year, and the venue is a real journal. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated."",
+  ""confidence"": ""high""
+}",559,68,0.0,1.966,0,,,False,,
+183,iclr2026,fabricated,fabricated,fabricated,"The reference is fabricated because it lacks a DOI and arXiv ID, which are commonly used identifiers for academic papers. While the title, author, and venue match a real paper, the lack of these identifiers makes it likely that the reference is fabricated or incomplete.",high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The reference is fabricated because it lacks a DOI and arXiv ID, which are commonly used identifiers for academic papers. While the title, author, and venue match a real paper, the lack of these identifiers makes it likely that the reference is fabricated or incomplete."",
+  ""confidence"": ""high""
+}",435,77,0.0,2.187,0,,,False,,
+184,iclr2026,fabricated,valid,valid,"The reference matches a real paper with the given title, authors, year, and DOI, and the venue is a real conference. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a real paper with the given title, authors, year, and DOI, and the venue is a real conference. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated."",
+  ""confidence"": ""high""
+}",517,70,0.0,2.021,0,,,False,,
+185,s2_real,valid,valid,valid,"The title, authors, year, and venue match a real paper with a valid DOI, indicating a high likelihood of authenticity.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, year, and venue match a real paper with a valid DOI, indicating a high likelihood of authenticity."",
+  ""confidence"": ""high""
+}",484,48,0.0,1.404,0,,,False,,
+186,s2_real,valid,valid,valid,"The reference has a valid DOI and matches a known paper, and the authors and venue are consistent with the paper's metadata.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference has a valid DOI and matches a known paper, and the authors and venue are consistent with the paper's metadata."",
+  ""confidence"": ""high""
+}",508,48,0.0,1.403,0,,,False,,
+187,neurips,fabricated,valid,valid,"The reference matches the format of a typical academic paper and the title, authors, and year are consistent with the raw reference string. The venue is also consistent with the raw reference string, and the paper appears to be a plausible publication in the field of computational physics.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the format of a typical academic paper and the title, authors, and year are consistent with the raw reference string. The venue is also consistent with the raw reference string, and the paper appears to be a plausible publication in the field of computational physics."",
+  ""confidence"": ""high""
+}",448,76,0.0,2.159,0,,,False,,
+188,neurips,fabricated,valid,valid,"The reference matches the provided raw string, and the authors, year, and venue are consistent with the information in the string. The DOI and arXiv ID are missing, but this does not necessarily indicate fabrication.",low,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided raw string, and the authors, year, and venue are consistent with the information in the string. The DOI and arXiv ID are missing, but this does not necessarily indicate fabrication."",
+  ""confidence"": ""low""
+}",496,66,0.0,1.887,0,,,False,,
+189,neurips,fabricated,valid,valid,"The reference matches the provided raw string, and the authors, year, and venue are consistent with the information available. The DOI and arXiv ID are missing, but this does not necessarily indicate fabrication.",low,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided raw string, and the authors, year, and venue are consistent with the information available. The DOI and arXiv ID are missing, but this does not necessarily indicate fabrication."",
+  ""confidence"": ""low""
+}",488,64,0.0,1.835,0,,,False,,
+190,s2_real,valid,valid,valid,"The reference has a valid DOI and a matching title and author list, suggesting it is a real paper. The year and title combination is plausible, and the lack of venue and arXiv ID does not necessarily indicate fabrication.",medium,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference has a valid DOI and a matching title and author list, suggesting it is a real paper. The year and title combination is plausible, and the lack of venue and arXiv ID does not necessarily indicate fabrication."",
+  ""confidence"": ""medium""
+}",502,68,0.0,1.947,0,,,False,,
+191,neurips,fabricated,valid,valid,"The reference matches the format of a typical academic paper and the title, authors, and venue are consistent with the provided raw reference string. The year is also consistent with the venue, as the ACL has been hosting annual meetings since 1968.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the format of a typical academic paper and the title, authors, and venue are consistent with the provided raw reference string. The year is also consistent with the venue, as the ACL has been hosting annual meetings since 1968."",
+  ""confidence"": ""high""
+}",485,72,0.0,2.078,0,,,False,,
+192,neurips,fabricated,valid,valid,"The title, author, and venue match the raw reference string, and the year is plausible for the venue. Without a DOI or arXiv ID, we cannot verify the paper's existence, but the provided information is consistent.",low,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, author, and venue match the raw reference string, and the year is plausible for the venue. Without a DOI or arXiv ID, we cannot verify the paper's existence, but the provided information is consistent."",
+  ""confidence"": ""low""
+}",451,69,0.0,1.976,0,,,False,,
+193,neurips,fabricated,valid,valid,"The title, authors, year, and arXiv ID match, and the arXiv ID is a valid arXiv preprint ID. The authors are listed as 'Andrew Black et al.', which is consistent with the single author listed.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, year, and arXiv ID match, and the arXiv ID is a valid arXiv preprint ID. The authors are listed as 'Andrew Black et al.', which is consistent with the single author listed."",
+  ""confidence"": ""high""
+}",446,73,0.0,2.079,0,,,False,,
+194,s2_real,valid,valid,valid,"The title, authors, and year match the provided raw reference string, and the DOI resolves to a paper in the journal 'Forests' with a similar title. The venue 'Forests' is a real journal.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, and year match the provided raw reference string, and the DOI resolves to a paper in the journal 'Forests' with a similar title. The venue 'Forests' is a real journal."",
+  ""confidence"": ""high""
+}",516,67,0.0,1.941,0,,,False,,
+195,iclr2026,fabricated,valid,valid,"The reference matches a real paper with a valid arXiv ID, and the authors and year are consistent with the paper's metadata.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a real paper with a valid arXiv ID, and the authors and year are consistent with the paper's metadata."",
+  ""confidence"": ""high""
+}",475,50,0.0,1.455,0,,,False,,
+196,neurips,fabricated,valid,valid,"The reference matches the provided raw string, and the authors, year, and venue are consistent with the information in the string. The DOI and arXiv ID are missing, but this does not necessarily indicate fabrication.",medium,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided raw string, and the authors, year, and venue are consistent with the information in the string. The DOI and arXiv ID are missing, but this does not necessarily indicate fabrication."",
+  ""confidence"": ""medium""
+}",512,66,0.0,1.888,0,,,False,,
+197,s2_real,valid,valid,valid,"The reference matches the provided raw BibTeX string, which suggests it is a real paper. The authors, title, year, and venue are consistent with the provided information.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided raw BibTeX string, which suggests it is a real paper. The authors, title, year, and venue are consistent with the provided information."",
+  ""confidence"": ""high""
+}",510,57,0.0,1.647,0,,,False,,
+198,iclr2026,fabricated,fabricated,fabricated,"The reference is fabricated because the arXiv ID is missing, which is a required field for a valid reference. Additionally, the authors' names contain some suspicious characters (e.g. 'teht sun', 'C. J. H. un'), which are likely typos or fabrications.",high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The reference is fabricated because the arXiv ID is missing, which is a required field for a valid reference. Additionally, the authors' names contain some suspicious characters (e.g. 'teht sun', 'C. J. H. un'), which are likely typos or fabrications."",
+  ""confidence"": ""high""
+}",588,84,0.0,2.396,0,,,False,,
+199,s2_real,valid,valid,valid,"The reference matches the provided information and the arXiv ID resolves to a paper with the same title, authors, and year. The venue and year combination is also plausible.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided information and the arXiv ID resolves to a paper with the same title, authors, and year. The venue and year combination is also plausible."",
+  ""confidence"": ""high""
+}",545,58,0.0,1.694,0,,,False,,
+200,s2_real,valid,valid,valid,"The reference has a valid DOI and a matching title, authors, and year. The arXiv ID is missing, but this is not a requirement for a valid reference. The venue is missing, but this is also not a requirement for a valid reference.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference has a valid DOI and a matching title, authors, and year. The arXiv ID is missing, but this is not a requirement for a valid reference. The venue is missing, but this is also not a requirement for a valid reference."",
+  ""confidence"": ""high""
+}",633,75,0.0,2.157,0,,,False,,
+201,s2_real,valid,fabricated,fabricated,"The reference is missing a venue and DOI, which are common identifiers for academic papers. Without these, it's difficult to verify the paper's existence or consistency.",high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The reference is missing a venue and DOI, which are common identifiers for academic papers. Without these, it's difficult to verify the paper's existence or consistency."",
+  ""confidence"": ""high""
+}",458,56,0.0,1.62,0,,,False,,
+202,s2_real,valid,valid,valid,"The reference matches a real paper with the given title, authors, and venue, and the DOI is consistent with the paper's title and authors. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a real paper with the given title, authors, and venue, and the DOI is consistent with the paper's title and authors. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated."",
+  ""confidence"": ""high""
+}",604,73,0.0,2.102,0,,,False,,
+203,iclr2026,fabricated,valid,valid,"The title, authors, and venue match a well-known paper, and the year is plausible for the venue. The lack of DOI and arXiv ID does not necessarily indicate fabrication, as not all papers have these identifiers.",medium,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, and venue match a well-known paper, and the year is plausible for the venue. The lack of DOI and arXiv ID does not necessarily indicate fabrication, as not all papers have these identifiers."",
+  ""confidence"": ""medium""
+}",508,68,0.0,1.975,0,,,False,,
+204,iclr2026,fabricated,valid,valid,"The title, author list, and year match the raw reference string, and the venue is a real conference. However, the lack of DOI and arXiv ID makes it difficult to verify the paper's existence, but the provided information is consistent and suggests a real paper.",low,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, author list, and year match the raw reference string, and the venue is a real conference. However, the lack of DOI and arXiv ID makes it difficult to verify the paper's existence, but the provided information is consistent and suggests a real paper."",
+  ""confidence"": ""low""
+}",436,78,0.0,2.234,0,,,False,,
+205,s2_real,valid,valid,valid,"The reference matches a real paper with the given title, authors, year, and venue, and the DOI is valid. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a real paper with the given title, authors, year, and venue, and the DOI is valid. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated."",
+  ""confidence"": ""high""
+}",579,68,0.0,1.967,0,,,False,,
+206,neurips,fabricated,valid,valid,"The title, authors, year, and arXiv ID match a real paper, and the venue is consistent with the arXiv ID. The DOI is missing, but this is not a reason to classify the reference as fabricated.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, year, and arXiv ID match a real paper, and the venue is consistent with the arXiv ID. The DOI is missing, but this is not a reason to classify the reference as fabricated."",
+  ""confidence"": ""high""
+}",479,70,0.0,2.008,0,,,False,,
+207,neurips,fabricated,valid,valid,"The reference matches the provided raw string, and the authors, year, and venue are consistent with the string. The DOI and arXiv ID are missing, but this does not necessarily indicate fabrication.",low,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided raw string, and the authors, year, and venue are consistent with the string. The DOI and arXiv ID are missing, but this does not necessarily indicate fabrication."",
+  ""confidence"": ""low""
+}",459,63,0.0,1.81,0,,,False,,
+208,neurips,fabricated,fabricated,fabricated,"The reference is missing authors, which is unusual for a paper, and the title seems to be a summary rather than a full title. Additionally, the arXiv ID is missing, which is a common identifier for papers.",high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The reference is missing authors, which is unusual for a paper, and the title seems to be a summary rather than a full title. Additionally, the arXiv ID is missing, which is a common identifier for papers."",
+  ""confidence"": ""high""
+}",430,69,0.0,1.972,0,,,False,,
+209,neurips,fabricated,valid,valid,"The title, authors, year, venue, and identifiers are consistent and match a real paper. The arXiv ID and DOI are the same, which is a strong indicator of a valid reference.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, year, venue, and identifiers are consistent and match a real paper. The arXiv ID and DOI are the same, which is a strong indicator of a valid reference."",
+  ""confidence"": ""high""
+}",523,63,0.0,1.832,0,,,False,,
+210,s2_real,valid,valid,valid,"The reference matches a real paper with the given title, authors, and DOI, and the venue and year combination is plausible for the given journal.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a real paper with the given title, authors, and DOI, and the venue and year combination is plausible for the given journal."",
+  ""confidence"": ""high""
+}",551,52,0.0,1.534,0,,,False,,
+211,iclr2026,fabricated,valid,valid,"The title, authors, and arXiv ID match the arXiv preprint, and the year is consistent with the arXiv ID's publication date. The lack of a DOI is not a reason to classify the reference as fabricated.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, and arXiv ID match the arXiv preprint, and the year is consistent with the arXiv ID's publication date. The lack of a DOI is not a reason to classify the reference as fabricated."",
+  ""confidence"": ""high""
+}",475,72,0.0,2.051,0,,,False,,
+212,s2_real,valid,fabricated,fabricated,"The reference is fabricated because it lacks a venue, which is a required field for a conference paper. Additionally, the DOI provided does not match any known paper, suggesting it is fake.",high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The reference is fabricated because it lacks a venue, which is a required field for a conference paper. Additionally, the DOI provided does not match any known paper, suggesting it is fake."",
+  ""confidence"": ""high""
+}",486,61,0.0,1.758,0,,,False,,
+213,s2_real,valid,fabricated,fabricated,"The reference is missing a venue and DOI, which are common identifiers for academic papers. Without these, it's difficult to verify the paper's existence or consistency.",high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The reference is missing a venue and DOI, which are common identifiers for academic papers. Without these, it's difficult to verify the paper's existence or consistency."",
+  ""confidence"": ""high""
+}",475,56,0.0,1.622,0,,,False,,
+214,s2_real,valid,valid,valid,"The reference matches a real paper with the same title, authors, year, and venue, and the DOI is valid. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a real paper with the same title, authors, year, and venue, and the DOI is valid. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated."",
+  ""confidence"": ""high""
+}",537,68,0.0,1.966,0,,,False,,
+215,s2_real,valid,valid,valid,"The reference matches a real paper with the given title, authors, year, venue, and identifiers. The arXiv ID and DOI are consistent with the paper's existence.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a real paper with the given title, authors, year, venue, and identifiers. The arXiv ID and DOI are consistent with the paper's existence."",
+  ""confidence"": ""high""
+}",1223,58,0.0,1.841,0,,,False,,
+216,s2_real,valid,valid,valid,"The reference matches a real paper with the given title, authors, and DOI, and the venue and year combination is plausible. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a real paper with the given title, authors, and DOI, and the venue and year combination is plausible. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated."",
+  ""confidence"": ""high""
+}",536,69,0.0,1.993,0,,,False,,
+217,s2_real,valid,valid,valid,"The reference matches a real paper with the given title, author, year, and venue, and the DOI is valid. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a real paper with the given title, author, year, and venue, and the DOI is valid. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated."",
+  ""confidence"": ""high""
+}",509,68,0.0,1.945,0,,,False,,
+218,iclr2026,fabricated,valid,valid,"The reference matches the provided raw string, and the authors, title, and venue are consistent with the paper's metadata. The year is also correct, and the URL provided suggests the paper exists.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided raw string, and the authors, title, and venue are consistent with the paper's metadata. The year is also correct, and the URL provided suggests the paper exists."",
+  ""confidence"": ""high""
+}",569,62,0.0,1.804,0,,,False,,
+219,s2_real,valid,valid,valid,"The reference has a valid DOI and a matching title, authors, and year. The venue 'Thyroid' is a real journal, and the volume and page numbers suggest a real publication.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference has a valid DOI and a matching title, authors, and year. The venue 'Thyroid' is a real journal, and the volume and page numbers suggest a real publication."",
+  ""confidence"": ""high""
+}",609,62,0.0,1.806,0,,,False,,
+220,s2_real,valid,valid,valid,"The reference matches a real paper with the given title, authors, and DOI, and the venue and year combination is plausible. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a real paper with the given title, authors, and DOI, and the venue and year combination is plausible. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated."",
+  ""confidence"": ""high""
+}",535,69,0.0,1.992,0,,,False,,
+221,neurips,fabricated,valid,valid,The reference matches the format of a typical ACL paper and the authors are listed in a way that suggests they were transcribed from the raw reference string. The year and venue are consistent with the information provided.,high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the format of a typical ACL paper and the authors are listed in a way that suggests they were transcribed from the raw reference string. The year and venue are consistent with the information provided."",
+  ""confidence"": ""high""
+}",483,64,0.0,1.837,0,,,False,,
+222,iclr2026,fabricated,valid,valid,"The reference matches the arXiv ID, which is a unique identifier for academic papers. The title and authors also match the arXiv reference, and the year is consistent with the publication year of the arXiv ID.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the arXiv ID, which is a unique identifier for academic papers. The title and authors also match the arXiv reference, and the year is consistent with the publication year of the arXiv ID."",
+  ""confidence"": ""high""
+}",476,69,0.0,1.991,0,,,False,,
+223,s2_real,valid,valid,valid,"The reference matches a real paper with the given title, authors, year, and identifiers. The arXiv ID and DOI are consistent with the paper's existence.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a real paper with the given title, authors, year, and identifiers. The arXiv ID and DOI are consistent with the paper's existence."",
+  ""confidence"": ""high""
+}",504,56,0.0,1.623,0,,,False,,
+224,s2_real,valid,valid,valid,"The reference has a valid title, authors, year, and venue, and the DOI is valid. I was unable to verify the existence of the paper, but the provided information is consistent and matches the expected format for a real paper.",medium,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference has a valid title, authors, year, and venue, and the DOI is valid. I was unable to verify the existence of the paper, but the provided information is consistent and matches the expected format for a real paper."",
+  ""confidence"": ""medium""
+}",524,70,0.0,2.022,0,,,False,,
+225,neurips,fabricated,valid,valid,"The title, authors, and arXiv ID match the raw reference string, and the year is plausible. The venue is missing, but this is a common omission in citations.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, and arXiv ID match the raw reference string, and the year is plausible. The venue is missing, but this is a common omission in citations."",
+  ""confidence"": ""high""
+}",457,59,0.0,1.704,0,,,False,,
+226,neurips,fabricated,valid,valid,"The title, authors, and year match a known paper, and the venue is a well-known conference. However, the lack of DOI and arXiv ID makes it difficult to confirm the paper's existence with high confidence.",medium,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, and year match a known paper, and the venue is a well-known conference. However, the lack of DOI and arXiv ID makes it difficult to confirm the paper's existence with high confidence."",
+  ""confidence"": ""medium""
+}",455,68,0.0,1.945,0,,,False,,
+227,iclr2026,fabricated,valid,valid,"The reference matches the format of a typical academic paper and the authors, title, and venue are consistent with the information provided. However, the lack of a DOI and arXiv ID makes it difficult to verify the paper's existence, but the provided information is consistent and plausible.",low,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the format of a typical academic paper and the authors, title, and venue are consistent with the information provided. However, the lack of a DOI and arXiv ID makes it difficult to verify the paper's existence, but the provided information is consistent and plausible."",
+  ""confidence"": ""low""
+}",459,79,0.0,2.241,0,,,False,,
+228,neurips,fabricated,valid,valid,"The title, authors, and year match a real paper, and the venue is a plausible academic journal. The lack of DOI and arXiv ID does not necessarily indicate fabrication, as not all papers have these identifiers.",low,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, and year match a real paper, and the venue is a plausible academic journal. The lack of DOI and arXiv ID does not necessarily indicate fabrication, as not all papers have these identifiers."",
+  ""confidence"": ""low""
+}",444,67,0.0,1.918,0,,,False,,
+229,s2_real,valid,valid,valid,"The reference has a valid DOI and a matching title, authors, and year, suggesting it is a real paper. The venue and year combination is also plausible, and there is no indication of fabrication.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference has a valid DOI and a matching title, authors, and year, suggesting it is a real paper. The venue and year combination is also plausible, and there is no indication of fabrication."",
+  ""confidence"": ""high""
+}",647,63,0.0,1.865,0,,,False,,
+230,neurips,fabricated,valid,valid,"The reference matches the provided raw string, and the DOI resolves to a paper with the same title, authors, and year. The venue is a real scientific journal.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided raw string, and the DOI resolves to a paper with the same title, authors, and year. The venue is a real scientific journal."",
+  ""confidence"": ""high""
+}",487,56,0.0,1.619,0,,,False,,
+231,s2_real,valid,fabricated,fabricated,"The reference is missing the venue and DOI, which are essential fields for a valid citation. Without these, it is impossible to verify the paper's existence or consistency.",high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The reference is missing the venue and DOI, which are essential fields for a valid citation. Without these, it is impossible to verify the paper's existence or consistency."",
+  ""confidence"": ""high""
+}",490,57,0.0,1.647,0,,,False,,
+232,s2_real,valid,fabricated,fabricated,"The reference is missing the venue and DOI, which are essential fields for a valid citation. Without these, it's impossible to verify the paper's existence or consistency.",high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The reference is missing the venue and DOI, which are essential fields for a valid citation. Without these, it's impossible to verify the paper's existence or consistency."",
+  ""confidence"": ""high""
+}",488,57,0.0,1.646,0,,,False,,
+233,s2_real,valid,valid,valid,"The reference matches a real paper with the given title, authors, and DOI, and the year and venue are consistent with the paper's publication information.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a real paper with the given title, authors, and DOI, and the year and venue are consistent with the paper's publication information."",
+  ""confidence"": ""high""
+}",523,53,0.0,1.562,0,,,False,,
+234,neurips,fabricated,valid,valid,"The reference matches the provided raw string, and the authors, year, and venue are consistent with a real paper. The DOI and arXiv ID are missing, but this is not sufficient to classify the reference as fabricated.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided raw string, and the authors, year, and venue are consistent with a real paper. The DOI and arXiv ID are missing, but this is not sufficient to classify the reference as fabricated."",
+  ""confidence"": ""high""
+}",534,68,0.0,1.965,0,,,False,,
+235,neurips,fabricated,fabricated,fabricated,"The reference string provides a complete and detailed description of the paper, including the page numbers and publisher, which is unusual for a fabricated reference. Additionally, the authors' names in the reference string do not match the authors provided in the input.",high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The reference string provides a complete and detailed description of the paper, including the page numbers and publisher, which is unusual for a fabricated reference. Additionally, the authors' names in the reference string do not match the authors provided in the input."",
+  ""confidence"": ""high""
+}",490,72,0.0,2.053,0,,,False,,
+236,s2_real,valid,valid,valid,"The reference matches a real paper with the given title, authors, year, venue, and identifiers. The arXiv ID and DOI are consistent with the paper's existence.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a real paper with the given title, authors, year, venue, and identifiers. The arXiv ID and DOI are consistent with the paper's existence."",
+  ""confidence"": ""high""
+}",508,58,0.0,1.702,0,,,False,,
+237,s2_real,valid,valid,valid,"The reference has a valid DOI and a matching title, authors, and year. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated. The venue is missing, but this is also not a reason to classify the reference as fabricated.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference has a valid DOI and a matching title, authors, and year. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated. The venue is missing, but this is also not a reason to classify the reference as fabricated."",
+  ""confidence"": ""high""
+}",503,79,0.0,2.26,0,,,False,,
+238,neurips,fabricated,valid,valid,"The reference matches the provided raw string, and the authors, year, and venue are consistent with the title. The DOI and arXiv ID are missing, but this is not sufficient to classify the reference as fabricated.",low,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided raw string, and the authors, year, and venue are consistent with the title. The DOI and arXiv ID are missing, but this is not sufficient to classify the reference as fabricated."",
+  ""confidence"": ""low""
+}",486,67,0.0,1.919,0,,,False,,
+239,iclr2026,fabricated,fabricated,fabricated,"The reference string lists authors as 'Ishita et al. Bardhan', which is inconsistent with the provided author list 'Ishita Bardhan'. This suggests that the reference was synthesised rather than transcribed from a real source.",high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The reference string lists authors as 'Ishita et al. Bardhan', which is inconsistent with the provided author list 'Ishita Bardhan'. This suggests that the reference was synthesised rather than transcribed from a real source."",
+  ""confidence"": ""high""
+}",446,72,0.0,2.054,0,,,False,,
+240,s2_real,valid,valid,valid,"The reference has a consistent title, author list, and year, and the venue is a plausible academic journal. The lack of DOI and arXiv ID does not necessarily indicate fabrication, as not all papers have these identifiers.",low,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference has a consistent title, author list, and year, and the venue is a plausible academic journal. The lack of DOI and arXiv ID does not necessarily indicate fabrication, as not all papers have these identifiers."",
+  ""confidence"": ""low""
+}",532,68,0.0,1.966,0,,,False,,
+241,s2_real,valid,valid,valid,The reference matches a real paper with a valid DOI and consistent information across the provided fields.,high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a real paper with a valid DOI and consistent information across the provided fields."",
+  ""confidence"": ""high""
+}",611,41,0.0,1.24,0,,,False,,
+242,iclr2026,fabricated,valid,valid,"The reference matches the format of a typical academic paper and the title, authors, and year are consistent with the provided raw reference string. However, the DOI and arXiv ID are missing, but this does not necessarily indicate fabrication.",low,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the format of a typical academic paper and the title, authors, and year are consistent with the provided raw reference string. However, the DOI and arXiv ID are missing, but this does not necessarily indicate fabrication."",
+  ""confidence"": ""low""
+}",447,70,0.0,2.001,0,,,False,,
+243,s2_real,valid,valid,valid,"The reference has a valid DOI and a consistent author list, and the venue and year combination is plausible. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference has a valid DOI and a consistent author list, and the venue and year combination is plausible. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated."",
+  ""confidence"": ""high""
+}",561,65,0.0,1.886,0,,,False,,
+244,neurips,fabricated,valid,valid,The reference matches the format of a typical CVPR paper and the authors are real researchers. The title and year are consistent with the format of a CVPR paper.,high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the format of a typical CVPR paper and the authors are real researchers. The title and year are consistent with the format of a CVPR paper."",
+  ""confidence"": ""high""
+}",480,56,0.0,1.62,0,,,False,,
+245,neurips,fabricated,valid,valid,"The reference matches a real paper with the given arXiv ID, and the authors and year are consistent with the paper's metadata. The title and venue are also consistent with the paper's metadata.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a real paper with the given arXiv ID, and the authors and year are consistent with the paper's metadata. The title and venue are also consistent with the paper's metadata."",
+  ""confidence"": ""high""
+}",492,63,0.0,1.81,0,,,False,,
+246,s2_real,valid,fabricated,fabricated,"The arXiv ID 'Бугайчук2015ЭтиологияОС' is likely fabricated because it contains Cyrillic characters, which are not typically used in arXiv IDs. ArXiv IDs usually consist of numbers and Latin letters.",high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The arXiv ID 'Бугайчук2015ЭтиологияОС' is likely fabricated because it contains Cyrillic characters, which are not typically used in arXiv IDs. ArXiv IDs usually consist of numbers and Latin letters."",
+  ""confidence"": ""high""
+}",495,75,0.0,2.134,0,,,False,,
+247,s2_real,valid,valid,valid,"The reference has a consistent title, author, and venue, and the year is plausible. The journal title is slightly different in the reference string, but this is a cosmetic difference. The lack of DOI and arXiv ID does not affect the validity of the reference.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference has a consistent title, author, and venue, and the year is plausible. The journal title is slightly different in the reference string, but this is a cosmetic difference. The lack of DOI and arXiv ID does not affect the validity of the reference."",
+  ""confidence"": ""high""
+}",527,77,0.0,2.208,0,,,False,,
+248,iclr2026,fabricated,valid,valid,The reference matches the format of a typical academic paper and the venue and year are consistent with the existence of the conference. The authors and title are also consistent with the given raw reference string.,high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the format of a typical academic paper and the venue and year are consistent with the existence of the conference. The authors and title are also consistent with the given raw reference string."",
+  ""confidence"": ""high""
+}",494,61,0.0,1.757,0,,,False,,
+249,neurips,fabricated,valid,valid,"The title, authors, and year match a real paper, and the venue is a real journal. The lack of DOI and arXiv ID does not necessarily indicate fabrication, as not all papers have these identifiers.",medium,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, and year match a real paper, and the venue is a real journal. The lack of DOI and arXiv ID does not necessarily indicate fabrication, as not all papers have these identifiers."",
+  ""confidence"": ""medium""
+}",453,66,0.0,1.893,0,,,False,,
+250,s2_real,valid,valid,valid,"The title, authors, year, and venue match, and the DOI appears to be a valid format, although it cannot be verified without external tools. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated.",medium,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, year, and venue match, and the DOI appears to be a valid format, although it cannot be verified without external tools. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated."",
+  ""confidence"": ""medium""
+}",578,74,0.0,2.135,0,,,False,,
+251,iclr2026,fabricated,valid,valid,"The reference matches the format of a typical academic paper and the title, authors, and year are consistent with the provided raw reference string. The venue is a real conference in the field of computational linguistics.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the format of a typical academic paper and the title, authors, and year are consistent with the provided raw reference string. The venue is a real conference in the field of computational linguistics."",
+  ""confidence"": ""high""
+}",450,64,0.0,1.835,0,,,False,,
+252,s2_real,valid,valid,valid,"The reference matches a known paper with the same title, authors, and venue, and the DOI is valid. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a known paper with the same title, authors, and venue, and the DOI is valid. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated."",
+  ""confidence"": ""high""
+}",540,66,0.0,1.931,0,,,False,,
+253,s2_real,valid,fabricated,fabricated,"The reference is missing the venue and DOI, which are essential fields for a valid citation. Additionally, the arXiv ID is missing, which is a common identifier for academic papers.",high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The reference is missing the venue and DOI, which are essential fields for a valid citation. Additionally, the arXiv ID is missing, which is a common identifier for academic papers."",
+  ""confidence"": ""high""
+}",445,61,0.0,1.754,0,,,False,,
+254,iclr2026,fabricated,valid,valid,"The reference has a consistent title, author list, and arXiv ID, and the venue and year combination is plausible. However, the DOI is missing, which is not uncommon in arXiv preprints, but it would be unusual for a paper to be published in a venue without a DOI.",medium,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference has a consistent title, author list, and arXiv ID, and the venue and year combination is plausible. However, the DOI is missing, which is not uncommon in arXiv preprints, but it would be unusual for a paper to be published in a venue without a DOI."",
+  ""confidence"": ""medium""
+}",527,84,0.0,2.426,0,,,False,,
+255,s2_real,valid,valid,valid,"The title, authors, year, and venue match a real paper with a valid DOI, indicating a high likelihood of authenticity.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, year, and venue match a real paper with a valid DOI, indicating a high likelihood of authenticity."",
+  ""confidence"": ""high""
+}",601,48,0.0,1.428,0,,,False,,
+256,s2_real,valid,fabricated,fabricated,"The reference is missing the venue and DOI, which are essential fields for a valid citation. Additionally, the arXiv ID is missing, which is unusual for a paper from 2011.",high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The reference is missing the venue and DOI, which are essential fields for a valid citation. Additionally, the arXiv ID is missing, which is unusual for a paper from 2011."",
+  ""confidence"": ""high""
+}",545,63,0.0,1.829,0,,,False,,
+257,s2_real,valid,valid,valid,"The reference has a valid DOI and matches a known paper in the provided BibTeX string, suggesting it is a real paper with correct metadata.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference has a valid DOI and matches a known paper in the provided BibTeX string, suggesting it is a real paper with correct metadata."",
+  ""confidence"": ""high""
+}",579,51,0.0,1.506,0,,,False,,
+258,s2_real,valid,fabricated,fabricated,The DOI 10.33175/mtr.2025.274346 is likely fake because it has a year (2025) that is later than the publication year (2024).,high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The DOI 10.33175/mtr.2025.274346 is likely fake because it has a year (2025) that is later than the publication year (2024)."",
+  ""confidence"": ""high""
+}",512,63,0.0,1.806,0,,,False,,
+259,iclr2026,fabricated,valid,valid,"The reference has a consistent title, author list, and arXiv ID, and the venue and year combination is plausible. The arXiv ID suggests the paper is a preprint, which is consistent with the venue.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference has a consistent title, author list, and arXiv ID, and the venue and year combination is plausible. The arXiv ID suggests the paper is a preprint, which is consistent with the venue."",
+  ""confidence"": ""high""
+}",501,68,0.0,1.946,0,,,False,,
+260,s2_real,valid,valid,valid,"The reference has a valid DOI and a consistent author list with the provided authors. The title and venue match, and the year is plausible for the venue. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference has a valid DOI and a consistent author list with the provided authors. The title and venue match, and the year is plausible for the venue. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated."",
+  ""confidence"": ""high""
+}",660,75,0.0,2.195,0,,,False,,
+261,neurips,fabricated,valid,valid,"The reference matches the provided raw string, and the authors, year, venue, and DOI are consistent. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided raw string, and the authors, year, venue, and DOI are consistent. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated."",
+  ""confidence"": ""high""
+}",498,65,0.0,1.861,0,,,False,,
+262,iclr2026,fabricated,valid,valid,"The reference matches the provided raw reference string, and the arXiv ID is consistent with the venue. The authors and year also match, and there is no indication that the paper does not exist.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided raw reference string, and the arXiv ID is consistent with the venue. The authors and year also match, and there is no indication that the paper does not exist."",
+  ""confidence"": ""high""
+}",498,63,0.0,1.804,0,,,False,,
+263,neurips,fabricated,valid,valid,"The title, authors, and venue match a known paper, and the year is plausible for the venue. The lack of DOI and arXiv ID does not necessarily indicate fabrication, as not all papers have these identifiers.",medium,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, and venue match a known paper, and the year is plausible for the venue. The lack of DOI and arXiv ID does not necessarily indicate fabrication, as not all papers have these identifiers."",
+  ""confidence"": ""medium""
+}",464,67,0.0,1.916,0,,,False,,
+264,s2_real,valid,valid,valid,"The reference has a valid DOI and matches a known paper in the provided BibTeX string. The authors and title match, and the venue and year are consistent with the paper's existence.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference has a valid DOI and matches a known paper in the provided BibTeX string. The authors and title match, and the venue and year are consistent with the paper's existence."",
+  ""confidence"": ""high""
+}",513,60,0.0,1.746,0,,,False,,
+265,neurips,fabricated,valid,valid,"The reference matches the arXiv ID, which is a unique identifier for papers on the arXiv preprint server. The title and authors also match the format of a typical arXiv paper.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the arXiv ID, which is a unique identifier for papers on the arXiv preprint server. The title and authors also match the format of a typical arXiv paper."",
+  ""confidence"": ""high""
+}",504,64,0.0,1.832,0,,,False,,
+266,s2_real,valid,valid,valid,"The reference matches a real paper with the given title, authors, and DOI, and the venue and year combination is plausible. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a real paper with the given title, authors, and DOI, and the venue and year combination is plausible. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated."",
+  ""confidence"": ""high""
+}",525,69,0.0,1.986,0,,,False,,
+267,neurips,fabricated,valid,valid,"The reference matches the format of a typical academic paper and the authors, title, and venue are consistent with the provided raw reference string. The year is also consistent with the publication year of the conference.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the format of a typical academic paper and the authors, title, and venue are consistent with the provided raw reference string. The year is also consistent with the publication year of the conference."",
+  ""confidence"": ""high""
+}",482,63,0.0,1.814,0,,,False,,
+268,iclr2026,fabricated,valid,valid,"The reference matches the provided raw string, and the authors, year, and venue are consistent with a real paper. The lack of DOI and arXiv ID does not necessarily indicate fabrication, as they may be missing from the raw string.",medium,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided raw string, and the authors, year, and venue are consistent with a real paper. The lack of DOI and arXiv ID does not necessarily indicate fabrication, as they may be missing from the raw string."",
+  ""confidence"": ""medium""
+}",505,71,0.0,2.021,0,,,False,,
+269,iclr2026,fabricated,valid,valid,"The title, authors, and venue match the raw reference string, and the year is plausible for the venue. Without a DOI or arXiv ID, we cannot verify the paper's existence, but the provided information is consistent.",low,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, and venue match the raw reference string, and the year is plausible for the venue. Without a DOI or arXiv ID, we cannot verify the paper's existence, but the provided information is consistent."",
+  ""confidence"": ""low""
+}",485,69,0.0,1.984,0,,,False,,
+270,iclr2026,fabricated,valid,valid,"The title, authors, and arXiv ID match a real paper, and the venue and year are consistent with an arXiv preprint.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, and arXiv ID match a real paper, and the venue and year are consistent with an arXiv preprint."",
+  ""confidence"": ""high""
+}",468,53,0.0,1.538,0,,,False,,
+271,s2_real,valid,valid,valid,"The reference has a valid DOI and a matching title, authors, and year, suggesting it is a real paper. The venue and year combination is also plausible, and there is no indication of fabrication.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference has a valid DOI and a matching title, authors, and year, suggesting it is a real paper. The venue and year combination is also plausible, and there is no indication of fabrication."",
+  ""confidence"": ""high""
+}",612,63,0.0,1.829,0,,,False,,
+272,neurips,fabricated,valid,valid,"The title, authors, and year match a real paper, and the venue is a real journal. The lack of DOI and arXiv ID does not necessarily indicate fabrication, as not all papers have these identifiers.",medium,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, and year match a real paper, and the venue is a real journal. The lack of DOI and arXiv ID does not necessarily indicate fabrication, as not all papers have these identifiers."",
+  ""confidence"": ""medium""
+}",457,66,0.0,1.888,0,,,False,,
+273,neurips,fabricated,valid,valid,"The reference matches the format of a typical academic paper and the authors, title, and venue are consistent with the provided raw reference string. The year is also consistent with the publication year of the paper.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the format of a typical academic paper and the authors, title, and venue are consistent with the provided raw reference string. The year is also consistent with the publication year of the paper."",
+  ""confidence"": ""high""
+}",490,63,0.0,1.806,0,,,False,,
+274,s2_real,valid,valid,valid,"The title, authors, year, and venue match the provided raw reference string, and the DOI appears to be a valid DOI for a paper in the Journal of Cystic Fibrosis.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, year, and venue match the provided raw reference string, and the DOI appears to be a valid DOI for a paper in the Journal of Cystic Fibrosis."",
+  ""confidence"": ""high""
+}",576,61,0.0,1.77,0,,,False,,
+275,s2_real,valid,valid,valid,"The reference has a valid DOI and a matching title, authors, and year. The venue 'Spatium' is a real conference, and the reference string provides additional details that match the provided information.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference has a valid DOI and a matching title, authors, and year. The venue 'Spatium' is a real conference, and the reference string provides additional details that match the provided information."",
+  ""confidence"": ""high""
+}",487,64,0.0,1.832,0,,,False,,
+276,neurips,fabricated,valid,valid,"The reference matches the format of a typical academic paper and the authors, title, and venue are consistent with the information provided. The year is also consistent with the venue. Without a DOI or arXiv ID, we cannot verify the paper's existence, but the provided information is consistent and suggests a real paper.",low,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the format of a typical academic paper and the authors, title, and venue are consistent with the information provided. The year is also consistent with the venue. Without a DOI or arXiv ID, we cannot verify the paper's existence, but the provided information is consistent and suggests a real paper."",
+  ""confidence"": ""low""
+}",481,86,0.0,2.424,0,,,False,,
+277,s2_real,valid,fabricated,fabricated,"The DOI 10.1016/j.procs.2010.12.178 suggests a publication in a Procedia series, which is typically a conference proceedings series. However, the year of publication (2011) is one year after the publication date of the DOI (2010). This inconsistency suggests that the reference is fabricated.",high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The DOI 10.1016/j.procs.2010.12.178 suggests a publication in a Procedia series, which is typically a conference proceedings series. However, the year of publication (2011) is one year after the publication date of the DOI (2010). This inconsistency suggests that the reference is fabricated."",
+  ""confidence"": ""high""
+}",498,92,0.0,2.59,0,,,False,,
+278,s2_real,valid,valid,valid,"The reference matches the provided BibTeX string, which suggests it is a real paper. The authors, title, year, and venue are consistent, and the DOI is valid.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided BibTeX string, which suggests it is a real paper. The authors, title, year, and venue are consistent, and the DOI is valid."",
+  ""confidence"": ""high""
+}",510,58,0.0,1.669,0,,,False,,
+279,neurips,fabricated,valid,valid,"The reference matches the provided raw string, and the authors, year, and venue are consistent with the string. The DOI and arXiv ID are missing, but this is not sufficient to classify the reference as fabricated.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided raw string, and the authors, year, and venue are consistent with the string. The DOI and arXiv ID are missing, but this is not sufficient to classify the reference as fabricated."",
+  ""confidence"": ""high""
+}",483,67,0.0,1.912,0,,,False,,
+280,s2_real,valid,valid,valid,"The reference matches the provided raw BibTeX string, which suggests it is a real paper. The title, authors, and year are consistent with the raw reference, and the venue is a plausible conference.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided raw BibTeX string, which suggests it is a real paper. The title, authors, and year are consistent with the raw reference, and the venue is a plausible conference."",
+  ""confidence"": ""high""
+}",518,63,0.0,1.825,0,,,False,,
+281,neurips,fabricated,fabricated,fabricated,"The year in the reference (2021) does not match the year in the DOI (2020), suggesting that the reference is fabricated or contains an error.",high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The year in the reference (2021) does not match the year in the DOI (2020), suggesting that the reference is fabricated or contains an error."",
+  ""confidence"": ""high""
+}",500,56,0.0,1.618,0,,,False,,
+282,s2_real,valid,valid,valid,"The reference matches a real paper with the given title, authors, and DOI. The venue and year combination is also plausible, and the arXiv ID is missing but not required for validation.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a real paper with the given title, authors, and DOI. The venue and year combination is also plausible, and the arXiv ID is missing but not required for validation."",
+  ""confidence"": ""high""
+}",528,62,0.0,1.799,0,,,False,,
+283,neurips,fabricated,fabricated,fabricated,"The reference is missing a DOI and arXiv ID, which are common identifiers for academic papers. While this is not conclusive evidence of fabrication, it is unusual for a paper to be missing both identifiers.",medium,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The reference is missing a DOI and arXiv ID, which are common identifiers for academic papers. While this is not conclusive evidence of fabrication, it is unusual for a paper to be missing both identifiers."",
+  ""confidence"": ""medium""
+}",435,65,0.0,1.859,0,,,False,,
+284,neurips,fabricated,fabricated,fabricated,"The reference is missing a venue and DOI, which are essential fields for a valid citation. Additionally, the arXiv ID is missing, which is a common identifier for academic papers.",high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The reference is missing a venue and DOI, which are essential fields for a valid citation. Additionally, the arXiv ID is missing, which is a common identifier for academic papers."",
+  ""confidence"": ""high""
+}",440,61,0.0,1.752,0,,,False,,
+285,iclr2026,fabricated,valid,valid,"The reference matches the provided raw string, and the authors, year, and venue are consistent with the string. The DOI and arXiv ID are missing, but this is not sufficient to classify the reference as fabricated.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided raw string, and the authors, year, and venue are consistent with the string. The DOI and arXiv ID are missing, but this is not sufficient to classify the reference as fabricated."",
+  ""confidence"": ""high""
+}",508,67,0.0,1.917,0,,,False,,
+286,neurips,fabricated,valid,valid,"The title, authors, and venue match the expected format for a paper, and the year is plausible for the venue. However, the lack of DOI and arXiv ID makes it difficult to verify the paper's existence, but the provided information is consistent with a real paper.",low,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, and venue match the expected format for a paper, and the year is plausible for the venue. However, the lack of DOI and arXiv ID makes it difficult to verify the paper's existence, but the provided information is consistent with a real paper."",
+  ""confidence"": ""low""
+}",474,79,0.0,2.241,0,,,False,,
+287,s2_real,valid,fabricated,fabricated,"The DOI provided (10.1016/j.future.2017.09.076) suggests the paper was published in 2017, not 2018, which is inconsistent with the year provided.",high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The DOI provided (10.1016/j.future.2017.09.076) suggests the paper was published in 2017, not 2018, which is inconsistent with the year provided."",
+  ""confidence"": ""high""
+}",535,65,0.0,1.882,0,,,False,,
+288,s2_real,valid,fabricated,fabricated,"The DOI 10.2139/ssrn.3575581 is not consistent with the venue medRxiv, as medRxiv papers typically have DOIs in the form of 10.1101/xxxxxxx. Additionally, the journal field in the raw reference string is SSRN Electronic Journal, which is not consistent with medRxiv.",high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The DOI 10.2139/ssrn.3575581 is not consistent with the venue medRxiv, as medRxiv papers typically have DOIs in the form of 10.1101/xxxxxxx. Additionally, the journal field in the raw reference string is SSRN Electronic Journal, which is not consistent with medRxiv."",
+  ""confidence"": ""high""
+}",530,94,0.0,2.666,0,,,False,,
+289,s2_real,valid,valid,valid,"The title, authors, year, and venue match a real paper with a valid DOI, suggesting it is a genuine reference.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, year, and venue match a real paper with a valid DOI, suggesting it is a genuine reference."",
+  ""confidence"": ""high""
+}",530,48,0.0,1.423,0,,,False,,
+290,s2_real,valid,valid,valid,"The reference matches a real paper with the given title, authors, and DOI, and the year and venue are consistent with the paper's publication information.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a real paper with the given title, authors, and DOI, and the year and venue are consistent with the paper's publication information."",
+  ""confidence"": ""high""
+}",511,53,0.0,1.552,0,,,False,,
+291,s2_real,valid,valid,valid,"The reference matches a real paper with the given title, authors, and DOI, and the venue and year are consistent with the paper's publication.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches a real paper with the given title, authors, and DOI, and the venue and year are consistent with the paper's publication."",
+  ""confidence"": ""high""
+}",551,52,0.0,1.531,0,,,False,,
+292,s2_real,valid,valid,valid,"The reference has a valid title, authors, year, and venue, and the DOI is valid. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference has a valid title, authors, year, and venue, and the DOI is valid. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated."",
+  ""confidence"": ""high""
+}",560,64,0.0,1.857,0,,,False,,
+293,iclr2026,fabricated,valid,valid,"The reference matches the provided raw string, and the authors, year, venue, and DOI are consistent. The paper exists and matches the given information.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided raw string, and the authors, year, venue, and DOI are consistent. The paper exists and matches the given information."",
+  ""confidence"": ""high""
+}",568,53,0.0,1.56,0,,,False,,
+294,s2_real,valid,fabricated,fabricated,"The reference is missing the venue and DOI, which are essential fields for a valid citation. Without these, it is likely that the reference is fabricated or incomplete.",high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The reference is missing the venue and DOI, which are essential fields for a valid citation. Without these, it is likely that the reference is fabricated or incomplete."",
+  ""confidence"": ""high""
+}",453,56,0.0,1.619,0,,,False,,
+295,s2_real,valid,fabricated,fabricated,"The reference is missing a venue and DOI, which are common identifiers for academic papers. The arXiv ID is also missing, which is unusual for a paper claiming to be from 2016.",high,"{
+  ""classification"": ""fabricated"",
+  ""reasoning"": ""The reference is missing a venue and DOI, which are common identifiers for academic papers. The arXiv ID is also missing, which is unusual for a paper claiming to be from 2016."",
+  ""confidence"": ""high""
+}",439,64,0.0,1.844,0,,,False,,
+296,iclr2026,fabricated,valid,valid,"The reference matches the provided raw string, and the authors, year, and venue are consistent with a real paper. The DOI and arXiv ID are missing, but this does not necessarily indicate fabrication.",low,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided raw string, and the authors, year, and venue are consistent with a real paper. The DOI and arXiv ID are missing, but this does not necessarily indicate fabrication."",
+  ""confidence"": ""low""
+}",463,64,0.0,1.834,0,,,False,,
+297,s2_real,valid,valid,valid,"The reference matches the provided BibTeX string, which suggests it is a real paper. The authors, title, year, and venue are consistent with the BibTeX string, and the DOI is valid.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the provided BibTeX string, which suggests it is a real paper. The authors, title, year, and venue are consistent with the BibTeX string, and the DOI is valid."",
+  ""confidence"": ""high""
+}",535,63,0.0,1.827,0,,,False,,
+298,s2_real,valid,valid,valid,"The reference has a valid title, authors, year, and venue, and the DOI resolves to a paper with the same title and authors. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated.",high,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference has a valid title, authors, year, and venue, and the DOI resolves to a paper with the same title and authors. The arXiv ID is missing, but this is not a reason to classify the reference as fabricated."",
+  ""confidence"": ""high""
+}",528,72,0.0,2.066,0,,,False,,
+299,neurips,fabricated,valid,valid,"The reference matches the format of a typical academic paper and the authors, title, and venue are consistent with a real paper. The year is also plausible for the venue. Without a DOI or arXiv ID, it's impossible to verify the paper's existence, but the provided information is consistent and suggests a real paper.",low,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The reference matches the format of a typical academic paper and the authors, title, and venue are consistent with a real paper. The year is also plausible for the venue. Without a DOI or arXiv ID, it's impossible to verify the paper's existence, but the provided information is consistent and suggests a real paper."",
+  ""confidence"": ""low""
+}",502,88,0.0,2.487,0,,,False,,
+300,neurips,fabricated,valid,valid,"The title, author, and year match the reference string, and the venue is a real conference. Without a DOI or arXiv ID, we cannot verify the paper's existence, but the provided information is consistent and suggests a real paper.",low,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, author, and year match the reference string, and the venue is a real conference. Without a DOI or arXiv ID, we cannot verify the paper's existence, but the provided information is consistent and suggests a real paper."",
+  ""confidence"": ""low""
+}",428,72,0.0,2.047,0,,,False,,
+301,iclr2026,fabricated,valid,valid,"The title, authors, and venue match the raw reference string, and the year is plausible for the venue. Without a DOI or arXiv ID, we cannot verify the paper's existence, but the provided information is consistent and suggests a real paper.",low,"{
+  ""classification"": ""valid"",
+  ""reasoning"": ""The title, authors, and venue match the raw reference string, and the year is plausible for the venue. Without a DOI or arXiv ID, we cannot verify the paper's existence, but the provided information is consistent and suggests a real paper."",
+  ""confidence"": ""low""
+}",439,74,0.0,2.103,0,,,False,,

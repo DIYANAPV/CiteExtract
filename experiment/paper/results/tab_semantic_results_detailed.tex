@@ -1,0 +1,21 @@
+\begin{tabular}{llrrrrrr}
+\toprule
+Model & Condition & Acc & Macro-F1 & V-F1 & M-F1 & Time (min) & Cost (\$) \\
+\midrule
+gpt-4o-mini & Title only & 72.74 & 69.75 & 79.26 & 60.24 & 25.9 & 0.17 \\
+ & Title + Abstract & 71.39 & 68.07 & 78.37 & 57.77 & 25.5 & 0.19 \\
+ & Title + Abstract + Passages & \textbf{83.81} & \textbf{77.82} & \textbf{89.34} & \textbf{66.29} & 30.5 & 0.25 \\
+\midrule
+gpt-4o & Title only & 80.43 & 73.93 & 86.95 & 60.92 & 16.2 & 2.83 \\
+ & Title + Abstract & 78.00 & 73.19 & 84.55 & 61.83 & 17.8 & 3.18 \\
+ & Title + Abstract + Passages & 85.02 & 78.86 & 90.27 & 67.45 & 19.2 & 4.19 \\
+\midrule
+Qwen3-8B & Title only & 76.11 & 71.50 & 82.96 & 60.05 & 19.4 & -- \\
+ & Title + Abstract & 71.79 & 68.30 & 78.82 & 57.78 & 22.7 & -- \\
+ & Title + Abstract + Passages & 83.00 & 77.86 & 88.52 & 67.19 & 26.6 & -- \\
+\midrule
+Llama-3.1-8B-Instruct & Title only & 56.55 & 55.91 & 61.20 & 50.61 & 110.8 & -- \\
+ & Title + Abstract & 52.36 & 52.24 & 54.69 & 49.79 & 60.0 & -- \\
+ & Title + Abstract + Passages & 53.98 & 53.83 & 56.45 & 51.22 & 45.6 & -- \\
+\bottomrule
+\end{tabular}
