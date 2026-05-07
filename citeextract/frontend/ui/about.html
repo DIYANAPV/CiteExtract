@@ -1,0 +1,98 @@
+<div class="cc-about">
+    <div class="cc-about-section">
+        <h3>What it does</h3>
+        <p>CiteExtract is designed to verify citations in academic writing.
+        For each reference, it considers two questions separately: whether
+        the cited work exists with the stated bibliographic details, and
+        whether it supports the claim made in the text. Each assessment is
+        supported by evidence, such as database records for the
+        bibliographic check and relevant excerpts from the cited work for
+        the claim check.</p>
+
+        <p>Authors can use it to review their manuscripts before
+        submission, while reviewers can use it to examine references more
+        efficiently. The tool also produces an annotated PDF in which
+        citations are labeled with their assessment, and any disputed
+        claims are flagged with notes that point to the relevant
+        supporting passages.</p>
+    </div>
+
+    <div class="cc-about-section">
+        <h3>Verdict guide</h3>
+        <p><strong>Metadata verdicts</strong> describe the cited paper itself.</p>
+        <ul style="margin:8px 0 12px 20px;line-height:1.7;">
+            <li><strong>VALID.</strong> The paper exists and its fields match.</li>
+            <li><strong>FABRICATED.</strong> At least two databases responded with no match, the metadata mismatches a real paper, or the paper has been retracted. Suggested action: remove the citation.</li>
+            <li><strong>UNVERIFIABLE.</strong> Coverage was insufficient to decide. Only one database responded, or all timed out. Flagged for human review.</li>
+        </ul>
+        <p><strong>Claim verdicts</strong> describe the relationship between the cited paper and the citing sentence.</p>
+        <ul style="margin:8px 0 12px 20px;line-height:1.7;">
+            <li><strong>SUPPORTS.</strong> The cited paper says what the citing sentence attributes to it.</li>
+            <li><strong>CONTRADICTS.</strong> The cited paper says something materially different. Suggested action: re-read the cited paper and revise.</li>
+            <li><strong>NEUTRAL.</strong> The cited paper does not address the specific topic the citing sentence claims. The general area may overlap but the specific point is not entailed.</li>
+            <li><strong>UNVERIFIABLE.</strong> Claim verification could not run, for example because the full text is paywalled, the agent failed, or there is no substantive citing sentence.</li>
+        </ul>
+    </div>
+
+
+    <div class="cc-about-section">
+        <h3>Frequently asked questions</h3>
+
+        <details class="cc-faq">
+            <summary>Which databases does the tool consult?</summary>
+            <p>The tool consults CrossRef, Semantic Scholar, OpenAlex, PubMed, and arXiv. For non-paper citations such as tweets or blog posts, it also checks whether the cited URL resolves.</p>
+        </details>
+
+        <details class="cc-faq">
+            <summary>What model is used for claim verification?</summary>
+            <p>OpenAI's <code>gpt-4o-mini</code>.</p>
+        </details>
+
+        <details class="cc-faq">
+            <summary>Is my paper sent to OpenAI?</summary>
+            <p>No. Only short excerpts are sent to OpenAI: the citing sentence with its surrounding context, and passages retrieved from the cited paper. Your full draft is never uploaded.</p>
+        </details>
+
+        <details class="cc-faq">
+            <summary>How accurate is it, and how should I read a verdict?</summary>
+            <p>The tool's primary output is the <em>evidence trail</em>, not the verdict label. Every verdict shows you what was retrieved — which databases responded for an existence check, and which passages from the cited paper supported or contradicted each claim — and the report exposes all of it so you can read the underlying material and decide whether you agree.</p>
+        </details>
+
+    </div>
+
+    <div class="cc-about-section">
+        <h3>Cite CiteExtract</h3>
+        <div class="cc-bibtex-wrap">
+            <pre class="cc-bibtex" id="cc-bibtex-cite"><code>@software{citeextract,
+  title  = {CiteExtract},
+  author = {Anonymous},
+  year   = {2026},
+  note   = {Submitted for double-blind review}
+}</code></pre>
+            <button type="button" class="cc-bibtex-copy"
+                onclick="(function(btn){
+                    var pre = document.getElementById('cc-bibtex-cite');
+                    if(!pre) return;
+                    var text = pre.innerText;
+                    var done = function(){
+                        btn.classList.add('cc-copied');
+                        btn.textContent = 'Copied';
+                        setTimeout(function(){ btn.classList.remove('cc-copied'); btn.textContent = 'Copy'; }, 1500);
+                    };
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(text).then(done).catch(function(){});
+                    } else {
+                        var ta = document.createElement('textarea'); ta.value = text;
+                        document.body.appendChild(ta); ta.select();
+                        try { document.execCommand('copy'); done(); } catch(e){}
+                        document.body.removeChild(ta);
+                    }
+                })(this)">Copy</button>
+        </div>
+    </div>
+
+    <div class="cc-about-section">
+        <h3>Status</h3>
+        <p>Open-source. Anonymized for double-blind review. Repository link will follow the review period.</p>
+    </div>
+</div>

@@ -60,7 +60,7 @@ python -m experiment.paper.semantic.make_table
 ### Metadata table
 
 ```bash
-# OpenAI rows + the deterministic CiteExtract row (uses src/verification/*)
+# OpenAI rows + the deterministic CiteExtract row (uses citeextract/verification/*)
 python -m experiment.paper.metadata.runner --full
 
 # Open-weight rows

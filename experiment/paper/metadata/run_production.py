@@ -1,18 +1,3 @@
-"""Production-pipeline cell for the metadata table.
-
-Per benchmark instance, runs the production cascade:
-
-    Reference  →  check_existence  →  validate_metadata  →  triage_reference
-                                                            ↓
-                          if NEEDS_METADATA / NEEDS_BOTH: MetadataAgent
-
-Verdict mapping to the table's binary label:
-  CLEAR_VALID                                  → valid
-  CLEAR_FABRICATED, UNVERIFIABLE               → fabricated
-  NEEDS_METADATA → MetadataAgent VALID         → valid
-  NEEDS_METADATA → MetadataAgent FABRICATED    → fabricated
-  NEEDS_METADATA → MetadataAgent UNVERIFIABLE  → fabricated
-"""
 
 from __future__ import annotations
 
@@ -23,12 +8,11 @@ from typing import Optional
 
 import httpx
 
-from src.models.reference import Reference
-from src.verification.api_clients.llm_client import CostTracker
-from src.verification.cache import APICache
-from src.verification.existence import check_existence
-from src.verification.metadata import validate_metadata
-from src.verification.triage import TriageRoute, triage_reference
+from citeextract.models.reference import Reference
+from citeextract.verification.cache import APICache
+from citeextract.verification.existence import check_existence
+from citeextract.verification.metadata import validate_metadata
+from citeextract.verification.triage import TriageRoute, triage_reference
 
 log = logging.getLogger(__name__)
 
@@ -50,7 +34,6 @@ class ProductionResult:
 
 def _record_to_reference(record: dict) -> Reference:
     rec_id = f"bench-{record['instance_id']:04d}"
-    # S2 corpus rows carry @Article{...}; fabricated halves are free-text APA.
     src = record.get("source", "")
     source_format = "bibtex" if src == "s2_real" else "text"
     return Reference(
@@ -129,7 +112,7 @@ async def run_one_production(
 
     if triage.route in (TriageRoute.NEEDS_METADATA, TriageRoute.NEEDS_BOTH):
         agent = metadata_agent_factory()
-        from src.verification.agentic.metadata_agent import build_metadata_user_message
+        from citeextract.verification.agentic.metadata_agent import build_metadata_user_message
 
         title_comp = next(
             (c for c in (metadata.comparisons or []) if c.field == "title"), None,
@@ -180,7 +163,6 @@ async def run_one_production(
             error=err,
         )
 
-    # NEEDS_CLAIM should never fire (no citations on these records); defend anyway.
     return ProductionResult(
         predicted_verdict="fabricated", raw_verdict=triage.route.name,
         triage_route=triage.route.name, metadata_agent_called=False,

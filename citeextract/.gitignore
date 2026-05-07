@@ -1,0 +1,25 @@
+# Secrets
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# IDE
+.vscode/
+.idea/
+
+# Data (generated at runtime)
+data/cache/
+data/output/
+data/dataset_final.*
+
+# Pytest
+.pytest_cache/
+
+# OS
+.DS_Store
+Thumbs.db

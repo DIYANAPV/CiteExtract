@@ -1,20 +1,3 @@
-"""Metadata-table benchmark runner.
-
-5 cells:
-  - gpt-4o-mini × llm_only
-  - gpt-4o-mini × llm_with_search
-  - gpt-4o      × llm_only
-  - gpt-4o      × llm_with_search
-  - our_system  (production existence + metadata + triage + metadata_agent)
-
-Reads from experiment/paper/data/benchmark_metadata.jsonl (302 instances).
-Writes per-cell CSVs and a JSONL safety log to experiment/paper/results/.
-Mirrors the semantic runner's resume / smoke / full pattern.
-
-CLI:
-    python -m experiment.paper.metadata.runner --smoke
-    python -m experiment.paper.metadata.runner --full
-"""
 
 from __future__ import annotations
 
@@ -25,7 +8,7 @@ import json
 import logging
 import sys
 import time
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Iterable
 
@@ -44,10 +27,10 @@ except Exception:
 import httpx
 
 from experiment.paper.metadata.llm_clients import (
-    PRICING, build_client,
+    build_client,
 )
 from experiment.paper.metadata.prompt_builder import (
-    CONDITIONS, build_user_message, load_system_prompt, parse_response,
+    build_user_message, load_system_prompt, parse_response,
 )
 from experiment.paper.metadata.run_production import (
     ProductionResult, run_one_production,
@@ -116,7 +99,6 @@ def load_records() -> list[dict]:
 
 
 def stratified_smoke_sample(records: list[dict], n: int = 10, seed: int = 42) -> list[dict]:
-    """Balanced fabricated/valid + at least one row per source."""
     import random
     rng = random.Random(seed)
     by_label: dict[str, list[dict]] = {"valid": [], "fabricated": []}
@@ -205,7 +187,6 @@ def _read_partial_as_rows(p: Path, records: list[dict]) -> list[Row]:
             d = json.loads(line)
             if int(d["instance_id"]) not in keep_ids:
                 continue
-            # Tolerate older partials missing newer columns.
             d.setdefault("n_search_invocations", 0)
             d.setdefault("search_queries", "")
             d.setdefault("triage_route", "")
@@ -351,13 +332,11 @@ async def run_production_cell(
     if completed:
         log.info(f"[our_system | production] resume: {len(completed)} already in partial")
 
-    # Local imports — keeps module-level import cheap and avoids loading
-    # production dependencies for callers that only need the LLM cells.
     from openai import AsyncOpenAI
-    from src.verification.cache import APICache
-    from src.verification.agentic.metadata_agent import MetadataAgent
-    from src.verification.agentic.tools import ToolExecutor
-    from src.verification.api_clients.llm_client import CostTracker
+    from citeextract.verification.cache import APICache
+    from citeextract.verification.agentic.metadata_agent import MetadataAgent
+    from citeextract.verification.agentic.tools import ToolExecutor
+    from citeextract.verification.api_clients.llm_client import CostTracker
 
     cache = APICache()
     sem = asyncio.Semaphore(concurrency)

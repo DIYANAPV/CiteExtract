@@ -1,4 +1,3 @@
-"""Prompt + user-message + JSON-parser for metadata-table LLM cells."""
 
 from __future__ import annotations
 
@@ -40,15 +39,10 @@ def build_user_message(record: dict) -> str:
 
 
 def parse_response(raw: str) -> tuple[str, str, str, str | None]:
-    """Returns ``(verdict, reasoning, confidence, error)``.
-
-    Conservative-default to "fabricated" on parse failure or unknown verdict.
-    """
     raw = (raw or "").strip()
     if not raw:
         return ("fabricated", "", "", "empty_response")
 
-    # Web-search calls disable JSON mode, so the model occasionally fences output.
     s = raw
     if s.startswith("```"):
         s = s.strip("`")

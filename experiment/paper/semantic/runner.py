@@ -1,16 +1,3 @@
-"""Semantic-table benchmark runner.
-
-Runs N models × 3 information conditions over the 741-instance benchmark.
-Per-cell output:
-
-    experiment/paper/results/semantic_{model}_{condition}.csv
-    experiment/paper/results/semantic_partial_{model}_{condition}.jsonl
-
-CLI:
-    python -m experiment.paper.semantic.runner --smoke
-    python -m experiment.paper.semantic.runner --full
-    python -m experiment.paper.semantic.runner --smoke --models gpt-4o-mini gemini-2.5-flash
-"""
 
 from __future__ import annotations
 
@@ -94,7 +81,6 @@ def load_evaluable() -> list[dict]:
 
 
 def stratified_smoke_sample(records: list[dict], n: int = 10, seed: int = 42) -> list[dict]:
-    """Deterministic ~75/25 VALID/MISREP split with at least one record per source."""
     import random
     rng = random.Random(seed)
     by_source: dict[str, list[dict]] = {}

@@ -1,0 +1,150 @@
+{
+  "name": "citeextract",
+  "version": "0.2.0",
+  "display_name": "CiteExtract",
+  "description": "Verify the citations in a scientific paper. Given a paper (PDF, LaTeX, BibTeX, or plain text), returns one verdict per reference along two independent dimensions: a metadata-driven top-level verdict (VALID / FABRICATED / UNVERIFIABLE) and a claim-support dimension (SUPPORTED / CONTRADICTS / NEUTRAL / UNVERIFIABLE) telling whether the cited paper actually supports the citing sentence. Each verdict travels with the evidence trail that produced it — databases checked, metadata comparison, retrieved passages from the cited paper, and the verifier's reasoning.",
+  "vendor": "CiteExtract project",
+  "license": "Apache-2.0",
+  "homepage": "",
+  "repository": "",
+  "keywords": [
+    "citation-verification",
+    "reference-checking",
+    "scientific-paper",
+    "retrieval-augmented-generation",
+    "human-in-the-loop",
+    "digital-libraries",
+    "fabrication-detection"
+  ],
+  "endpoint": {
+    "base_url": "http://localhost:8000",
+    "openapi_url": "/api/v1/openapi.json",
+    "interactive_docs": "/api/v1/docs"
+  },
+  "operations": [
+    {
+      "operation_id": "verify",
+      "method": "POST",
+      "path": "/api/v1/verify",
+      "summary": "Verify all citations in a scientific paper (synchronous).",
+      "description": "Runs the full three-layer CiteExtract pipeline synchronously and returns the full report. Best for small papers (<30 references) and demos. For long papers, clients that cannot hold the HTTP connection open, or anything that must survive a refresh, prefer the async flow (submit_job / get_job).",
+      "content_type": "multipart/form-data",
+      "parameters": {
+        "file": {
+          "type": "file",
+          "required": true,
+          "accepted_extensions": [".pdf", ".tex", ".bib", ".txt"],
+          "description": "The paper to check."
+        },
+        "mode": {
+          "type": "string",
+          "enum": ["quick", "agentic"],
+          "default": "quick",
+          "description": "'quick' runs only the deterministic existence + metadata layers (free). 'agentic' additionally runs the LLM-based semantic verification layer."
+        },
+        "retry_failed": {
+          "type": "boolean",
+          "default": false,
+          "description": "Clear NOT_FOUND cache and retry references that previously failed existence lookup."
+        }
+      },
+      "returns": {
+        "schema": "$ref:PaperReport",
+        "description": "List of per-reference verdicts with evidence trails; see the OpenAPI spec at `/api/v1/openapi.json` for the full schema."
+      },
+      "example": {
+        "curl": "curl -X POST -F 'file=@paper.pdf' -F 'mode=agentic' http://localhost:8000/api/v1/verify"
+      }
+    },
+    {
+      "operation_id": "submit_job",
+      "method": "POST",
+      "path": "/api/v1/jobs",
+      "summary": "Submit a paper for asynchronous verification.",
+      "description": "Queues the verification pipeline as a background job and returns a `job_id` immediately (HTTP 202). The response also carries a `status_url` the client can poll. Jobs persist to disk, so they survive browser refreshes, client disconnects, and brief server restarts.",
+      "content_type": "multipart/form-data",
+      "parameters": {
+        "file": {"type": "file", "required": true, "accepted_extensions": [".pdf", ".tex", ".bib", ".txt"]},
+        "mode": {"type": "string", "enum": ["quick", "agentic"], "default": "quick"},
+        "retry_failed": {"type": "boolean", "default": false}
+      },
+      "returns": {
+        "schema": "JobCreated",
+        "description": "`{job_id, status: 'queued', status_url}`."
+      },
+      "example": {
+        "curl": "curl -X POST -F 'file=@paper.pdf' -F 'mode=agentic' http://localhost:8000/api/v1/jobs"
+      }
+    },
+    {
+      "operation_id": "get_job",
+      "method": "GET",
+      "path": "/api/v1/jobs/{job_id}",
+      "summary": "Fetch the status and (if ready) result of an async job.",
+      "description": "Safe to call repeatedly. Poll every 1-3 seconds until `status` is `done` or `failed`. When `done`, the full PaperReport is available under `result`.",
+      "returns": {
+        "schema": "JobStatus",
+        "description": "`{job_id, status: queued|running|done|failed, stage, progress, input_info, result?, error?}`."
+      },
+      "example": {
+        "curl": "curl http://localhost:8000/api/v1/jobs/6d9e20408391417a"
+      }
+    },
+    {
+      "operation_id": "list_jobs",
+      "method": "GET",
+      "path": "/api/v1/jobs",
+      "summary": "List recent jobs (metadata only).",
+      "parameters": {"limit": {"type": "integer", "default": 50}}
+    },
+    {
+      "operation_id": "delete_job",
+      "method": "DELETE",
+      "path": "/api/v1/jobs/{job_id}",
+      "summary": "Delete a completed or failed job record."
+    },
+    {
+      "operation_id": "health",
+      "method": "GET",
+      "path": "/api/v1/health",
+      "summary": "Liveness probe.",
+      "returns": {
+        "schema": {"status": "string", "version": "string"}
+      }
+    },
+    {
+      "operation_id": "manifest",
+      "method": "GET",
+      "path": "/api/v1/manifest",
+      "summary": "Return this manifest document.",
+      "returns": {
+        "schema": "ToolManifest",
+        "description": "Self-describing metadata so an agent framework can discover CiteExtract programmatically."
+      }
+    }
+  ],
+  "input_formats": {
+    "pdf": "Portable Document Format. Requires a running GROBID instance for reference parsing.",
+    "tex": "LaTeX source. References are read from the companion `.bib` file.",
+    "bib": "BibTeX bibliography. Forces 'quick' mode (no citing context).",
+    "txt": "Plain text with inline references. Best-effort parsing."
+  },
+  "output_verdicts": {
+    "metadata": {
+      "VALID": "The reference exists in scholarly databases and its metadata matches.",
+      "FABRICATED": "The reference could not be resolved to any scholarly database, was retracted, or its metadata mismatches a real paper (chimera citation).",
+      "UNVERIFIABLE": "Insufficient database coverage to reach a confident metadata verdict; flagged for human review."
+    },
+    "claim": {
+      "SUPPORTED": "The cited paper's content supports the citing sentence(s).",
+      "CONTRADICTS": "The cited paper says something materially different from at least one citing sentence.",
+      "NEUTRAL": "The cited paper does not directly address the citing sentence — same general topic, but no entailment.",
+      "UNVERIFIABLE": "Claim verification could not run (paywalled, agent error, or no substantive citing sentence)."
+    }
+  },
+  "integration_hints": {
+    "agent_framework": "Register as a REST tool. For long papers use the async flow: POST /api/v1/jobs, then poll GET /api/v1/jobs/{job_id} until status is 'done'. Output schema: PaperReport JSON (see openapi_url). Rendering: results are a list of cards; the existing Gradio UI at `/` can be embedded via iframe if a native renderer is not required.",
+    "mcp_server": "Two patterns are supported. (1) Short paper: wrap POST /api/v1/verify as a synchronous tool call. (2) Long paper: wrap submit_job + get_job with a small polling loop inside the MCP adapter; expose the combined operation as a single MCP tool that returns when status is terminal.",
+    "langchain": "Expose as `StructuredTool`. For small papers call /api/v1/verify; for larger ones call /api/v1/jobs and have the tool poll internally. Return the JSON-serialised PaperReport as the tool output."
+  }
+}

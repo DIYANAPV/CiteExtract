@@ -1,4 +1,3 @@
-"""Per-call LLM clients used by the semantic-table runner."""
 
 from __future__ import annotations
 
@@ -13,7 +12,6 @@ from dataclasses import dataclass
 log = logging.getLogger(__name__)
 
 
-# Per-million-token USD pricing (input, output).
 PRICING: dict[str, tuple[float, float]] = {
     "gpt-4o-mini":      (0.15,  0.60),
     "gpt-4o":           (2.50, 10.00),

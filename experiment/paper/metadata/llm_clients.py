@@ -1,11 +1,3 @@
-"""Per-call LLM clients used by the metadata-table runner.
-
-Two flavours:
-  - ``OpenAIChatBenchClient`` — Chat Completions, JSON mode (``llm_only``).
-  - ``OpenAIResponsesBenchClient`` — Responses API + native ``web_search_preview``
-    tool (``llm_with_search``). JSON mode is unavailable when web_search is on,
-    so the prompt instructs JSON-only output and the parser tolerates fences.
-"""
 
 from __future__ import annotations
 
@@ -24,7 +16,6 @@ PRICING: dict[str, tuple[float, float]] = {
     "gpt-4o":      (2.50, 10.00),
 }
 
-# OpenAI charges $25 per 1k web_search invocations on top of token cost.
 WEB_SEARCH_COST_PER_CALL = 0.025
 
 
@@ -168,7 +159,6 @@ class OpenAIResponsesBenchClient(LLMClient):
 
         timeout = httpx.Timeout(connect=15.0, read=self.timeout_s, write=15.0, pool=15.0)
 
-        # Responses API uses ``input`` + ``max_output_tokens`` (not Chat's ``messages`` / ``max_tokens``).
         async def _one_shot():
             return await self._client.responses.create(
                 model=self.model,

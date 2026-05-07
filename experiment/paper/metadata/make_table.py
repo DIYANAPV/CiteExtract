@@ -1,15 +1,3 @@
-"""Aggregate per-cell CSVs into the metadata-results LaTeX table.
-
-Reads experiment/paper/results/metadata_{model}_{condition}.csv for the
-7 cells (4 OpenAI LLM + 2 open-weight + 1 production) and emits:
-
-    experiment/paper/results/tab_metadata_results.tex
-    experiment/paper/results/tab_metadata_results_full.json
-
-CLI:
-    python -m experiment.paper.metadata.make_table
-    python -m experiment.paper.metadata.make_table --smoke
-"""
 
 from __future__ import annotations
 
@@ -27,8 +15,6 @@ if str(_REPO_ROOT) not in sys.path:
 
 RESULTS_DIR = _PAPER_ROOT / "results"
 
-# (model, condition, display_label) — LLM rows first, deterministic last.
-# Open-weight rows have llm_only only (no native web-search tool).
 CELLS: list[tuple[str, str, str]] = [
     ("gpt-4o-mini",           "llm_only",        "gpt-4o-mini"),
     ("gpt-4o-mini",           "llm_with_search", "gpt-4o-mini + web search"),
@@ -63,7 +49,6 @@ def cell_metrics(rows: list[dict]) -> dict:
     if n == 0:
         return {"n": 0}
     correct = sum(1 for r in rows if r["predicted_verdict"] == r["gold_label"])
-    # Fabricated = positive class for headline P/R/F1.
     tp_f = sum(1 for r in rows if r["gold_label"] == "fabricated" and r["predicted_verdict"] == "fabricated")
     fp_f = sum(1 for r in rows if r["gold_label"] == "valid"      and r["predicted_verdict"] == "fabricated")
     fn_f = sum(1 for r in rows if r["gold_label"] == "fabricated" and r["predicted_verdict"] == "valid")
@@ -119,7 +104,6 @@ def render_latex(metrics: dict[tuple[str, str], dict]) -> str:
 
 
 def render_latex_detailed(metrics: dict[tuple[str, str], dict]) -> str:
-    """Per-method table with Acc, Macro-F1, V-F1 (valid), F-F1 (fabricated), Time, Cost."""
     lines = []
     lines.append("\\begin{tabular}{lrrrrrr}")
     lines.append("\\toprule")

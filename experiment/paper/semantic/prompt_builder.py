@@ -1,4 +1,3 @@
-"""Prompt loader, user-message builder, and JSON-response parser."""
 
 from __future__ import annotations
 
@@ -38,7 +37,6 @@ def build_user_message(record: dict, condition: str) -> str:
     if condition == "title_abstract_passages":
         passages = record.get("passages") or []
         if passages:
-            # Wrap text in untrusted markers so the model's prompt-injection guard fires.
             wrapped = [
                 {
                     "section": (p.get("section") or "Unknown").strip(),
@@ -63,7 +61,6 @@ def parse_response(raw: str) -> tuple[str, str, str, str | None]:
     try:
         data = json.loads(raw)
     except json.JSONDecodeError:
-        # Some models emit ```json ... ``` even in JSON mode.
         s = raw
         if s.startswith("```"):
             s = s.strip("`")

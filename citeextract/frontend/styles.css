@@ -1,0 +1,1154 @@
+/* ── Design tokens — single source of truth ──
+   All palette / typography / spacing values live here. Anything elsewhere
+   in this stylesheet that still hard-codes a hex value is incremental
+   cleanup for a later stage; new rules should reference these vars. */
+:root {
+  /* Surfaces */
+  --bg:           #FAF9F5;            /* warm ivory page background */
+  --bg-alt:       #F3F1EA;            /* alternating section bands / hint chips */
+  --surface:      #FFFFFF;            /* card / panel background */
+  --border:       #E7E9EA;            /* hairline borders */
+  --border-muted: rgba(0,0,0,0.08);
+
+  /* Text */
+  --text:         #222222;            /* primary body */
+  --text-strong:  #0f172a;            /* headings (true near-black for emphasis) */
+  --text-muted:   #5B6D78;            /* secondary / captions */
+
+  /* Accent (links, primary CTA) — Distill navy */
+  --accent:       #004276;
+  --accent-hover: #0066AA;
+  --accent-soft:  rgba(0, 66, 118, 0.06);   /* faint accent tint for hovers */
+
+  /* Verdict semantics — independent from brand accent */
+  --verdict-ok:        #15803D;       /* SUPPORTED */
+  --verdict-ok-bg:     #F0F7F1;
+  --verdict-ok-border: #A3C6A6;
+  --verdict-warn:        #B45309;     /* NEUTRAL / PARTIAL */
+  --verdict-warn-bg:     #FBF5E8;
+  --verdict-warn-border: #E0B678;
+  --verdict-err:        #991B1B;      /* FABRICATED / CONTRADICTS */
+  --verdict-err-bg:     #FDF3F3;
+  --verdict-err-border: #F07979;
+  --verdict-info:        #525252;     /* UNVERIFIABLE / NEUTRAL */
+  --verdict-info-bg:     #F2F5F7;
+  --verdict-info-border: #C7D6E1;
+
+  /* Distill-style cream callout (for "Note:" / "Limitation:" boxes) */
+  --callout-bg:   hsl(54, 78%, 96%);
+  --callout-rule: hsl(54, 60%, 70%);
+
+  /* Type stacks */
+  --font-serif: "Crimson Pro", "Source Serif 4", Charter, Georgia, serif;
+  --font-sans:  "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono:  "JetBrains Mono", Consolas, Monaco, monospace;
+}
+
+/* ── Selective serif: real headings only ──
+   The serif (Distill / arXiv academic register) is reserved for headings.
+   Body copy — paragraphs, list items, feature-card titles, FAQ summaries —
+   uses Inter so the whole app reads in a single font, matching the hero
+   subtitle. The universal sans rule below uses !important, so this override
+   does too; without it the cascade resets every descendant back to Inter. */
+.gradio-container h1,
+.gradio-container h2,
+.gradio-container h3,
+.cc-hero h1,
+.cc-about-section h3 {
+    font-family: var(--font-serif) !important;
+    letter-spacing: -0.005em;
+}
+
+/* ── Hide Gradio chrome ──
+   `footer_links=[]` on mount_gradio_app drops the API link / Gradio logo /
+   settings gear in Gradio 6+, but older / inner footer elements can still
+   leak through. These rules are defensive belt-and-braces. */
+footer,
+gradio-app footer,
+.gradio-container footer,
+.api-link, .built-with, .show-api,
+.svelte-1lcyrx4 footer { display: none !important; }
+[data-testid="settings-button"],
+button[aria-label="Settings"],
+.icon-button.settings { display: none !important; }
+
+/* ── Layout ── */
+.gradio-container {
+    /* Full-viewport width to match modern research-tool layouts. Padding
+       below keeps content off the edges on wide monitors. */
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 auto !important;
+    min-height: 100vh !important;
+    padding: 24px 48px 64px !important;
+    font-family: var(--font-sans) !important;
+    font-size: 17px !important;
+    color: var(--text);
+}
+/* Gradio 6 wraps content in <main class="main"> and <div class="wrap contain">
+   each with their own max-width. Knock them out so the UI fills the page. */
+.gradio-container > main,
+.gradio-container > main > .wrap,
+.gradio-container .contain,
+.gradio-container .main,
+gradio-app { max-width: 100% !important; width: 100% !important; }
+/* The page background must override Gradio's own body / container styles,
+   which otherwise leak through as a cool slate. Belt-and-braces selector
+   list covers Gradio 4-6 internal class shuffles. */
+html, body,
+gradio-app,
+gradio-app > div,
+gradio-app .gradio-container,
+gradio-app > main,
+.gradio-container,
+.gradio-container > .main { background: var(--bg) !important; }
+/* Propagate Inter to every descendant — Gradio 4+ sets fonts on many
+   individual elements with higher specificity than .gradio-container.  */
+.gradio-container, .gradio-container *,
+.gradio-container button, .gradio-container input,
+.gradio-container textarea, .gradio-container select {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+}
+
+/* ── Subtle entrance ── */
+@keyframes cc-fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Hero ──
+   Hairline border + no shadow (Distill / arXiv-style restraint). Spans
+   the full container width to match the step-cards row below it. */
+.cc-hero {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 40px 44px;
+    margin: 0 0 32px;
+    display: flex; gap: 32px; align-items: center;
+}
+.cc-hero-text { flex: 1; min-width: 0; }
+/* Right-side demo video. Capped at a sensible max so it doesn't balloon
+   when the hero panel goes very wide; on narrow screens the row collapses
+   to a column (handled by the media query at the bottom of this file). */
+.cc-hero-video { flex: 1; min-width: 0; display: flex; justify-content: flex-end; }
+.cc-hero-video video {
+    width: 100%;
+    max-width: 720px;
+    aspect-ratio: 16 / 9;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    background: var(--bg);
+    object-fit: cover;
+}
+.cc-hero h1 {
+    font-size: 39px; font-weight: 700; color: var(--text-strong);
+    letter-spacing: -0.015em; margin: 0 0 14px; line-height: 1.2;
+}
+.cc-hero h1 .cc-hero-accent {
+    /* Pull one phrase of the headline out in accent navy without underline
+       gimmicks — keeps the academic register while adding visual rhythm. */
+    color: var(--accent);
+}
+.cc-hero-sub {
+    font-size: 20px; color: var(--text); margin: 0; font-weight: 400;
+    line-height: 1.6;
+}
+
+/* ── Feature strip (three cards, below hero) ──
+   Each card carries a small monoline icon at the top-left, a pipeline-step
+   number on the right, and a single sentence of body. The dotted-grid
+   background under the row gives it a subtle texture without needing a
+   colored band — borrowed from scite.ai's section-separation trick. */
+.cc-features {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin: 0 0 40px;
+    padding: 14px;
+    background-image: radial-gradient(circle at 1px 1px,
+        rgba(0, 66, 118, 0.10) 1px, transparent 0);
+    background-size: 14px 14px;
+    border-radius: 14px;
+}
+.cc-feature {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 22px 22px 24px;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+    position: relative;
+}
+.cc-feature:hover {
+    border-color: var(--accent);
+    transform: translateY(-1px);
+}
+.cc-feature-icon {
+    display: inline-flex; align-items: center; justify-content: center;
+    color: var(--accent);
+    margin-bottom: 14px;
+}
+.cc-feature-icon svg { width: 32px; height: 32px; }
+/* Duotone fill: a low-opacity wash of the same colour as the stroke,
+   placed on a copy of the silhouette path. Phosphor-style depth without
+   sacrificing the monochrome / academic register. */
+.cc-feature-icon svg .duo-fill { opacity: 0.20; }
+.cc-feature-step {
+    position: absolute; top: 18px; right: 20px;
+    font-size: 13px; font-weight: 700; letter-spacing: 0.08em;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+}
+.cc-feature-title {
+    font-size: 20px; font-weight: 700; color: var(--text-strong);
+    margin: 0 0 10px; letter-spacing: 0; line-height: 1.3;
+}
+.cc-feature-body {
+    font-size: 16px; color: var(--text-muted); line-height: 1.6; margin: 0;
+}
+
+/* ── File status chip (post-upload summary + size-limit warning) ── */
+.cc-file-status {
+    margin: 8px 0 4px; min-height: 0;
+    font-size: 15px; line-height: 1.4;
+    display: none;          /* hidden until JS populates it */
+}
+.cc-file-status.cc-has-content { display: block; }
+.cc-file-chip {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 12px; border-radius: 999px;
+    font-size: 14.5px; font-weight: 500;
+    background: #F0F7F1; color: #2F6B33; border: 1px solid #A3C6A6;
+}
+.cc-file-chip.cc-file-over {
+    background: var(--verdict-err-bg); color: var(--verdict-err); border-color: var(--verdict-err-border);
+}
+.cc-file-chip-name {
+    font-weight: 600; max-width: 340px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.cc-file-chip-size { opacity: 0.75; }
+.cc-file-chip-warn { font-weight: 600; }
+
+/* ── Discoverability hint under Claim Verification checkbox ── */
+.cc-hint {
+    font-size: 14.5px; color: #5B6D78; line-height: 1.5;
+    padding: 10px 12px; margin: 4px 0 12px;
+    background: #F2F5F7; border: 1px solid #E7E9EA;
+    border-radius: 10px;
+}
+.cc-hint b { color: #334155; }
+
+/* ── Drag-and-drop feedback ── */
+.cc-drop-overlay {
+    position: fixed; inset: 0; z-index: 9998;
+    background: rgba(174, 19, 19, 0.06);
+    backdrop-filter: blur(1px);
+    display: none; align-items: center; justify-content: center;
+    pointer-events: none;
+    animation: cc-fadeIn 0.15s ease-out both;
+}
+.cc-drop-overlay.cc-active { display: flex; }
+.cc-drop-overlay-msg {
+    font-size: 22px; font-weight: 700; color: var(--accent);
+    background: var(--surface); padding: 20px 32px; border-radius: 20px;
+    border: 2px dashed var(--accent);
+    box-shadow: 0 8px 48px rgba(0, 66, 118, 0.18);
+}
+body.cc-dragging .gradio-container [data-testid="file"],
+body.cc-dragging .gradio-container .gr-file {
+    border-color: var(--accent) !important;
+    background: var(--accent-soft) !important;
+}
+
+/* ── About-page sections ──
+   Each section is a card with a thin accent left-rail so the page reads as
+   a stack of distinct ideas rather than a wall of prose. h3 headings pick
+   up the same Distill navy as the hero accent for visual continuity. */
+.cc-about-section {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    border-left: 3px solid var(--accent);
+    padding: 30px 38px; margin: 0 0 18px;
+}
+.cc-about-section p,
+.cc-about-section ul,
+.cc-about-section ol {
+    /* Use the full card width so prose lines up with everything else on
+       the page. Cards have ~38px side padding for breathing room. */
+    max-width: 100%;
+}
+/* Headings are the only piece that inherits the navy accent. Everything
+   else inside an about card — paragraphs, list items, FAQ summaries —
+   shares one type ramp (15px / 1.7 line-height / near-black) so the page
+   reads as a single document rather than a stack of mismatched widgets.
+   Inline <strong> stays bold + near-black; we never repeat the accent
+   colour inside body copy. */
+.cc-about-section h3 {
+    font-size: 22px; font-weight: 700; color: var(--accent);
+    letter-spacing: -0.01em; margin: 0 0 14px;
+}
+.cc-about-section p,
+.cc-about-section ul,
+.cc-about-section ol,
+.cc-about-section li {
+    font-size: 17px;
+    font-weight: 400;
+    color: var(--text-strong);
+    line-height: 1.7;
+}
+.cc-about-section p   { margin: 0 0 12px; }
+.cc-about-section li  { margin: 0 0 6px; }
+.cc-about-section strong {
+    font-weight: 700;
+    color: var(--text-strong);
+}
+.cc-about-section a {
+    color: var(--accent); text-decoration: none; font-weight: 500;
+    border-bottom: 1px dashed #F07979; padding-bottom: 1px;
+    transition: all 0.15s ease;
+}
+.cc-about-section a:hover { color: var(--accent-hover); border-bottom-color: var(--accent-hover); border-bottom-style: solid; }
+
+/* ── FAQ accordion (inside About tab) ── */
+.cc-faq {
+    border-top: 1px solid var(--border);
+    padding: 14px 0;
+}
+.cc-faq:last-of-type { border-bottom: 1px solid var(--border); }
+.cc-faq summary {
+    cursor: pointer;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text-strong);
+    list-style: none;
+    padding: 0;
+    transition: color 0.15s ease;
+}
+.cc-faq summary::-webkit-details-marker { display: none; }
+.cc-faq summary::before {
+    content: "+";
+    display: inline-block;
+    width: 16px;
+    color: var(--text-muted);
+    font-weight: 400;
+    font-family: var(--font-sans);
+}
+.cc-faq[open] summary::before { content: "−"; }
+.cc-faq summary:hover { color: var(--accent); }
+.cc-faq p {
+    /* Mirror .cc-about-section paragraph styling so an expanded FAQ
+       answer reads identically to body copy in the cards above. Only
+       the left margin is FAQ-specific so the answer indents under the
+       toggle bullet. */
+    margin: 10px 0 0 16px;
+    font-size: 17px;
+    font-weight: 400;
+    color: var(--text-strong);
+    line-height: 1.7;
+}
+.cc-faq code {
+    background: var(--bg-alt);
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    border: 1px solid var(--border);
+}
+
+/* ── Page footer (academic ISSN-style version pill, not Built-with-Gradio) ── */
+.cc-page-footer {
+    border-top: 1px solid var(--border);
+    margin: 64px 12px 0;
+    padding: 20px 0 8px;
+    font-size: 14.5px;
+    color: var(--text-muted);
+    line-height: 1.5;
+    font-family: var(--font-sans);
+    text-align: center;
+}
+.cc-page-footer code {
+    font-family: var(--font-mono);
+    font-size: 0.95em;
+    background: var(--bg-alt);
+    padding: 1px 5px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+}
+.cc-page-footer .cc-footer-sep {
+    margin: 0 8px;
+    opacity: 0.5;
+}
+
+/* ── BibTeX block + Copy button ── */
+.cc-bibtex-wrap {
+    position: relative; margin: 12px 0 4px;
+}
+pre.cc-bibtex {
+    background: #F2F5F7; border: 1px solid #E7E9EA; border-radius: 12px;
+    padding: 16px 20px; margin: 0; overflow-x: auto;
+    font-family: ui-monospace, 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+    font-size: 14.5px; line-height: 1.55; color: #1e293b;
+    white-space: pre;
+}
+.cc-bibtex-copy {
+    position: absolute; top: 10px; right: 10px;
+    font-family: inherit; font-size: 13px; font-weight: 600;
+    padding: 4px 10px; border-radius: 8px;
+    background: #ffffff; border: 1px solid #C7D6E1; color: #5B6D78;
+    cursor: pointer; transition: all 0.15s ease;
+}
+.cc-bibtex-copy:hover { background: var(--bg-alt); color: var(--accent); border-color: var(--accent); }
+.cc-bibtex-copy.cc-copied {
+    background: #F0F7F1; color: #2F6B33; border-color: #A3C6A6;
+}
+
+/* ── Tab-page header (Batch / About) ── */
+.cc-tabpage-header {
+    padding: 20px 24px 16px; margin: 0 0 16px;
+    border-bottom: 1px solid #E7E9EA;
+}
+.cc-tabpage-header h2 {
+    font-size: 26px; font-weight: 700; color: #0f172a;
+    letter-spacing: -0.02em; line-height: 1.2; margin: 0 0 8px;
+}
+.cc-tabpage-header p {
+    font-size: 16px; color: #334155; line-height: 1.6; margin: 0 0 6px;
+}
+.cc-tabpage-header .cc-tabpage-meta {
+    font-size: 15px; color: #5B6D78;
+}
+.cc-tabpage-header code {
+    background: var(--bg-alt); padding: 1px 6px; border-radius: 6px;
+    font-size: 14px; color: var(--accent); border: 1px solid var(--border);
+    font-family: var(--font-mono);
+}
+
+/* ── Sticky context bar on results ── */
+.cc-ctxbar {
+    position: sticky; top: 0; z-index: 30;
+    background: #ffffff; border: 1px solid #E7E9EA; border-radius: 14px;
+    padding: 10px 16px; margin: 0 0 12px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; font-size: 15px;
+    box-shadow: 0 4px 18px rgba(12, 63, 94, 0.08);
+    backdrop-filter: saturate(1.1);
+}
+.cc-ctxbar-main {
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    color: #334155;
+}
+.cc-ctxbar-file {
+    font-weight: 700; color: #0f172a; letter-spacing: -0.01em;
+    max-width: 420px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.cc-ctxbar-sep { color: #C7D6E1; }
+.cc-ctxbar-chip {
+    display: inline-block; padding: 2px 10px; border-radius: 999px;
+    font-size: 14px; font-weight: 600;
+}
+/* Semantic — "this citation is flagged" reads as error, stays red. */
+.cc-ctxbar-flagged { background: var(--verdict-err-bg); color: var(--verdict-err); border: 1px solid var(--verdict-err-border); }
+.cc-ctxbar-clean   { background: #F0F7F1; color: #2F6B33; border: 1px solid #A3C6A6; }
+.cc-ctxbar-btn {
+    font-size: 14px; font-weight: 600; color: #5B6D78;
+    padding: 6px 12px; border-radius: 10px;
+    background: #F2F5F7; border: 1px solid #C7D6E1;
+    text-decoration: none; white-space: nowrap;
+    transition: all 0.15s ease;
+}
+.cc-ctxbar-btn:hover { background: var(--bg-alt); color: var(--accent); border-color: var(--border); }
+
+/* ── In-page pipeline progress card ──
+   Shown inside the Results region while run_analyze is executing. Each
+   stage flips from pending (hollow dot) → active (spinner) → done (check).
+   Replaces Gradio's generic horizontal progress bar with something that
+   tells the user *what* is happening, not just *that* it is. */
+.cc-pipeline {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin: 8px 0 0;
+    animation: cc-fadeIn 0.25s ease-out both;
+}
+.cc-pipeline-header {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 16px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 12px;
+    margin-bottom: 18px;
+}
+.cc-pipeline-title {
+    font-size: 17px; font-weight: 600; color: var(--text-strong);
+    letter-spacing: -0.005em;
+}
+.cc-pipeline-elapsed {
+    font-size: 15px; color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+}
+.cc-pipeline-stages {
+    list-style: none; margin: 0; padding: 0;
+    display: flex; flex-direction: column; gap: 2px;
+}
+.cc-step {
+    display: flex; align-items: center; gap: 14px;
+    padding: 10px 4px;
+    font-size: 16px;
+    transition: color 0.18s ease;
+}
+.cc-step + .cc-step {
+    border-top: 1px dashed var(--border-muted);
+}
+.cc-step-icon {
+    flex: 0 0 22px; width: 22px; height: 22px;
+    display: inline-flex; align-items: center; justify-content: center;
+}
+.cc-step-icon-svg { width: 18px; height: 18px; }
+.cc-step-dot {
+    width: 9px; height: 9px; border-radius: 50%;
+    border: 1.5px solid var(--border);
+    background: transparent;
+}
+.cc-step-spinner {
+    width: 16px; height: 16px; border-radius: 50%;
+    border: 2px solid rgba(0, 66, 118, 0.18);
+    border-top-color: var(--accent);
+    animation: cc-spin 0.85s linear infinite;
+}
+@keyframes cc-spin { to { transform: rotate(360deg); } }
+.cc-step-label { flex: 1; }
+/* Sub-progress counter ("15 / 41") shown next to long-running stage
+   labels. Lighter weight + tabular numerals so the count animating
+   upward doesn't shift the row width as digits change. */
+.cc-step-progress {
+    color: var(--text-muted);
+    font-weight: 400;
+    font-variant-numeric: tabular-nums;
+    margin-left: 6px;
+}
+.cc-step-done   { color: var(--text); }
+.cc-step-done .cc-step-icon { color: var(--verdict-ok); }
+.cc-step-active {
+    color: var(--text-strong);
+    font-weight: 600;
+    background: var(--accent-soft);
+    border-radius: 6px;
+    padding-left: 10px; padding-right: 10px;
+    margin: 0 -6px;
+}
+.cc-step-pending { color: var(--text-muted); }
+
+/* ── Contextual retry banner (Analyze tab, post-run) ──
+   Surfaced only when the run produced FABRICATED / UNVERIFIABLE results
+   that could plausibly be transient. Sits between the dashboard and the
+   per-reference cards. */
+.cc-retry-hint {
+    flex: 1; min-width: 0;
+    font-size: 15px; color: var(--text-muted);
+    line-height: 1.5;
+    align-self: center;
+}
+.cc-retry-btn {
+    flex: 0 0 auto !important;
+    min-width: 160px !important;
+    align-self: center !important;
+}
+
+/* ── Resume banner ── */
+.cc-resume-banner {
+    background: var(--surface); border: 1px solid var(--border);
+    border-left: 4px solid var(--accent); border-radius: 12px;
+    padding: 20px 24px; margin: 0 0 20px;
+    animation: cc-fadeIn 0.3s ease-out both;
+}
+.cc-resume-title {
+    font-size: 18px; font-weight: 700; color: #0f172a;
+    letter-spacing: -0.01em; margin: 0 0 12px;
+}
+.cc-resume-facts {
+    font-size: 16px; color: #334155; line-height: 1.7;
+    margin: 0 0 16px;
+}
+.cc-resume-file {
+    font-weight: 600; color: #0f172a;
+    font-family: 'Inter', system-ui, sans-serif;
+}
+.cc-resume-actions {
+    display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap;
+}
+.cc-resume-btn {
+    font-family: inherit; font-size: 15px; font-weight: 600;
+    padding: 8px 18px; border-radius: 10px; cursor: pointer;
+    border: 1px solid transparent; transition: all 0.15s ease;
+}
+.cc-resume-btn-primary {
+    background: var(--accent); color: #ffffff; border-color: var(--accent);
+}
+.cc-resume-btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+.cc-resume-btn-secondary {
+    background: var(--surface); color: var(--text); border-color: var(--border);
+}
+.cc-resume-btn-secondary:hover { background: var(--bg-alt); border-color: var(--text-muted); }
+.cc-resume-hint {
+    margin-top: 12px; padding: 10px 14px;
+    background: #FBF5E8; border: 1px solid #E0B678; border-radius: 10px;
+    font-size: 15px; color: #9A6609; line-height: 1.5;
+    animation: cc-fadeIn 0.25s ease-out both;
+}
+
+@media (max-width: 900px) {
+    .cc-hero { padding: 24px 20px; flex-direction: column; gap: 24px; }
+    .cc-hero-video video { aspect-ratio: 16 / 9; }
+    .cc-features { grid-template-columns: 1fr; }
+}
+
+/* ── Section labels ── */
+.cc-section-label {
+    font-size: 13px; font-weight: 700; color: #5B6D78;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    margin: 16px 0 10px; padding-bottom: 6px;
+    border-bottom: 1px solid #E7E9EA;
+}
+
+/* ── Cards ── */
+.card {
+    border-radius: 12px; padding: 18px 22px; margin-bottom: 10px;
+    border: 1px solid var(--border);
+    border-left: 4px solid;  /* keeps the verdict-color accent stripe */
+    background: var(--surface);
+    animation: cc-fadeIn 0.2s ease-out both;
+}
+/* No card hover — each card has an inline per-verdict bg color (set in
+   _render_verdict_card) which overrides any rule we'd put here. The
+   verdict-stripe and the badge text are the visual cues; restraint reads
+   as more academic anyway. */
+
+/* Claim badge in card summary — secondary pill next to the metadata badge. */
+.cc-claim-pill {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 2px 9px;
+    border-radius: 999px;
+    font-size: 13.5px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    vertical-align: middle;
+}
+
+/* Per-citation-context panel — each citing sentence + its agent decision +
+   its retrieved passages live in their own visually distinct card so a
+   reference cited in two paragraphs reads as two separate findings. */
+.cc-context-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 18px;
+    margin: 10px 0;
+}
+.cc-context-panel + .cc-context-panel { margin-top: 14px; }
+.cc-context-label {
+    font-size: 13px; font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.08em;
+    margin-bottom: 12px;
+}
+
+/* Three colored sections inside a citation-context panel.
+   Order matters: claim → judgement → evidence. */
+
+/* Section 1 — citing context (what the user wrote in their paper).
+   Faint navy tint to read as "input" / "the question". */
+.cc-citing-block {
+    background: var(--accent-soft);
+    border: 1px solid rgba(0, 66, 118, 0.12);
+    border-left: 3px solid var(--accent);
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin-bottom: 10px;
+}
+.cc-citing-text {
+    font-size: 16px;
+    color: var(--text-strong);
+    line-height: 1.6;
+}
+
+/* Section 2 — claim agent's decision. The bg/border is set inline by
+   _format_claim_verdict using the verdict colour. The wrapper here just
+   carries the small label above it. */
+.cc-claim-block {
+    margin-bottom: 10px;
+}
+.cc-claim-empty {
+    font-size: 15px;
+    color: var(--text-muted);
+    background: var(--bg-alt);
+    border: 1px dashed var(--border);
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-style: italic;
+}
+
+/* Section 3 — retrieved passages. Stays on plain white surface. */
+.cc-passages-section {
+    margin-top: 6px;
+}
+
+/* ── Evidence chips (Abstract / Retrieved passages) ──
+   Below the claim agent's decision in each citing-context block. Each chip
+   is a <details> styled as an inline button — collapsed by default so the
+   card stays scannable; expanding shows the long evidence inline. */
+.cc-evidence-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+}
+.cc-evidence-chip {
+    flex: 1 1 220px;
+    min-width: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: border-color 0.15s ease;
+}
+.cc-evidence-chip:hover { border-color: var(--text-muted); }
+.cc-evidence-chip[open] { flex-basis: 100%; border-color: var(--accent); }
+.cc-evidence-chip > summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 8px 14px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    user-select: none;
+}
+.cc-evidence-chip > summary::after {
+    content: "▸";
+    margin-left: auto;
+    font-size: 13px;
+    color: var(--text-muted);
+    transition: transform 0.15s ease;
+}
+.cc-evidence-chip[open] > summary::after { transform: rotate(90deg); }
+.cc-evidence-chip > summary::-webkit-details-marker { display: none; }
+.cc-chip-icon { font-size: 16px; opacity: 0.7; }
+.cc-chip-body {
+    padding: 0 14px 14px;
+    font-size: 15.5px;
+    line-height: 1.6;
+    color: var(--text);
+    border-top: 1px dashed var(--border-muted);
+    padding-top: 10px;
+    margin-top: 2px;
+    max-height: 360px;
+    overflow-y: auto;
+}
+
+/* Small uppercase mini-label used inside each section. */
+.cc-section-mini-label {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+}
+.card summary { cursor: pointer; font-weight: 600; font-size: 17px; line-height: 1.5; }
+
+/* Better empty state */
+.cc-empty {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: 48px 24px; text-align: center; color: var(--text-muted);
+}
+.cc-empty-icon { font-size: 42px; margin-bottom: 12px; opacity: 0.4; }
+.cc-empty-title { font-size: 19px; font-weight: 600; color: #334155; margin-bottom: 6px; }
+.cc-empty-sub { font-size: 15px; color: #5B6D78; line-height: 1.5; max-width: 380px; margin: 0 auto; }
+
+/* ── Skeleton shimmer for loading state ── */
+@keyframes cc-shimmer {
+    0%   { background-position: -1000px 0; }
+    100% { background-position:  1000px 0; }
+}
+.cc-skel {
+    background: linear-gradient(90deg,
+        #E7E9EA 0%, #F2F5F7 50%, #E7E9EA 100%);
+    background-size: 1000px 100%;
+    animation: cc-shimmer 1.6s linear infinite;
+    border-radius: 8px;
+}
+.cc-loading-card {
+    background: #fff; border: 1px solid #E7E9EA; border-left: 4px solid #C7D6E1;
+    border-radius: 20px; padding: 18px 22px; margin-bottom: 12px;
+    box-shadow: 0 2px 24px rgba(12, 63, 94, 0.06);
+}
+.cc-loading-row { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
+.cc-loading-stage {
+    background: #ffffff; border: 1px solid #E7E9EA; border-radius: 20px;
+    padding: 20px 24px; margin-bottom: 14px;
+    box-shadow: 0 2px 24px rgba(12, 63, 94, 0.08);
+}
+.cc-stage-list { display: flex; flex-direction: column; gap: 8px; margin: 14px 0 4px; }
+.cc-stage {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 16px; color: #5B6D78;
+}
+.cc-stage .cc-stage-dot {
+    display: inline-block; width: 10px; height: 10px; border-radius: 50%;
+    background: #E7E9EA; position: relative;
+}
+.cc-stage.cc-active .cc-stage-dot {
+    background: var(--accent);
+    box-shadow: 0 0 0 6px rgba(0, 66, 118, 0.12);
+    animation: cc-pulse 1.3s ease-in-out infinite;
+}
+.cc-stage.cc-done .cc-stage-dot { background: var(--verdict-ok-border); }
+.cc-stage.cc-done { color: var(--verdict-ok); }
+.cc-stage.cc-active { color: var(--accent); font-weight: 600; }
+@keyframes cc-pulse {
+    0%   { box-shadow: 0 0 0 0    rgba(0, 66, 118, 0.35); }
+    70%  { box-shadow: 0 0 0 10px rgba(0, 66, 118, 0);    }
+    100% { box-shadow: 0 0 0 0    rgba(0, 66, 118, 0);    }
+}
+.cc-spinner {
+    width: 16px; height: 16px; border: 2px solid var(--border);
+    border-top-color: var(--accent); border-radius: 50%;
+    animation: cc-spin 0.8s linear infinite;
+    display: inline-block;
+}
+@keyframes cc-spin { to { transform: rotate(360deg); } }
+
+/* ── Metadata table ── */
+.meta-table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 15px; }
+.meta-table th, .meta-table td { text-align: left; padding: 7px 10px; border-bottom: 1px solid #f1f5f9; }
+.meta-table th {
+    background: #f8fafc; font-weight: 600; color: #475569;
+    font-size: 13px; text-transform: uppercase; letter-spacing: 0.04em;
+}
+.meta-table tr:hover td { background: #F2F5F7; }
+.meta-table td { max-width: 300px; word-break: break-word; }
+.status-match    { color: #2F6B33; font-weight: 600; }
+.status-close    { color: #9A6609; font-weight: 600; }
+.status-mismatch { color: var(--verdict-err); font-weight: 600; }
+.status-missing  { color: #C7D6E1; }
+
+/* ── Dashboard ── */
+.dashboard {
+    background: #F2F5F7; border: 1px solid #E7E9EA; border-radius: 16px;
+    padding: 20px 24px; margin-bottom: 14px;
+    animation: cc-fadeIn 0.3s ease-out both;
+}
+.stat-cards { display: flex; gap: 10px; flex-wrap: wrap; margin: 14px 0; }
+.stat-card {
+    flex: 1; min-width: 100px; text-align: center;
+    padding: 14px 10px; border-radius: 12px;
+    border: 1px solid #E7E9EA; background: white;
+    box-shadow: 0 2px 12px rgba(12, 63, 94, 0.04);
+}
+.stat-card:hover { box-shadow: 0 2px 18px rgba(12, 63, 94, 0.08); }
+.stat-card .num { font-size: 28px; font-weight: 700; line-height: 1.2; }
+.stat-card .lbl {
+    font-size: 13px; color: #64748b; margin-top: 2px;
+    font-weight: 500; text-transform: uppercase; letter-spacing: 0.03em;
+}
+.progress-bar { height: 6px; border-radius: 6px; background: #e5e7eb; overflow: hidden; margin: 6px 0; }
+.progress-fill { height: 100%; border-radius: 6px; transition: width 0.5s ease-out; }
+
+/* ── Claims & passages ── */
+.claim-box {
+    background: #fff; border: 1px solid #E7E9EA; border-radius: 12px;
+    padding: 12px 14px; margin: 6px 0; font-size: 15px; line-height: 1.6;
+}
+.claim-arrow { text-align: center; font-size: 20px; margin: 4px 0; color: #C7D6E1; }
+.claim-section {
+    background: #F2F5F7; border: 1px solid #E7E9EA;
+    border-radius: 12px; padding: 12px 14px; margin: 8px 0;
+}
+.passage-card {
+    background: #fff; border: 1px solid #E7E9EA; border-radius: 12px;
+    padding: 12px 14px; margin: 6px 0;
+}
+.passage-card:hover { border-color: #AEC5CB; }
+.passage-header { font-size: 13px; color: #64748b; margin-bottom: 4px; font-weight: 500; }
+.passage-text { font-size: 15px; line-height: 1.65; color: #1e293b; }
+
+/* ── Links & pills ── */
+.link-pill {
+    display: inline-block; background: #F2F5F7; color: #5B6D78;
+    padding: 2px 10px; border-radius: 12px; font-size: 13px;
+    text-decoration: none; margin-right: 4px; font-weight: 500;
+    border: 1px solid #E1E9EF;
+}
+.link-pill:hover { background: #E1E9EF; color: #4D5B62; }
+
+/* ── Coverage ── */
+.coverage-bar { display: flex; gap: 8px; align-items: center; margin: 5px 0; font-size: 14px; }
+.coverage-fill { height: 6px; border-radius: 3px; }
+.info-row { font-size: 14px; color: #64748b; margin-top: 8px; }
+
+/* ── Empty state ── */
+.cc-empty { text-align: center; padding: 48px 20px; color: #94a3b8; }
+.cc-empty-icon { font-size: 38px; margin-bottom: 8px; opacity: 0.35; }
+.cc-empty-title { font-size: 16px; font-weight: 600; color: #64748b; margin-bottom: 4px; }
+.cc-empty-sub { font-size: 14px; color: #94a3b8; }
+
+/* ── Tab styling ──
+   Bottom-border underline (Distill / arXiv style) instead of rounded chips.
+   No background tile, no inset shadow — just an accent rule under the
+   selected tab. */
+.tab-nav,
+.tab-container {
+    background: transparent !important;
+    border: none !important;
+    border-bottom: 1px solid var(--border) !important;
+    padding: 0 !important;
+    gap: 0 !important;
+}
+.tab-nav button,
+.tab-container button {
+    font-weight: 500 !important; font-size: 16px !important;
+    background: transparent !important;
+    border: none !important;
+    border-bottom: 2px solid transparent !important;
+    color: var(--text-muted) !important;
+    padding: 12px 18px !important;
+    border-radius: 0 !important;
+    margin-bottom: -1px !important;  /* overlap container's bottom border */
+    transition: color 0.15s ease, border-color 0.15s ease !important;
+}
+.tab-nav button:hover,
+.tab-container button:hover {
+    background: transparent !important;
+    color: var(--text) !important;
+}
+.tab-nav button.selected,
+.tab-container button.selected {
+    background: transparent !important;
+    color: var(--accent) !important;
+    border-bottom: 2px solid var(--accent) !important;
+    box-shadow: none !important;
+}
+
+/* ── File dropzone — override Gradio's generic file input look ── */
+.gradio-container .file-preview,
+.gradio-container [data-testid="file"],
+.gradio-container .gr-file,
+.gradio-container div[class*="file_upload"] > div:first-child {
+    background: var(--surface) !important;
+    border: 1px dashed var(--border) !important;
+    border-radius: 8px !important;
+    padding: 24px !important;
+    min-height: 140px !important;
+    transition: border-color 0.15s ease, background 0.15s ease !important;
+}
+.gradio-container .file-preview:hover,
+.gradio-container [data-testid="file"]:hover,
+.gradio-container .gr-file:hover,
+.gradio-container div[class*="file_upload"] > div:first-child:hover {
+    border-color: var(--accent) !important;
+    background: var(--accent-soft) !important;
+}
+
+/* ── Paper / Analysis-options panel row ── */
+.cc-panel-row { align-items: stretch !important; gap: 16px !important; }
+.cc-panel {
+    background: var(--surface) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 12px !important;
+    padding: 24px !important;
+    /* No shadow — Distill / arXiv-style restraint. */
+    display: flex !important;
+    flex-direction: column !important;
+    min-width: 0 !important;
+}
+.cc-panel .cc-panel-title {
+    /* Sentence-case + thin border: less shouty than the all-caps tracking
+       version. Reads as a section label in a research paper, not a
+       form-section header in a SaaS dashboard. */
+    font-size: 15px; font-weight: 600; color: var(--text-muted);
+    margin: 0 0 14px; padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+}
+/* File dropzone inside the upload panel fills remaining vertical space */
+.cc-panel-upload .cc-filedrop { flex: 1 1 auto; }
+.cc-panel-upload .cc-filedrop > div { min-height: 180px !important; }
+/* Hide Gradio's auto-label on the main file dropzone (we render our own title) */
+.cc-panel-upload .cc-filedrop > label,
+.cc-panel-upload .cc-filedrop span.svelte-1gfkn6j { display: none !important; }
+
+/* ── Loaded-file state ──
+   Once Gradio paints a file, drop the dashed dropzone chrome entirely and
+   present the file as a single inline chip with the close (×) button
+   vertically centered on the file-name row. Three things have to give:
+     1. Gradio's `.auto-margin` on the .cc-filedrop block pushes it to the
+        bottom of the panel column — undo with margin-top:0/bottom:auto.
+     2. `table.file-preview` ships with `min-height: 140px` which inflates
+        the chip to a tall band — clamp to 0.
+     3. The Clear (×) button lives in `.icon-button-wrapper.top-panel`,
+        positioned absolutely at the top corner of the (now collapsed)
+        dropzone — pin it to the file-row's vertical centerline. */
+.cc-panel-upload .cc-filedrop:has(.file-preview-holder) {
+    flex: 0 0 auto !important;
+    margin-top: 0 !important;
+    margin-bottom: auto !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    position: relative !important;
+}
+.cc-panel-upload .cc-filedrop:has(.file-preview-holder) table.file-preview {
+    min-height: 0 !important;
+    height: auto !important;
+    margin: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+}
+.cc-panel-upload .cc-filedrop:has(.file-preview-holder) .file-preview-holder {
+    background: var(--bg-alt) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 8px !important;
+    padding: 12px 48px 12px 16px !important;
+    margin: 0 !important;
+    height: auto !important;
+    min-height: 0 !important;
+}
+/* Stop Gradio's html/markdown blocks above the dropzone from flex-growing
+   to fill the column, which would shove the file chip to the bottom. */
+.cc-panel-upload > .block.hide-container,
+.cc-panel-upload > .block.padded {
+    flex: 0 0 auto !important;
+}
+.cc-panel-upload .cc-filedrop:has(.file-preview-holder) .icon-button-wrapper.top-panel {
+    position: absolute !important;
+    top: 50% !important;
+    right: 10px !important;
+    bottom: auto !important;
+    height: auto !important;
+    transform: translateY(-50%) !important;
+    background: transparent !important;
+    padding: 0 !important;
+    z-index: 2 !important;
+}
+.cc-panel-upload .cc-filedrop:has(.file-preview-holder) .icon-button-wrapper.top-panel button {
+    width: 28px !important; height: 28px !important;
+    border-radius: 6px !important;
+    color: var(--text-muted) !important;
+    background: transparent !important;
+    --bg-color: transparent !important;
+    border-color: transparent !important;
+    transition: background 0.12s ease, color 0.12s ease;
+}
+.cc-panel-upload .cc-filedrop:has(.file-preview-holder) .icon-button-wrapper.top-panel button:hover {
+    background: rgba(0, 0, 0, 0.06) !important;
+    color: var(--verdict-err) !important;
+}
+/* Push the Analyze button to bottom of the options panel so the two cards
+   visually bottom-align even when the file panel is taller. Constrain its
+   width — full-width primary buttons read as SaaS, not academic. */
+.cc-panel-options > * + * { margin-top: 10px !important; }
+.cc-panel-options .cc-analyze-btn {
+    margin-top: auto !important;
+    align-self: flex-end !important;
+    min-width: 140px !important;
+    max-width: 200px !important;
+    width: auto !important;
+}
+/* Checkbox inside the options panel: give each row a subtle tile */
+.cc-panel-options .gr-form, .cc-panel-options .wrap.svelte-1ixn6qd,
+.cc-panel-options [data-testid="checkbox"] { padding: 0 !important; }
+
+/* ── Brand-aligned primary action button ── */
+/* Gradio assigns primary buttons various class suffixes across versions; this
+   selector list covers the common ones without touching secondary buttons. */
+button.primary,
+button.lg.primary,
+.gr-button-primary,
+.gr-button.gr-button-primary {
+    background: var(--accent) !important;
+    background-image: none !important;
+    color: #ffffff !important;
+    border: 1px solid var(--accent) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 2px 18px rgba(0, 66, 118, 0.18) !important;
+}
+button.primary:hover,
+button.lg.primary:hover,
+.gr-button-primary:hover,
+.gr-button.gr-button-primary:hover {
+    background: var(--accent-hover) !important;
+    border-color: var(--accent-hover) !important;
+    box-shadow: 0 2px 24px rgba(0, 66, 118, 0.24) !important;
+}
+
+/* Secondary / outline buttons — academic restraint: hairline border + body text */
+button.secondary,
+.gr-button-secondary,
+.gr-button.gr-button-secondary {
+    background: var(--surface) !important;
+    color: var(--text) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 8px !important;
+    box-shadow: none !important;
+}
+button.secondary:hover,
+.gr-button-secondary:hover,
+.gr-button.gr-button-secondary:hover {
+    background: var(--bg-alt) !important;
+    border-color: var(--text-muted) !important;
+    color: var(--text-strong) !important;
+}
+
+/* Primary button: tighter radius for the academic look (Distill / arXiv). */
+button.primary,
+button.lg.primary,
+.gr-button-primary,
+.gr-button.gr-button-primary {
+    border-radius: 8px !important;
+}
+
+/* ── Checkboxes — flat thin border, accent color when checked ── */
+.gradio-container input[type="checkbox"] {
+    width: 16px !important;
+    height: 16px !important;
+    accent-color: var(--accent);
+    cursor: pointer;
+}
+.gradio-container [data-testid="checkbox"] label,
+.gradio-container [data-testid="checkbox"] span {
+    font-size: 16px !important;
+    color: var(--text) !important;
+    line-height: 1.5 !important;
+}
+
+/* ── Toasts (gr.Info / gr.Warning / gr.Error) — slim banner with our palette ──
+   Gradio renders these via `.toast-body` / `.toast-message` plus a type
+   modifier. The selectors below are intentionally generous so they work
+   across Gradio 4 → 6 internal class shuffles. */
+.toast-body,
+.toast,
+[role="status"][class*="toast"] {
+    border-radius: 8px !important;
+    border: 1px solid var(--border) !important;
+    box-shadow: none !important;
+    font-family: var(--font-sans) !important;
+    font-size: 16px !important;
+    padding: 10px 14px !important;
+}
+.toast-body.error, .toast.error, .error[class*="toast"] {
+    background: var(--verdict-err-bg) !important;
+    border-color: var(--verdict-err-border) !important;
+    color: var(--verdict-err) !important;
+}
+.toast-body.warning, .toast.warning, .warning[class*="toast"] {
+    background: var(--verdict-warn-bg) !important;
+    border-color: var(--verdict-warn-border) !important;
+    color: var(--verdict-warn) !important;
+}
+.toast-body.info, .toast.info, .info[class*="toast"] {
+    background: var(--surface) !important;
+    border-color: var(--border) !important;
+    color: var(--text) !important;
+}
+

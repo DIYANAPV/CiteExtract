@@ -1,0 +1,64 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "citeextract"
+version = "0.1.0"
+description = "Verifies citations in academic papers using GROBID and LLM-based verification."
+requires-python = ">=3.10"
+dependencies = [
+    "pydantic==2.12.5",
+    "bibtexparser==1.4.4",
+    "spacy==3.8.13",
+    "rapidfuzz==3.14.3",
+    "unidecode==1.4.0",
+    "pyyaml==6.0.3",
+    "requests==2.33.0",
+    "tenacity==9.1.4",
+    "defusedxml==0.7.1",
+    "httpx==0.28.1",
+    "aiolimiter==1.2.1",
+    "aiosqlite==0.22.1",
+    "openai==2.30.0",
+    "bm25s==0.3.3",
+    "sentence-transformers==5.3.0",
+    "flashrank==0.2.10",
+    "fastapi==0.135.3",
+    "uvicorn==0.44.0",
+    "python-multipart==0.0.24",
+    "gradio==6.11.0",
+    "pymupdf==1.27.2.2",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[tool.setuptools]
+packages = [
+    "citeextract",
+    "citeextract.api",
+    "citeextract.citation",
+    "citeextract.classification",
+    "citeextract.models",
+    "citeextract.parsers",
+    "citeextract.report",
+    "citeextract.utils",
+    "citeextract.verification",
+    "citeextract.verification.agentic",
+    "citeextract.verification.api_clients",
+    "citeextract_ui",
+    "citeextract_ui.downloads",
+    "citeextract_ui.render",
+    "citeextract_ui.ui",
+]
+
+[tool.setuptools.package-dir]
+citeextract = "backend"
+citeextract_ui = "frontend"
+
+[tool.setuptools.package-data]
+"citeextract.api" = ["manifest.json"]
+"citeextract_ui" = ["styles.css"]
+"citeextract_ui.ui" = ["about.html"]
+"citeextract.verification.agentic" = ["prompts/*.txt"]

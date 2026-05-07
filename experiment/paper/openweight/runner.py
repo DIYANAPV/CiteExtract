@@ -1,22 +1,3 @@
-"""Open-weight model benchmark runner — semantic + metadata.
-
-Self-contained, single-process runner using HuggingFace ``transformers``.
-Designed for a SLURM/GPU compute node. Reads JSONLs from
-``experiment/paper/data/`` and writes per-cell CSVs to
-``experiment/paper/results/``, matching the OpenAI runners' schemas so
-the aggregators pick them up uniformly.
-
-CLI:
-    python -m experiment.paper.openweight.runner --model Qwen/Qwen3-8B --task semantic --smoke
-    python -m experiment.paper.openweight.runner --model Qwen/Qwen3-8B --task semantic --full
-    python -m experiment.paper.openweight.runner --model Qwen/Qwen3-8B --task metadata --full
-    python -m experiment.paper.openweight.runner --model meta-llama/Llama-3.1-8B-Instruct --task semantic --full
-    # Llama is gated: huggingface-cli login first.
-
-Generation is greedy (deterministic). Qwen 3 thinking mode is suppressed
-three ways: ``enable_thinking=False`` chat-template kwarg, a ``/no_think``
-user-message prefix, and a ``<think>...</think>`` parser scrub.
-"""
 
 from __future__ import annotations
 
@@ -68,9 +49,6 @@ logging.basicConfig(
 log = logging.getLogger("openweight")
 
 
-# ── data classes ──────────────────────────────────────────────────────
-
-
 @dataclass
 class SemanticRow:
     instance_id: int
@@ -120,7 +98,6 @@ class CallResult:
 
 
 class TransformersClient:
-    """Loads a HuggingFace model and runs greedy generation in-process."""
 
     def __init__(self, model_id: str, dtype: str = "auto"):
         try:
@@ -176,7 +153,6 @@ class TransformersClient:
         try:
             return self.tokenizer.apply_chat_template(messages, **kwargs)
         except TypeError:
-            # Older tokenizers reject enable_thinking; drop it and retry.
             kwargs.pop("enable_thinking", None)
             return self.tokenizer.apply_chat_template(messages, **kwargs)
 
@@ -190,7 +166,7 @@ class TransformersClient:
                 output = self.model.generate(
                     **inputs,
                     max_new_tokens=max_tokens,
-                    do_sample=False,        # greedy → deterministic
+                    do_sample=False,
                     pad_token_id=self.tokenizer.pad_token_id,
                 )
         except Exception as e:
@@ -204,10 +180,6 @@ class TransformersClient:
 
     async def call(self, system: str, user: str, max_tokens: int = 512,
                    _want_json: bool = True) -> CallResult:
-        # ``_want_json`` matches the OpenAI/Gemini client signatures for
-        # drop-in compatibility but has no effect — transformers has no
-        # native JSON mode. The prompt itself enforces JSON output, and
-        # the parser tolerates fences / leaked <think> blocks.
         return await asyncio.to_thread(self._generate_sync, system, user, max_tokens)
 
     def aclose(self) -> None:
@@ -237,7 +209,6 @@ def build_user_message_semantic(record: dict, condition: str, *, qwen3: bool) ->
     title = (record.get("cited_paper_title") or "").strip()
     parts: list[str] = []
     if qwen3:
-        # Belt-and-suspenders alongside the chat template's enable_thinking=False.
         parts.append("/no_think")
     parts.append(f'Citing sentence: "{citing}"')
     parts.append(f"Cited paper title: {title}")
@@ -285,7 +256,6 @@ def build_user_message_metadata(record: dict, *, qwen3: bool) -> str:
 
 
 def parse_semantic(raw: str) -> tuple[str, str, str, str, str | None]:
-    """Returns (mapped_verdict, raw_verdict, reasoning, evidence, error)."""
     verdict, reason, evidence, err = _parse_two_class(
         raw, ("SUPPORTED", "NOT_SUPPORTED"), evidence_key="evidence_quote",
     )
@@ -296,7 +266,6 @@ def parse_semantic(raw: str) -> tuple[str, str, str, str, str | None]:
 
 
 def parse_metadata(raw: str) -> tuple[str, str, str, str, str | None]:
-    """Returns (verdict, raw_verdict, reasoning, confidence, error)."""
     verdict, reason, conf, err = _parse_two_class(
         raw, ("valid", "fabricated"), evidence_key="confidence",
     )
@@ -312,7 +281,6 @@ def _parse_two_class(
     if not raw:
         return ("", "", "", "empty_response")
     s = raw
-    # Strip Qwen 3 <think>...</think> blocks that leak past enable_thinking=False.
     if "<think>" in s:
         end = s.find("</think>")
         if end >= 0:
@@ -374,7 +342,6 @@ def load_metadata_records() -> list[dict]:
 
 def stratified_sample(records: list[dict], n: int, seed: int,
                       label_key: str, label_values: tuple[str, str]) -> list[dict]:
-    """Balanced sample with at least one row per source. Deterministic."""
     rng = random.Random(seed)
     by_src: dict[str, list[dict]] = {}
     for r in records:
@@ -406,7 +373,6 @@ def stratified_sample(records: list[dict], n: int, seed: int,
 
 
 def _safe_model_name(model: str) -> str:
-    # "Qwen/Qwen3-8B" → "Qwen3-8B"
     base = model.rsplit("/", 1)[-1]
     return base.replace(":", "-").replace("/", "_")
 
@@ -492,7 +458,6 @@ async def run_semantic_cell(client: TransformersClient, condition: str,
     qwen3 = _is_qwen3(client.model_id)
     t0 = time.perf_counter()
 
-    # Sequential: generation is GPU-bound; one model instance can't usefully parallelize.
     for i, rec in enumerate(todo, start=1):
         user = build_user_message_semantic(rec, condition, qwen3=qwen3)
         res = await client.call(system, user, max_tokens=512)
@@ -683,7 +648,7 @@ async def main_async() -> int:
                 )
                 summaries[f"{client.model_id}__semantic__{c}"] = cell_summary_semantic(rows)
 
-        else:  # metadata
+        else:
             records = load_metadata_records()
             if args.smoke:
                 sample = stratified_sample(

@@ -1,16 +1,3 @@
-"""Aggregate per-cell CSVs into the semantic-results LaTeX table.
-
-Reads ``experiment/paper/results/semantic_{model}_{condition}.csv`` for
-each cell and emits:
-
-    experiment/paper/results/tab_semantic_results.tex          — the paper table
-    experiment/paper/results/tab_semantic_results_full.json    — per-cell metrics
-
-Usage:
-    python -m experiment.paper.semantic.make_table
-    python -m experiment.paper.semantic.make_table --smoke
-        (writes tab_semantic_results_smoke.tex etc.)
-"""
 
 from __future__ import annotations
 
@@ -42,7 +29,6 @@ CONDITION_LABELS = {
     "title_abstract_passages": "Title + Abstract + Passages",
 }
 
-# Bolded in the rendered tables.
 PRODUCTION_CELL = ("gpt-4o-mini", "title_abstract_passages")
 
 
@@ -126,10 +112,6 @@ def render_latex_detailed(
     metrics: dict[tuple[str, str], dict],
     models: tuple[str, ...] = DEFAULT_MODELS,
 ) -> str:
-    """Flat (model × condition) table with Acc, Macro-F1, V-F1, M-F1, Time, Cost.
-
-    Open-weight cells have cost_usd == 0; the Cost column renders as ``--`` for them.
-    """
     lines = []
     lines.append("\\begin{tabular}{llrrrrrr}")
     lines.append("\\toprule")
