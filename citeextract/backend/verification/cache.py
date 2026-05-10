@@ -1,6 +1,7 @@
 
 import hashlib
 import json
+import logging
 import time
 from pathlib import Path
 from typing import Optional
@@ -8,6 +9,8 @@ from typing import Optional
 import aiosqlite
 
 from citeextract import config
+
+log = logging.getLogger(__name__)
 
 _ttl_cache: Optional[dict] = None
 
@@ -79,6 +82,7 @@ class APICache:
         if self._db is None:
             Path(self.db_path).parent.mkdir(parents=True, exist_ok=True)
             self._db = await aiosqlite.connect(self.db_path, timeout=10)
+            await self._apply_pragmas(self._db)
             await self._db.execute("""
                 CREATE TABLE IF NOT EXISTS cache (
                     key TEXT PRIMARY KEY,
@@ -88,6 +92,28 @@ class APICache:
             """)
             await self._db.commit()
         return self._db
+
+    @staticmethod
+    async def _apply_pragmas(db: aiosqlite.Connection) -> None:
+        # Best-practice pragmas for an async-accessed SQLite cache.
+        # Wrapped per-pragma so a read-only FS or FUSE mount can degrade
+        # gracefully (warning, not crash) instead of disabling the cache.
+        pragmas = [
+            ("journal_mode", "WAL"),       # readers don't block writers
+            ("synchronous", "NORMAL"),     # safe with WAL; faster than FULL
+            ("temp_store", "MEMORY"),      # temp tables in RAM
+            ("cache_size", "-16000"),      # 16 MB page cache
+            ("mmap_size", "67108864"),     # 64 MB mmap (capped at file size)
+        ]
+        for name, value in pragmas:
+            try:
+                await db.execute(f"PRAGMA {name} = {value};")
+            except Exception as exc:
+                log.warning(
+                    "APICache: PRAGMA %s = %s failed (%s); "
+                    "cache will fall back to SQLite defaults.",
+                    name, value, type(exc).__name__,
+                )
 
     async def get(self, key: str) -> Optional[dict]:
         db = await self._ensure_db()
