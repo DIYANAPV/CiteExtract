@@ -211,7 +211,7 @@ class MetadataAgent:
         self,
         openai_client: AsyncOpenAI,
         tool_executor: ToolExecutor,
-        model: str = "gpt-4o-mini",
+        model: str = "gpt-5-mini",
         temperature: float = 0.0,
         max_tool_rounds: int = 3,
         max_tokens: int = 1024,
@@ -237,16 +237,24 @@ class MetadataAgent:
             {"role": "user", "content": user_message},
         ]
 
+        from citeextract.verification.api_clients.llm_client import (
+            is_reasoning_model, effective_max_completion_tokens,
+        )
+
         for round_num in range(self._max_tool_rounds):
-            response = await self._client.chat.completions.create(
-                model=self._model,
-                messages=messages,
-                temperature=self._temperature,
-                max_tokens=self._max_tokens,
-                timeout=self._timeout,
-                tools=METADATA_TOOL_DEFINITIONS,
-                tool_choice="auto",
-            )
+            kwargs: dict = {
+                "model": self._model,
+                "messages": messages,
+                "max_completion_tokens": effective_max_completion_tokens(
+                    self._model, self._max_tokens,
+                ),
+                "timeout": self._timeout,
+                "tools": METADATA_TOOL_DEFINITIONS,
+                "tool_choice": "auto",
+            }
+            if not is_reasoning_model(self._model):
+                kwargs["temperature"] = self._temperature
+            response = await self._client.chat.completions.create(**kwargs)
             choice = response.choices[0]
 
             if response.usage:
@@ -292,16 +300,24 @@ class MetadataAgent:
             {"role": "user", "content": followup_message},
         ]
 
+        from citeextract.verification.api_clients.llm_client import (
+            is_reasoning_model, effective_max_completion_tokens,
+        )
+
         for _ in range(2):
-            response = await self._client.chat.completions.create(
-                model=self._model,
-                messages=messages,
-                temperature=self._temperature,
-                max_tokens=self._max_tokens,
-                timeout=self._timeout,
-                tools=gs_tools,
-                tool_choice="auto",
-            )
+            kwargs: dict = {
+                "model": self._model,
+                "messages": messages,
+                "max_completion_tokens": effective_max_completion_tokens(
+                    self._model, self._max_tokens,
+                ),
+                "timeout": self._timeout,
+                "tools": gs_tools,
+                "tool_choice": "auto",
+            }
+            if not is_reasoning_model(self._model):
+                kwargs["temperature"] = self._temperature
+            response = await self._client.chat.completions.create(**kwargs)
             choice = response.choices[0]
 
             if response.usage:
@@ -341,15 +357,23 @@ class MetadataAgent:
             "content": "Provide your final metadata verdict now as JSON.",
         })
 
+        from citeextract.verification.api_clients.llm_client import (
+            is_reasoning_model, effective_max_completion_tokens,
+        )
+
         try:
-            response = await self._client.chat.completions.create(
-                model=self._model,
-                messages=messages_copy,
-                temperature=self._temperature,
-                max_tokens=self._max_tokens,
-                timeout=self._timeout,
-                response_format=METADATA_VERDICT_SCHEMA,
-            )
+            verdict_kwargs: dict = {
+                "model": self._model,
+                "messages": messages_copy,
+                "max_completion_tokens": effective_max_completion_tokens(
+                    self._model, self._max_tokens,
+                ),
+                "timeout": self._timeout,
+                "response_format": METADATA_VERDICT_SCHEMA,
+            }
+            if not is_reasoning_model(self._model):
+                verdict_kwargs["temperature"] = self._temperature
+            response = await self._client.chat.completions.create(**verdict_kwargs)
 
             if response.usage:
                 self._cost_tracker.add(

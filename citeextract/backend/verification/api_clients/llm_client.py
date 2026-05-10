@@ -47,11 +47,31 @@ class LLMClient(ABC):
         ...
 
 
+_REASONING_MODEL_PREFIXES = ("gpt-5", "o1", "o3", "o4")
+
+_REASONING_MIN_COMPLETION_TOKENS = 8192
+
+
+def is_reasoning_model(model: str) -> bool:
+    return model.lower().startswith(_REASONING_MODEL_PREFIXES)
+
+
+def effective_max_completion_tokens(model: str, configured: int) -> int:
+    """Reasoning models spend tokens on hidden reasoning before producing
+    output. The configured `max_tokens` (sized for non-reasoning JSON output)
+    is too tight when the model is gpt-5-* / o1-* / etc., causing empty
+    completions that fail JSON parsing. Floor at 8k for reasoning models.
+    """
+    if is_reasoning_model(model):
+        return max(configured, _REASONING_MIN_COMPLETION_TOKENS)
+    return configured
+
+
 class OpenAIClient(LLMClient):
 
     def __init__(
         self,
-        model: str = "gpt-4o-mini",
+        model: str = "gpt-5-mini",
         api_key: str | None = None,
         temperature: float = 0.0,
         max_tokens: int = 1024,
@@ -77,17 +97,19 @@ class OpenAIClient(LLMClient):
     ) -> str:
         import httpx
         timeout = httpx.Timeout(connect=30.0, read=180.0, write=30.0, pool=30.0)
-        response = await self._client.chat.completions.create(
-            model=self.model,
-            messages=[
+        kwargs: dict = {
+            "model": self.model,
+            "messages": [
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt},
             ],
-            temperature=self.temperature,
-            max_tokens=max_tokens,
-            response_format={"type": "json_object"},
-            timeout=timeout,
-        )
+            "max_completion_tokens": effective_max_completion_tokens(self.model, max_tokens),
+            "response_format": {"type": "json_object"},
+            "timeout": timeout,
+        }
+        if not is_reasoning_model(self.model):
+            kwargs["temperature"] = self.temperature
+        response = await self._client.chat.completions.create(**kwargs)
         if response.usage:
             self.cost_tracker.add(
                 response.usage.prompt_tokens,
@@ -100,7 +122,7 @@ def create_llm_client(llm_cfg: dict) -> LLMClient:
     provider = llm_cfg.get("provider", "openai")
     if provider == "openai":
         return OpenAIClient(
-            model=llm_cfg.get("model", "gpt-4o-mini"),
+            model=llm_cfg.get("model", "gpt-5-mini"),
             api_key=llm_cfg.get("api_key") or config.openai_api_key(),
             temperature=llm_cfg.get("temperature", 0.0),
             max_tokens=llm_cfg.get("max_tokens", 1024),

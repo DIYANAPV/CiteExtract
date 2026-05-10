@@ -146,6 +146,7 @@ def thresholds() -> dict:
         "author_match": section.get("author_match", 0.50),
         "venue_match": section.get("venue_match", 0.60),
         "subtitle_ratio": section.get("subtitle_ratio", 0.40),
+        "composite_match": section.get("composite_match", 0.65),
     }
 
 
@@ -188,7 +189,7 @@ def claim_verification() -> dict:
     section = _get_section("claim_verification")
     return {
         "provider": "openai",
-        "model": section.get("model", "gpt-4o-mini"),
+        "model": section.get("model", "gpt-5-mini"),
         "temperature": section.get("temperature", 0.0),
         "max_tokens": section.get("max_tokens", 1024),
         "timeout": section.get("timeout", 60),

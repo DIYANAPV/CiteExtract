@@ -58,6 +58,7 @@ thresholds:
   author_match: 0.80                # surname-Jaccard floor for MATCH; <0.80 routes to NEEDS_METADATA for the agent to investigate
   venue_match: 0.60
   subtitle_ratio: 0.40              # colon-split threshold in title normalization
+  composite_match: 0.65             # 0.5*title + 0.3*author + 0.2*year floor for picking a DB candidate; below this the cascade falls back to title-only match
 
 # Experimental L2 fallback databases. Each one fires only when the main
 # scholarly cascade (CrossRef → S2 → OpenAlex → CrossRef-by-title → PubMed
@@ -110,7 +111,7 @@ comprehension:
 
 # Agentic verification mode (rule-based triage + focused agents for ambiguous cases)
 agentic:
-  model: "gpt-4o-mini"
+  model: "gpt-5-mini"
   temperature: 0.0
   max_concurrent_agents: 15
   timeout: 60
@@ -142,7 +143,7 @@ agentic:
 
 # Claim verification (Standard mode: passage retrieval + LLM analysis)
 claim_verification:
-  model: "gpt-4o-mini"
+  model: "gpt-5-mini"
   temperature: 0.0
   max_tokens: 1024
   timeout: 60

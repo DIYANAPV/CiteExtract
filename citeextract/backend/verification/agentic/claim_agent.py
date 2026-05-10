@@ -78,10 +78,6 @@ def build_verdict_schema(verdict_classes: int) -> dict[str, Any]:
                                     ],
                                     "description": "Type of citation being made.",
                                 },
-                                "sub_claim": {
-                                    "type": "string",
-                                    "description": "The specific sub-claim attributed to this reference (not the full sentence).",
-                                },
                                 "verdict": {
                                     "type": "string",
                                     "enum": _VERDICT_VALUES[verdict_classes],
@@ -96,7 +92,7 @@ def build_verdict_schema(verdict_classes: int) -> dict[str, Any]:
                                 },
                             },
                             "required": [
-                                "citing_sentence", "citation_type", "sub_claim",
+                                "citing_sentence", "citation_type",
                                 "verdict", "explanation", "evidence_quote",
                             ],
                             "additionalProperties": False,
@@ -240,7 +236,7 @@ class ClaimAgent:
         self,
         openai_client: AsyncOpenAI,
         tool_executor: ToolExecutor,
-        model: str = "gpt-4o-mini",
+        model: str = "gpt-5-mini",
         temperature: float = 0.0,
         max_tool_rounds: int = 2,
         max_tokens: int = 1024,
@@ -279,13 +275,19 @@ class ClaimAgent:
         ]
 
         for _round in range(self._max_tool_rounds):
+            from citeextract.verification.api_clients.llm_client import (
+                is_reasoning_model, effective_max_completion_tokens,
+            )
             kwargs: dict[str, Any] = {
                 "model": self._model,
                 "messages": messages,
-                "temperature": self._temperature,
-                "max_tokens": self._max_tokens,
+                "max_completion_tokens": effective_max_completion_tokens(
+                    self._model, self._max_tokens,
+                ),
                 "timeout": self._timeout,
             }
+            if not is_reasoning_model(self._model):
+                kwargs["temperature"] = self._temperature
             if CLAIM_TOOL_DEFINITIONS:
                 kwargs["tools"] = CLAIM_TOOL_DEFINITIONS
                 kwargs["tool_choice"] = "auto"
@@ -350,14 +352,21 @@ class ClaimAgent:
         })
 
         try:
-            response = await self._client.chat.completions.create(
-                model=self._model,
-                messages=messages_copy,
-                temperature=self._temperature,
-                max_tokens=self._max_tokens,
-                timeout=self._timeout,
-                response_format=self._verdict_schema,
+            from citeextract.verification.api_clients.llm_client import (
+                is_reasoning_model, effective_max_completion_tokens,
             )
+            verdict_kwargs: dict[str, Any] = {
+                "model": self._model,
+                "messages": messages_copy,
+                "max_completion_tokens": effective_max_completion_tokens(
+                    self._model, self._max_tokens,
+                ),
+                "timeout": self._timeout,
+                "response_format": self._verdict_schema,
+            }
+            if not is_reasoning_model(self._model):
+                verdict_kwargs["temperature"] = self._temperature
+            response = await self._client.chat.completions.create(**verdict_kwargs)
 
             if response.usage:
                 self._cost_tracker.add(

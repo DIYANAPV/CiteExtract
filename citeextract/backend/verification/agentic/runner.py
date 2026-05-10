@@ -30,6 +30,9 @@ PassagesByRef = dict[str, dict[str, list[ScoredChunk]]]
 FullTextByRef = dict[str, FullTextResult]
 
 
+_AGENT_TASK_TIMEOUT_S = 240.0
+
+
 def _group_citations_by_ref(citations: list[Citation]) -> dict[str, list[Citation]]:
     groups: dict[str, list[Citation]] = defaultdict(list)
     for cit in citations:
@@ -135,7 +138,7 @@ async def run_agentic_verification(
         meta_agent = MetadataAgent(
             openai_client=openai_client,
             tool_executor=tool_executor,
-            model=agentic_config.get("model", "gpt-4o-mini"),
+            model=agentic_config.get("model", "gpt-5-mini"),
             temperature=agentic_config.get("temperature", 0.0),
             max_tool_rounds=meta_cfg.get("max_tool_rounds", 3),
             max_tokens=meta_cfg.get("max_tokens", 1024),
@@ -146,7 +149,7 @@ async def run_agentic_verification(
         claim_agent = ClaimAgent(
             openai_client=openai_client,
             tool_executor=tool_executor,
-            model=agentic_config.get("model", "gpt-4o-mini"),
+            model=agentic_config.get("model", "gpt-5-mini"),
             temperature=agentic_config.get("temperature", 0.0),
             max_tool_rounds=claim_cfg.get("max_tool_rounds", 2),
             max_tokens=claim_cfg.get("max_tokens", 1024),
@@ -158,7 +161,18 @@ async def run_agentic_verification(
 
         async def _run_metadata(tr):
             async with semaphore:
-                return await _dispatch_metadata(tr, meta_agent, parsed)
+                try:
+                    return await asyncio.wait_for(
+                        _dispatch_metadata(tr, meta_agent, parsed),
+                        timeout=_AGENT_TASK_TIMEOUT_S,
+                    )
+                except asyncio.TimeoutError:
+                    log.warning(
+                        "MetadataAgent for %s exceeded %.0fs task timeout; "
+                        "falling back to quick verdict",
+                        tr.ref_id, _AGENT_TASK_TIMEOUT_S,
+                    )
+                    return fallback_to_quick(tr)
 
         async def _do_pre_retrieve():
             with stage("agentic_pre_retrieve", refs=len(parsed.references)):
@@ -197,7 +211,18 @@ async def run_agentic_verification(
 
         async def _run_claim(tr):
             async with semaphore:
-                return await _dispatch_claim(tr, claim_agent, parsed)
+                try:
+                    return await asyncio.wait_for(
+                        _dispatch_claim(tr, claim_agent, parsed),
+                        timeout=_AGENT_TASK_TIMEOUT_S,
+                    )
+                except asyncio.TimeoutError:
+                    log.warning(
+                        "ClaimAgent for %s exceeded %.0fs task timeout; "
+                        "falling back to quick verdict",
+                        tr.ref_id, _AGENT_TASK_TIMEOUT_S,
+                    )
+                    return fallback_to_quick(tr)
 
         claim_tasks = {tr.ref_id: _run_claim(tr) for tr in needs_claim}
         if claim_tasks:
@@ -216,7 +241,18 @@ async def run_agentic_verification(
 
         async def _run_both(tr):
             async with semaphore:
-                return await _dispatch_both(tr, meta_agent, claim_agent, parsed)
+                try:
+                    return await asyncio.wait_for(
+                        _dispatch_both(tr, meta_agent, claim_agent, parsed),
+                        timeout=_AGENT_TASK_TIMEOUT_S,
+                    )
+                except asyncio.TimeoutError:
+                    log.warning(
+                        "Both-agents for %s exceeded %.0fs task timeout; "
+                        "falling back to quick verdict",
+                        tr.ref_id, _AGENT_TASK_TIMEOUT_S,
+                    )
+                    return fallback_to_quick(tr)
 
         both_tasks = {tr.ref_id: _run_both(tr) for tr in needs_both}
         if both_tasks:
