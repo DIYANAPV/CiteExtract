@@ -22,13 +22,58 @@ from citeextract.verification.matching import (
 )
 
 
+_CACHE_VERSION = 2
+
+
+_BIOMEDICAL_KEYWORDS = frozenset({
+    "biomedical", "biology", "biological", "biotechnology",
+    "medical", "medicine", "clinical", "clinic", "hospital", "hospitals",
+    "patient", "patients", "physician", "physicians", "nurse", "nursing",
+    "pharmacology", "pharmaceutical", "pharmacological", "pharmacy",
+    "pathology", "pathological", "physiology", "physiological",
+    "epidemiology", "epidemiological", "immunology", "immunological",
+    "oncology", "oncological", "cardiology", "cardiovascular",
+    "neurology", "neurological", "psychiatry", "psychiatric",
+    "dental", "dentistry", "veterinary", "surgery", "surgical", "surgeon",
+    "disease", "diseases", "syndrome", "syndromes",
+    "cancer", "cancers", "tumor", "tumour", "tumors", "tumours",
+    "diabetes", "alzheimer", "parkinson", "covid", "hiv", "aids", "hpv",
+    "sars", "influenza", "infection", "infections", "inflammation",
+    "blood", "brain", "heart", "liver", "kidney", "lung", "lungs",
+    "neuron", "neurons", "tissue", "tissues", "organ", "organs",
+    "protein", "proteins", "enzyme", "enzymes",
+    "antibody", "antibodies", "antigen", "antigens",
+    "receptor", "receptors",
+    "gene", "genes", "genome", "genomes", "genomic", "genetic", "genetics",
+    "dna", "rna", "mrna", "chromosome", "chromosomes",
+    "drug", "drugs", "vaccine", "vaccines",
+    "therapy", "therapies", "therapeutic", "therapeutics",
+    "virus", "viruses", "viral",
+    "bacteria", "bacterium", "bacterial",
+    "pathogen", "pathogens", "microbe", "microbes", "microbial",
+    "morbidity", "mortality", "prevalence", "incidence",
+})
+
+_WORD_RE = re.compile(r"\b[a-zA-Z]+\b")
+
+
+def _has_biomedical_signal(title: Optional[str], venue: Optional[str]) -> bool:
+    haystack = " ".join(filter(None, [title or "", venue or ""])).lower()
+    if not haystack:
+        return False
+    for word in _WORD_RE.findall(haystack):
+        if word in _BIOMEDICAL_KEYWORDS:
+            return True
+    return False
+
+
 def _cache_key(reference: Reference) -> str:
     if reference.title:
         title_hash = hashlib.sha256(
             normalize_title(reference.title).encode()
         ).hexdigest()[:8]
-        return f"existence:{reference.ref_id}:{title_hash}"
-    return f"existence:{reference.ref_id}"
+        return f"existence:v{_CACHE_VERSION}:{reference.ref_id}:{title_hash}"
+    return f"existence:v{_CACHE_VERSION}:{reference.ref_id}"
 
 
 async def check_existence(
@@ -59,6 +104,7 @@ async def _check_existence_cascade(
     cache: APICache,
 ) -> ExistenceResult:
     databases_checked: list[str] = []
+    errored_databases: list[str] = []
     all_flags: list[str] = []
 
     cached = await cache.get(_cache_key(reference))
@@ -70,7 +116,7 @@ async def _check_existence_cascade(
 
         exact_hit = await cache.get_title_ref_id(norm_title)
         if exact_hit and exact_hit != reference.ref_id:
-            cached_result = await cache.get(f"existence:{exact_hit}")
+            cached_result = await cache.get(f"existence:v{_CACHE_VERSION}:{exact_hit}")
             if cached_result and cached_result.get("status") == "FOUND":
                 result = ExistenceResult(
                     **{**cached_result, "ref_id": reference.ref_id,
@@ -88,7 +134,7 @@ async def _check_existence_cascade(
                 continue
             sim = title_similarity(reference.title, cached_title)
             if sim >= 0.90:
-                cached_result = await cache.get(f"existence:{cached_ref_id}")
+                cached_result = await cache.get(f"existence:v{_CACHE_VERSION}:{cached_ref_id}")
                 if cached_result and cached_result.get("status") == "FOUND":
                     result = ExistenceResult(
                         **{**cached_result, "ref_id": reference.ref_id,
@@ -113,7 +159,7 @@ async def _check_existence_cascade(
                 break
 
     if reference.doi:
-        db_record = await crossref.lookup_doi(reference.doi, client)
+        db_record = await crossref.lookup_doi(reference.doi, client, errors=errored_databases)
         databases_checked.append("crossref")
 
         if db_record:
@@ -122,7 +168,8 @@ async def _check_existence_cascade(
 
             if matched:
                 result = _build_found(
-                    reference, db_record, "crossref", sim, databases_checked, all_flags
+                    reference, db_record, "crossref", sim, databases_checked, all_flags,
+                    errored_databases=errored_databases,
                 )
                 await _cache_result(cache, reference.ref_id, result, _cache_key(reference))
                 return result
@@ -132,52 +179,23 @@ async def _check_existence_cascade(
                     f"'{db_record['title'][:60]}' (sim={sim:.2f}), treating as no-DOI"
                 )
 
-    s2_record = None
     if reference.doi or reference.arxiv_id:
         s2_id = f"DOI:{reference.doi}" if reference.doi else f"ARXIV:{reference.arxiv_id}"
-        s2_record = await semantic_scholar.lookup_by_id(s2_id, client)
-    if s2_record is None and reference.title:
-        s2_record = await semantic_scholar.search_by_title(
-            reference.title, client,
-            ref_authors=reference.authors, ref_year=reference.year,
-        )
-    databases_checked.append("semantic_scholar")
-
-    if s2_record:
-        matched, sim, flags = is_title_match(reference.title, s2_record["title"])
-        all_flags.extend(flags)
-        if matched:
-            upgraded = await _try_upgrade_preprint(
-                s2_record, reference, client, databases_checked, all_flags
-            )
-            if upgraded:
-                await _cache_result(cache, reference.ref_id, upgraded, _cache_key(reference))
-                return upgraded
-            result = _build_found(
-                reference, s2_record, "semantic_scholar", sim, databases_checked, all_flags
-            )
-            await _cache_result(cache, reference.ref_id, result, _cache_key(reference))
-            return result
-
-    if reference.title:
-        oa_record = await openalex.search_by_title(
-            reference.title, client,
-            ref_authors=reference.authors, ref_year=reference.year,
-        )
-        databases_checked.append("openalex")
-
-        if oa_record:
-            matched, sim, flags = is_title_match(reference.title, oa_record["title"])
+        s2_record = await semantic_scholar.lookup_by_id(s2_id, client, errors=errored_databases)
+        databases_checked.append("semantic_scholar")
+        if s2_record:
+            matched, sim, flags = is_title_match(reference.title, s2_record["title"])
             all_flags.extend(flags)
             if matched:
                 upgraded = await _try_upgrade_preprint(
-                    oa_record, reference, client, databases_checked, all_flags
+                    s2_record, reference, client, databases_checked, all_flags
                 )
                 if upgraded:
                     await _cache_result(cache, reference.ref_id, upgraded, _cache_key(reference))
                     return upgraded
                 result = _build_found(
-                    reference, oa_record, "openalex", sim, databases_checked, all_flags
+                    reference, s2_record, "semantic_scholar", sim, databases_checked, all_flags,
+                    errored_databases=errored_databases,
                 )
                 await _cache_result(cache, reference.ref_id, result, _cache_key(reference))
                 return result
@@ -186,6 +204,7 @@ async def _check_existence_cascade(
         cr_record = await crossref.search_by_title(
             reference.title, client,
             ref_authors=reference.authors, ref_year=reference.year,
+            errors=errored_databases,
         )
         databases_checked.append("crossref")
         if cr_record:
@@ -200,12 +219,62 @@ async def _check_existence_cascade(
                     return upgraded
                 result = _build_found(
                     reference, cr_record, "crossref", sim, databases_checked, all_flags,
+                    errored_databases=errored_databases,
                 )
                 await _cache_result(cache, reference.ref_id, result, _cache_key(reference))
                 return result
 
     if reference.title:
-        pm_record = await pubmed.search_by_title(reference.title, client)
+        oa_record = await openalex.search_by_title(
+            reference.title, client,
+            ref_authors=reference.authors, ref_year=reference.year,
+            errors=errored_databases,
+        )
+        databases_checked.append("openalex")
+
+        if oa_record:
+            matched, sim, flags = is_title_match(reference.title, oa_record["title"])
+            all_flags.extend(flags)
+            if matched:
+                upgraded = await _try_upgrade_preprint(
+                    oa_record, reference, client, databases_checked, all_flags
+                )
+                if upgraded:
+                    await _cache_result(cache, reference.ref_id, upgraded, _cache_key(reference))
+                    return upgraded
+                result = _build_found(
+                    reference, oa_record, "openalex", sim, databases_checked, all_flags,
+                    errored_databases=errored_databases,
+                )
+                await _cache_result(cache, reference.ref_id, result, _cache_key(reference))
+                return result
+
+    if reference.title and "semantic_scholar" not in databases_checked:
+        s2_record = await semantic_scholar.search_by_title(
+            reference.title, client,
+            ref_authors=reference.authors, ref_year=reference.year,
+            errors=errored_databases,
+        )
+        databases_checked.append("semantic_scholar")
+        if s2_record:
+            matched, sim, flags = is_title_match(reference.title, s2_record["title"])
+            all_flags.extend(flags)
+            if matched:
+                upgraded = await _try_upgrade_preprint(
+                    s2_record, reference, client, databases_checked, all_flags
+                )
+                if upgraded:
+                    await _cache_result(cache, reference.ref_id, upgraded, _cache_key(reference))
+                    return upgraded
+                result = _build_found(
+                    reference, s2_record, "semantic_scholar", sim, databases_checked, all_flags,
+                    errored_databases=errored_databases,
+                )
+                await _cache_result(cache, reference.ref_id, result, _cache_key(reference))
+                return result
+
+    if reference.title and _has_biomedical_signal(reference.title, reference.venue):
+        pm_record = await pubmed.search_by_title(reference.title, client, errors=errored_databases)
         databases_checked.append("pubmed")
 
         if pm_record:
@@ -213,13 +282,14 @@ async def _check_existence_cascade(
             all_flags.extend(flags)
             if matched:
                 result = _build_found(
-                    reference, pm_record, "pubmed", sim, databases_checked, all_flags
+                    reference, pm_record, "pubmed", sim, databases_checked, all_flags,
+                    errored_databases=errored_databases,
                 )
                 await _cache_result(cache, reference.ref_id, result, _cache_key(reference))
                 return result
 
     if reference.title:
-        arxiv_record = await arxiv.search_by_title(reference.title, client)
+        arxiv_record = await arxiv.search_by_title(reference.title, client, errors=errored_databases)
         databases_checked.append("arxiv")
 
         if arxiv_record:
@@ -233,7 +303,8 @@ async def _check_existence_cascade(
                     await _cache_result(cache, reference.ref_id, upgraded, _cache_key(reference))
                     return upgraded
                 result = _build_found(
-                    reference, arxiv_record, "arxiv", sim, databases_checked, all_flags
+                    reference, arxiv_record, "arxiv", sim, databases_checked, all_flags,
+                    errored_databases=errored_databases,
                 )
                 await _cache_result(cache, reference.ref_id, result, _cache_key(reference))
                 return result
@@ -245,6 +316,7 @@ async def _check_existence_cascade(
     ):
         ax_record = await arxiv.search_by_authors_year(
             reference.authors, reference.year, reference.title, client,
+            errors=errored_databases,
         )
         if ax_record:
             all_flags.append(
@@ -259,12 +331,13 @@ async def _check_existence_cascade(
             result = _build_found(
                 reference, ax_record, "arxiv", ax_record.get("title_similarity", sim),
                 databases_checked, all_flags,
+                errored_databases=errored_databases,
             )
             await _cache_result(cache, reference.ref_id, result, _cache_key(reference))
             return result
 
     if reference.title and _config.experimental_fallbacks().get("openreview"):
-        or_record = await openreview.search_by_title(reference.title, client)
+        or_record = await openreview.search_by_title(reference.title, client, errors=errored_databases)
         databases_checked.append("openreview")
         if or_record:
             matched, sim, flags = is_title_match(reference.title, or_record["title"])
@@ -273,6 +346,7 @@ async def _check_existence_cascade(
                 result = _build_found(
                     reference, or_record, "openreview", sim,
                     databases_checked, all_flags,
+                    errored_databases=errored_databases,
                 )
                 await _cache_result(cache, reference.ref_id, result, _cache_key(reference))
                 return result
@@ -301,16 +375,23 @@ async def _check_existence_cascade(
                 matched_doi=reference.doi,
                 title_similarity=1.0,
                 databases_checked=databases_checked,
+                errored_databases=list(errored_databases),
                 flags=all_flags,
             )
             await _cache_result(cache, reference.ref_id, result, _cache_key(reference))
             return result
 
+    if errored_databases:
+        all_flags.append(
+            f"transient_api_failures: {len(errored_databases)} source(s) errored "
+            f"({'; '.join(errored_databases)}) — verdict may be UNVERIFIABLE rather than FABRICATED"
+        )
     all_flags.append("not_found_in_any_database")
     result = ExistenceResult(
         ref_id=reference.ref_id,
         status="NOT_FOUND",
         databases_checked=databases_checked,
+        errored_databases=list(errored_databases),
         flags=all_flags,
     )
     await _cache_result(cache, reference.ref_id, result, _cache_key(reference))
@@ -484,6 +565,7 @@ def _build_found(
     sim: float,
     databases_checked: list[str],
     flags: list[str],
+    errored_databases: Optional[list[str]] = None,
 ) -> ExistenceResult:
     retraction_status = db_record.get("retraction_status")
     if retraction_status is None and source != "crossref":
@@ -524,6 +606,7 @@ def _build_found(
         retraction_status=retraction_status,
         title_similarity=sim,
         databases_checked=databases_checked,
+        errored_databases=list(errored_databases) if errored_databases else [],
         flags=flags,
     )
 
@@ -533,7 +616,7 @@ async def _cache_result(cache: APICache, ref_id: str, result: ExistenceResult,
     from citeextract.verification.cache import TTL_METADATA, TTL_NOT_FOUND
 
     ttl = TTL_METADATA if result.status == "FOUND" else TTL_NOT_FOUND
-    key = cache_key or f"existence:{ref_id}"
+    key = cache_key or f"existence:v{_CACHE_VERSION}:{ref_id}"
     await cache.set(key, result.model_dump(), ttl)
 
     if result.abstract:
@@ -585,6 +668,7 @@ async def check_all_references(
                     ref_id=ref.ref_id,
                     status="NOT_FOUND",
                     databases_checked=[],
+                    errored_databases=[f"cascade: {type(result).__name__}"],
                     flags=[f"existence_check_error: {type(result).__name__}: {result}"],
                 ))
             else:
