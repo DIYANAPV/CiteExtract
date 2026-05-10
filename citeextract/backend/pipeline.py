@@ -11,7 +11,7 @@ from citeextract.models.report import PaperReport
 from citeextract.models.verdict import ExistenceResult
 from citeextract.parsers.router import parse_file
 from citeextract.report.generator import build_report, save_json
-from citeextract.utils.timing import stage
+from citeextract.utils.timing import collect_stages, stage
 from citeextract.verification.agentic.runner import (
     FullTextByRef,
     PassagesByRef,
@@ -106,6 +106,7 @@ async def _run_agentic(
                 v.existence.abstract = ft.abstract
 
     report = build_report(parsed, verdicts, "agentic", input_file=file_path)
+    report.summary.total_cost_usd = round(llm_cost, 6)
 
     if llm_cost > 0:
         report.warnings.append(f"LLM cost (agentic): ${llm_cost:.4f}")
@@ -654,7 +655,9 @@ async def run_unified_pipeline(
                     parsed = parse_file(file_path)
             return paper_cached, comp_cached, parsed
 
-    with stage("pipeline_total", mode=effective_mode, file=Path(file_path).name):
+    with collect_stages() as run_stats_bucket, stage(
+        "pipeline_total", mode=effective_mode, file=Path(file_path).name,
+    ):
         with stage("L1_parse"):
             parsed = parse_file(file_path)
 
@@ -733,6 +736,8 @@ async def run_unified_pipeline(
                                 verify_claims=run_claim_verification,
                                 cache=shared_cache,
                             )
+                if paper_report is not None:
+                    paper_report.run_stats = dict(run_stats_bucket)
                 if use_cache and cache_key is not None:
                     report_cache.save(cache_key, paper_report, comp_report)
                 return paper_report, comp_report, parsed
@@ -751,6 +756,8 @@ async def run_unified_pipeline(
                         cache=shared_cache,
                     )
 
+            if paper_report is not None:
+                paper_report.run_stats = dict(run_stats_bucket)
             if use_cache and cache_key is not None:
                 report_cache.save(cache_key, paper_report, comp_report)
             return paper_report, comp_report, parsed

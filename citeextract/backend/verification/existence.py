@@ -619,9 +619,6 @@ async def _cache_result(cache: APICache, ref_id: str, result: ExistenceResult,
     key = cache_key or f"existence:v{_CACHE_VERSION}:{ref_id}"
     await cache.set(key, result.model_dump(), ttl)
 
-    if result.abstract:
-        await cache.set_abstract(ref_id, result.abstract)
-
     if result.status == "FOUND" and result.matched_title:
         norm = normalize_title(result.matched_title)
         if norm:

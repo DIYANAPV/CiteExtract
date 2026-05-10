@@ -141,9 +141,6 @@ class APICache:
         )
         await db.commit()
 
-    async def set_abstract(self, ref_id: str, abstract: str) -> None:
-        await self.set(f"abstract:{ref_id}", {"abstract": abstract}, TTL_ABSTRACT)
-
     async def set_title_index(self, normalized_title: str, ref_id: str) -> None:
         await self.set(f"title_idx:{normalized_title}", {"ref_id": ref_id}, TTL_METADATA)
 

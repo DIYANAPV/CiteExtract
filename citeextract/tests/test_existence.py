@@ -119,15 +119,6 @@ class TestCache:
             return result
         assert _run(_test()) is None
 
-    def test_abstract_shortcut(self):
-        async def _test():
-            cache = APICache(db_path="/tmp/test_citeextract_cache.db")
-            await cache.set_abstract("ref_test_1", "This is a test abstract.")
-            result = await cache.get_abstract("ref_test_1")
-            await cache.close()
-            return result
-        assert _run(_test()) == "This is a test abstract."
-
     def test_expired_entry(self):
         async def _test():
             cache = APICache(db_path="/tmp/test_citeextract_cache.db")

@@ -13,6 +13,10 @@ class ReportSummary(BaseModel):
     integrity_score: float = Field(default=0.0, description="Fraction of metadata-VALID verdicts")
     risk_level: str = Field(default="LOW", description="LOW, MEDIUM, HIGH, CRITICAL")
     flagged_for_review: int = 0
+    total_cost_usd: float = Field(
+        default=0.0,
+        description="Aggregate LLM cost across metadata + claim agents (USD)",
+    )
 
 
 class PaperReport(BaseModel):
@@ -25,3 +29,7 @@ class PaperReport(BaseModel):
     verdicts: list[CitationVerdict] = Field(default_factory=list)
     summary: ReportSummary = Field(default_factory=ReportSummary)
     warnings: list[str] = Field(default_factory=list)
+    run_stats: dict[str, float] = Field(
+        default_factory=dict,
+        description="Per-stage wall-clock seconds for this run; keys are STAGE names.",
+    )
