@@ -250,3 +250,63 @@ class TestGrobidDedupRemap:
         assert set(deduped.keys()) == {"1", "2"}
         assert remap == {}
 
+
+class TestVenueWipingHeuristic:
+    """The venue-wiping heuristic in _clean_grobid_reference wipes venue
+    when SequenceMatcher(venue, title).ratio() > 0.80 OR one is contained
+    in the other. Locks in the current behaviour so future refactors
+    cannot silently regress it."""
+
+    def test_wipe_when_venue_equals_title(self):
+        from citeextract.parsers.grobid_parser import _clean_grobid_reference
+        ref = _clean_grobid_reference({
+            "title": "Attention is all you need",
+            "venue": "Attention is all you need",
+        })
+        assert ref["venue"] is None
+
+    def test_wipe_when_venue_contained_in_title(self):
+        from citeextract.parsers.grobid_parser import _clean_grobid_reference
+        ref = _clean_grobid_reference({
+            "title": "Some Long Conference Title 2017 Proceedings",
+            "venue": "Some Long Conference Title 2017",
+        })
+        assert ref["venue"] is None
+
+    def test_wipe_when_title_contained_in_venue(self):
+        from citeextract.parsers.grobid_parser import _clean_grobid_reference
+        ref = _clean_grobid_reference({
+            "title": "Attention",
+            "venue": "Attention is all you need (paper)",
+        })
+        assert ref["venue"] is None
+
+    def test_keep_when_venue_distinct(self):
+        from citeextract.parsers.grobid_parser import _clean_grobid_reference
+        ref = _clean_grobid_reference({
+            "title": "Attention is all you need",
+            "venue": "NeurIPS",
+        })
+        assert ref["venue"] == "NeurIPS"
+
+    def test_keep_when_venue_shares_words_but_distinct(self):
+        # A title and a venue that share a few words must NOT wipe — they're
+        # not similar enough by SequenceMatcher and neither is a substring of
+        # the other.
+        from citeextract.parsers.grobid_parser import _clean_grobid_reference
+        ref = _clean_grobid_reference({
+            "title": "Online learning for reinforcement learning agents",
+            "venue": "Journal of Machine Learning Research",
+        })
+        assert ref["venue"] == "Journal of Machine Learning Research"
+
+    def test_no_op_when_venue_missing(self):
+        from citeextract.parsers.grobid_parser import _clean_grobid_reference
+        ref = _clean_grobid_reference({
+            "title": "Attention is all you need",
+            "venue": "",
+        })
+        # venue stays empty when nothing to compare; the heuristic only
+        # triggers when both fields are non-empty.
+        assert ref.get("venue") == ""
+
