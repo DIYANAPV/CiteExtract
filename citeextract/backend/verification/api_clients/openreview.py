@@ -14,7 +14,9 @@ BASE_URL = "https://api.openreview.net"
 
 
 async def search_by_title(
-    title: str, client: httpx.AsyncClient
+    title: str, client: httpx.AsyncClient,
+    *,
+    errors: Optional[list[str]] = None,
 ) -> Optional[dict]:
     if not title or len(title.strip()) < 5:
         return None
@@ -31,13 +33,19 @@ async def search_by_title(
             timeout=timeout,
         )
         if resp.status_code != 200:
+            if errors is not None and resp.status_code >= 500:
+                errors.append(f"openreview: HTTP {resp.status_code}")
             return None
-    except (httpx.HTTPStatusError, httpx.RequestError):
+    except (httpx.HTTPStatusError, httpx.RequestError) as exc:
+        if errors is not None:
+            errors.append(f"openreview: {type(exc).__name__}")
         return None
 
     try:
         notes = resp.json().get("notes", []) or []
-    except Exception:
+    except Exception as exc:
+        if errors is not None:
+            errors.append(f"openreview: {type(exc).__name__}")
         return None
     if not notes:
         return None

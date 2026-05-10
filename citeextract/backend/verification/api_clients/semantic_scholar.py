@@ -29,6 +29,7 @@ async def search_by_title(
     *,
     ref_authors: Optional[list[str]] = None,
     ref_year: Optional[int] = None,
+    errors: Optional[list[str]] = None,
 ) -> Optional[dict]:
     if not title or len(title.strip()) < 5:
         return None
@@ -49,12 +50,21 @@ async def search_by_title(
             timeout=timeout,
         )
         if resp.status_code == 429:
+            if errors is not None:
+                errors.append("semantic_scholar: HTTP 429")
             return None
         resp.raise_for_status()
-    except (httpx.HTTPStatusError, httpx.RequestError):
+    except (httpx.HTTPStatusError, httpx.RequestError) as exc:
+        if errors is not None:
+            errors.append(f"semantic_scholar: {type(exc).__name__}")
         return None
 
-    data = resp.json().get("data", [])
+    try:
+        data = resp.json().get("data", [])
+    except Exception as exc:
+        if errors is not None:
+            errors.append(f"semantic_scholar: {type(exc).__name__}")
+        return None
     if not data:
         return None
 
@@ -77,7 +87,9 @@ async def search_by_title(
 
 
 async def lookup_by_id(
-    paper_id: str, client: httpx.AsyncClient
+    paper_id: str, client: httpx.AsyncClient,
+    *,
+    errors: Optional[list[str]] = None,
 ) -> Optional[dict]:
     try:
         cfg_s2 = config.api("semantic_scholar")
@@ -88,13 +100,24 @@ async def lookup_by_id(
             headers=_headers(),
             timeout=cfg_s2.get("timeout", 20),
         )
-        if resp.status_code in (404, 429):
+        if resp.status_code == 404:
+            return None
+        if resp.status_code == 429:
+            if errors is not None:
+                errors.append("semantic_scholar: HTTP 429")
             return None
         resp.raise_for_status()
-    except (httpx.HTTPStatusError, httpx.RequestError):
+    except (httpx.HTTPStatusError, httpx.RequestError) as exc:
+        if errors is not None:
+            errors.append(f"semantic_scholar: {type(exc).__name__}")
         return None
 
-    paper = resp.json()
+    try:
+        paper = resp.json()
+    except Exception as exc:
+        if errors is not None:
+            errors.append(f"semantic_scholar: {type(exc).__name__}")
+        return None
     if not paper or not paper.get("title"):
         return None
 

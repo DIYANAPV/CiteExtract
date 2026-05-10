@@ -16,6 +16,7 @@ async def search_by_title(
     *,
     ref_authors: Optional[list[str]] = None,
     ref_year: Optional[int] = None,
+    errors: Optional[list[str]] = None,
 ) -> Optional[dict]:
     if not title or len(title.strip()) < 5:
         return None
@@ -40,10 +41,17 @@ async def search_by_title(
             timeout=timeout,
         )
         resp.raise_for_status()
-    except (httpx.HTTPStatusError, httpx.RequestError):
+    except (httpx.HTTPStatusError, httpx.RequestError) as exc:
+        if errors is not None:
+            errors.append(f"openalex: {type(exc).__name__}")
         return None
 
-    results = resp.json().get("results", [])
+    try:
+        results = resp.json().get("results", [])
+    except Exception as exc:
+        if errors is not None:
+            errors.append(f"openalex: {type(exc).__name__}")
+        return None
     if not results:
         return None
 

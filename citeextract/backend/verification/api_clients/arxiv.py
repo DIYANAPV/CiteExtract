@@ -15,7 +15,9 @@ _NS = {"atom": "http://www.w3.org/2005/Atom"}
 
 
 async def search_by_title(
-    title: str, client: httpx.AsyncClient
+    title: str, client: httpx.AsyncClient,
+    *,
+    errors: Optional[list[str]] = None,
 ) -> Optional[dict]:
     if not title or len(title.strip()) < 5:
         return None
@@ -36,7 +38,9 @@ async def search_by_title(
             timeout=15,
         )
         resp.raise_for_status()
-    except (httpx.HTTPStatusError, httpx.RequestError):
+    except (httpx.HTTPStatusError, httpx.RequestError) as exc:
+        if errors is not None:
+            errors.append(f"arxiv: {type(exc).__name__}")
         return None
 
     return _parse_response(resp.text, title)
@@ -47,6 +51,8 @@ async def search_by_authors_year(
     year: Optional[int],
     title_hint: str,
     client: httpx.AsyncClient,
+    *,
+    errors: Optional[list[str]] = None,
 ) -> Optional[dict]:
     from citeextract.verification.matching import _author_tokens, author_containment
 
@@ -68,7 +74,9 @@ async def search_by_authors_year(
             timeout=15,
         )
         resp.raise_for_status()
-    except (httpx.HTTPStatusError, httpx.RequestError):
+    except (httpx.HTTPStatusError, httpx.RequestError) as exc:
+        if errors is not None:
+            errors.append(f"arxiv: {type(exc).__name__}")
         return None
 
     try:

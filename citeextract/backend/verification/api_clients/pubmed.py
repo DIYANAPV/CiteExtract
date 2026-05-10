@@ -16,7 +16,9 @@ EFETCH_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
 
 
 async def search_by_title(
-    title: str, client: httpx.AsyncClient
+    title: str, client: httpx.AsyncClient,
+    *,
+    errors: Optional[list[str]] = None,
 ) -> Optional[dict]:
     if not title or len(title.strip()) < 5:
         return None
@@ -38,10 +40,17 @@ async def search_by_title(
             timeout=timeout,
         )
         resp.raise_for_status()
-    except (httpx.HTTPStatusError, httpx.RequestError):
+    except (httpx.HTTPStatusError, httpx.RequestError) as exc:
+        if errors is not None:
+            errors.append(f"pubmed: {type(exc).__name__}")
         return None
 
-    search_data = resp.json().get("esearchresult", {})
+    try:
+        search_data = resp.json().get("esearchresult", {})
+    except Exception as exc:
+        if errors is not None:
+            errors.append(f"pubmed: {type(exc).__name__}")
+        return None
     pmids = search_data.get("idlist", [])
     if not pmids:
         return None
@@ -57,7 +66,9 @@ async def search_by_title(
             timeout=timeout,
         )
         resp.raise_for_status()
-    except (httpx.HTTPStatusError, httpx.RequestError):
+    except (httpx.HTTPStatusError, httpx.RequestError) as exc:
+        if errors is not None:
+            errors.append(f"pubmed: {type(exc).__name__}")
         return None
 
     return _parse_and_match(resp.text, title)

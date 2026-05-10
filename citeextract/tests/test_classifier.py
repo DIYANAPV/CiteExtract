@@ -45,6 +45,28 @@ class TestClassifyQuick:
         assert v.action == "no_action"
         assert "insufficient_database_coverage" in v.flags
 
+    def test_not_found_all_errored_is_unverifiable(self):
+        exist = _exist(
+            status="NOT_FOUND", source=None, matched_title=None,
+            databases_checked=["semantic_scholar", "openalex"],
+            errored_databases=["semantic_scholar: HTTP 503", "openalex: TimeoutException"],
+        )
+        v = classify_quick(exist, None)
+        assert v.verdict == "UNVERIFIABLE"
+        assert v.action == "no_action"
+        assert "transient_api_failures" in v.flags
+        assert "errored" in v.explanation.lower()
+
+    def test_not_found_two_responded_one_errored_is_fabricated(self):
+        exist = _exist(
+            status="NOT_FOUND", source=None, matched_title=None,
+            databases_checked=["semantic_scholar", "openalex", "crossref"],
+            errored_databases=["openalex: HTTP 503"],
+        )
+        v = classify_quick(exist, None)
+        assert v.verdict == "FABRICATED"
+        assert v.action == "remove_citation"
+
     def test_retracted_is_fabricated(self):
         v = classify_quick(_exist(), _meta(retracted=True))
         assert v.verdict == "FABRICATED"

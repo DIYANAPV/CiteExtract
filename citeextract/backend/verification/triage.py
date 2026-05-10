@@ -105,15 +105,26 @@ def triage_reference(
         return _result(TriageRoute.UNVERIFIABLE, "No existence result available")
 
     if existence.status == "NOT_FOUND":
-        checked = len(existence.databases_checked)
-        if checked >= min_dbs_for_fabricated:
+        errored = list(existence.errored_databases)
+        responded = [
+            db for db in existence.databases_checked if db not in {e.split(":")[0] for e in errored}
+        ]
+        if len(responded) >= min_dbs_for_fabricated:
             return _result(
                 TriageRoute.CLEAR_FABRICATED,
-                f"Not found in {checked} databases: {', '.join(existence.databases_checked)}",
+                f"Not found in {len(responded)} databases: {', '.join(responded)}"
+                + (f" ({len(errored)} other source(s) errored: {'; '.join(errored)})" if errored else ""),
+            )
+        if errored:
+            return _result(
+                TriageRoute.UNVERIFIABLE,
+                f"Only {len(responded)} database(s) responded "
+                f"({', '.join(responded) if responded else 'none'}); "
+                f"{len(errored)} errored ({'; '.join(errored)}) — transient API failures",
             )
         return _result(
             TriageRoute.UNVERIFIABLE,
-            f"Not found, but only {checked} database(s) checked — insufficient coverage",
+            f"Not found, but only {len(responded)} database(s) checked — insufficient coverage",
         )
 
     if metadata and metadata.is_retracted:

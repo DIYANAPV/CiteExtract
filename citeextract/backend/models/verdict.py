@@ -48,4 +48,12 @@ class ExistenceResult(BaseModel):
     )
 
     databases_checked: list[str] = Field(default_factory=list)
+    errored_databases: list[str] = Field(
+        default_factory=list,
+        description=(
+            "Sources where the call raised/timed-out without a real response. "
+            "Subset of databases_checked. Used to distinguish UNVERIFIABLE "
+            "(transient API failures) from FABRICATED (sources truly said no)."
+        ),
+    )
     flags: list[str] = Field(default_factory=list)

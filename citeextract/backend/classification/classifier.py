@@ -88,29 +88,39 @@ def classify_quick(
         )
 
     if existence.status == "NOT_FOUND":
-        checked = existence.databases_checked
-        if len(checked) >= 2:
+        errored = list(existence.errored_databases)
+        errored_sources = {e.split(":")[0] for e in errored}
+        responded = [db for db in existence.databases_checked if db not in errored_sources]
+        if len(responded) >= 2:
+            tail = (
+                f" ({len(errored)} other source(s) errored: {'; '.join(errored)})"
+                if errored else ""
+            )
             return _build(
                 verdict="FABRICATED",
                 action="remove_citation",
                 explanation=(
                     f"Reference not found in any database. "
-                    f"Checked: {', '.join(checked)}."
+                    f"Responded: {', '.join(responded)}.{tail}"
                 ),
                 flags=all_flags,
             )
         else:
+            extra_flag = "transient_api_failures" if errored else "insufficient_database_coverage"
+            errored_note = (
+                f" {len(errored)} source(s) errored ({'; '.join(errored)})."
+                if errored else ""
+            )
             return _build(
                 verdict="UNVERIFIABLE",
                 action="no_action",
                 explanation=(
                     f"Could not verify this reference — only "
-                    f"{len(checked)} database(s) responded "
-                    f"({', '.join(checked) if checked else 'none'}). "
-                    f"This may be a real paper that was missed due to API "
-                    f"errors or rate limits."
+                    f"{len(responded)} database(s) responded "
+                    f"({', '.join(responded) if responded else 'none'}).{errored_note} "
+                    f"This may be a real paper missed due to API errors or rate limits."
                 ),
-                flags=all_flags + ["insufficient_database_coverage"],
+                flags=all_flags + [extra_flag],
             )
 
     if metadata and metadata.is_retracted:

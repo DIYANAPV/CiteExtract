@@ -20,7 +20,9 @@ _LOW_QUALITY_CROSSREF_TYPES = frozenset({
 
 
 async def lookup_doi(
-    doi: str, client: httpx.AsyncClient
+    doi: str, client: httpx.AsyncClient,
+    *,
+    errors: Optional[list[str]] = None,
 ) -> Optional[dict]:
     cfg = config.api("crossref")
     mailto = config.crossref_mailto()
@@ -37,12 +39,16 @@ async def lookup_doi(
         if resp.status_code == 404:
             return None
         resp.raise_for_status()
-    except (httpx.HTTPStatusError, httpx.RequestError):
+    except (httpx.HTTPStatusError, httpx.RequestError) as exc:
+        if errors is not None:
+            errors.append(f"crossref: {type(exc).__name__}")
         return None
 
     try:
         data = resp.json().get("message", {})
-    except Exception:
+    except Exception as exc:
+        if errors is not None:
+            errors.append(f"crossref: {type(exc).__name__}")
         return None
     if not data:
         return None
@@ -85,6 +91,7 @@ async def search_by_title(
     *,
     ref_authors: Optional[list[str]] = None,
     ref_year: Optional[int] = None,
+    errors: Optional[list[str]] = None,
 ) -> Optional[dict]:
     if not title or len(title.strip()) < 5:
         return None
@@ -107,13 +114,19 @@ async def search_by_title(
             timeout=timeout,
         )
         if resp.status_code != 200:
+            if errors is not None and resp.status_code >= 500:
+                errors.append(f"crossref: HTTP {resp.status_code}")
             return None
-    except (httpx.HTTPStatusError, httpx.RequestError):
+    except (httpx.HTTPStatusError, httpx.RequestError) as exc:
+        if errors is not None:
+            errors.append(f"crossref: {type(exc).__name__}")
         return None
 
     try:
         items = resp.json().get("message", {}).get("items", []) or []
-    except Exception:
+    except Exception as exc:
+        if errors is not None:
+            errors.append(f"crossref: {type(exc).__name__}")
         return None
     if not items:
         return None

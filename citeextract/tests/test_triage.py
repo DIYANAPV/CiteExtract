@@ -20,6 +20,7 @@ def _exist(
     source: str = "semantic_scholar",
     title_sim: float = 1.0,
     dbs: list[str] | None = None,
+    errored: list[str] | None = None,
     flags: list[str] | None = None,
 ) -> ExistenceResult:
     return ExistenceResult(
@@ -28,6 +29,7 @@ def _exist(
         source=source,
         title_similarity=title_sim,
         databases_checked=dbs or ["semantic_scholar", "openalex"],
+        errored_databases=errored or [],
         flags=flags or [],
     )
 
@@ -178,6 +180,56 @@ class TestUnverifiable:
             citations=[],
         )
         assert result.route == TriageRoute.UNVERIFIABLE
+
+    def test_not_found_all_sources_errored_routes_unverifiable(self):
+        result = triage_reference(
+            ref_id="1",
+            existence=_exist(
+                status="NOT_FOUND",
+                source=None,
+                title_sim=None,
+                dbs=["semantic_scholar", "openalex"],
+                errored=["semantic_scholar: TimeoutException", "openalex: HTTP 503"],
+            ),
+            metadata=None,
+            citations=[],
+        )
+        assert result.route == TriageRoute.UNVERIFIABLE
+        assert "errored" in result.triage_reason.lower()
+
+    def test_not_found_one_responded_one_errored_routes_unverifiable(self):
+        result = triage_reference(
+            ref_id="1",
+            existence=_exist(
+                status="NOT_FOUND",
+                source=None,
+                title_sim=None,
+                dbs=["semantic_scholar", "openalex"],
+                errored=["openalex: HTTP 503"],
+            ),
+            metadata=None,
+            citations=[],
+        )
+        assert result.route == TriageRoute.UNVERIFIABLE
+
+
+class TestFabricatedWithPartialErrors:
+
+    def test_two_responded_one_errored_still_fabricated(self):
+        result = triage_reference(
+            ref_id="1",
+            existence=_exist(
+                status="NOT_FOUND",
+                source=None,
+                title_sim=None,
+                dbs=["semantic_scholar", "openalex", "crossref"],
+                errored=["openalex: HTTP 503"],
+            ),
+            metadata=None,
+            citations=[],
+        )
+        assert result.route == TriageRoute.CLEAR_FABRICATED
+        assert "errored" in result.triage_reason.lower()
 
 
 class TestNeedsMetadata:

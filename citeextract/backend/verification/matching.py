@@ -241,9 +241,13 @@ MATCH_STRATEGY_TITLE_ONLY = "title_only"
 def pick_best_candidate(
     ref_title: Optional[str], ref_authors: list[str], ref_year: Optional[int],
     candidates: list[dict], title_threshold: Optional[float] = None,
+    composite_threshold: Optional[float] = None,
 ) -> tuple[Optional[dict], str, float]:
+    cfg = config.thresholds()
     if title_threshold is None:
-        title_threshold = config.thresholds()["title_match"]
+        title_threshold = cfg["title_match"]
+    if composite_threshold is None:
+        composite_threshold = cfg.get("composite_match", COMPOSITE_MATCH_THRESHOLD)
 
     best_composite: Optional[tuple[float, dict]] = None
     for cand in candidates:
@@ -254,7 +258,7 @@ def pick_best_candidate(
             ref_title, ref_authors or [], ref_year,
             cand.get("title"), cand_authors, cand.get("year"),
         )
-        if score >= COMPOSITE_MATCH_THRESHOLD:
+        if score >= composite_threshold:
             if best_composite is None or score > best_composite[0]:
                 best_composite = (score, cand)
 
