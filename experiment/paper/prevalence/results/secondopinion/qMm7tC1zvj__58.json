@@ -1,0 +1,19 @@
+{
+  "paper_id": "qMm7tC1zvj",
+  "ref_id": "58",
+  "citing_sentence": "The controller [56,58], usually a small neural network, finds a trajectory from the current place to the sub-goal and controls the robot's motion in a real-time manner.",
+  "cited_title": "NoMaD: Goal Masked Diffusion Policies for Navigation and Exploration",
+  "cited_doi": "10.1109/icra57147.2024.10610665",
+  "primary_verdict": "CONTRADICTS",
+  "primary_explanation": "NoMaD does describe a learned policy/controller that is used with a topological memory to plan subgoals and guide navigation, so it supports the functional part of the claim. However, NoMaD emphasizes using high-capacity, Transformer-based goal-conditioned policies rather than a \"small neural network,\" so citing it for the claim that the controller is \"usually a small neural network\" is misleading/contradicted by the paper.",
+  "secondopinion_verdict": "NOT_SUPPORTED",
+  "secondopinion_reasoning": "The cited paper does not describe a controller that is 'usually a small neural network' for finding a trajectory and controlling robot motion in real-time. Instead, it presents NoMaD, a diffusion model-based approach for goal-conditioned navigation and exploration, which uses a Transformer-based policy and diffusion models, not a small neural network. The paper focuses on a unified policy for both goal-directed and task-agnostic navigation, rather than a specific controller as described in the citing sentence.",
+  "secondopinion_confidence": "high",
+  "agrees": true,
+  "cited_text_chars": 28531,
+  "citing_context_chars": 4000,
+  "cited_text_source": "s2_fallback",
+  "model": "gpt-4o",
+  "cost_usd": 0.01922,
+  "error": null
+}

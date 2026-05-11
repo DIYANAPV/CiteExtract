@@ -1,0 +1,19 @@
+{
+  "paper_id": "kND7h1kD53",
+  "ref_id": "74",
+  "citing_sentence": "ModelTrain Time (s/epoch) Memory (MB)SchNet4.361628EGNN6.240608GVPGNN11.17210160TFN56.23543970FastEGNN11.7551954HEGNN6.3201232GotenNet10.3325894DualEqui10.9902436D.6 Datasets DetailsCOVID Vaccine The OpenVaccine COVID-19 dataset [74] consists of 4,082 synthetic RNAsequences, each 107-130 nucleotides long.",
+  "cited_title": "Deep learning models for predicting RNA degradation via dual crowdsourcing",
+  "cited_doi": "10.1038/s42256-022-00571-8",
+  "primary_verdict": "CONTRADICTS",
+  "primary_explanation": "The cited paper reports a different dataset size and length range: the OpenVaccine Kaggle dataset comprises 6,043 RNA constructs of 102–130 nucleotides (not 4,082 sequences of 107–130 nt). The available abstract and text thus contradict the specific numeric claim in the citing sentence.",
+  "secondopinion_verdict": "NOT_SUPPORTED",
+  "secondopinion_reasoning": "The citing sentence refers to the OpenVaccine COVID-19 dataset [74] as consisting of 4,082 synthetic RNA sequences, each 107-130 nucleotides long. However, the cited paper does not mention a dataset with exactly 4,082 sequences or specify the length range of 107-130 nucleotides. The cited paper discusses the OpenVaccine Kaggle competition and mentions 3,029 RNA designs of length 107 nt collected in the first round, but does not provide details matching the citing sentence.",
+  "secondopinion_confidence": "high",
+  "agrees": true,
+  "cited_text_chars": 33096,
+  "citing_context_chars": 4000,
+  "cited_text_source": "html_meta_pdf",
+  "model": "gpt-4o",
+  "cost_usd": 0.022273,
+  "error": null
+}

@@ -19,6 +19,10 @@ RESULTS_DIR = _PAPER_ROOT / "results"
 DEFAULT_MODELS = (
     "gpt-4o-mini",
     "gpt-4o",
+    "gpt-5-min",
+    "gpt-5-med",
+    "gpt-5.5-min",
+    "gpt-5.5-med",
     "Qwen3-8B",
     "Llama-3.1-8B-Instruct",
 )
@@ -164,7 +168,7 @@ def _latex_safe(s: str) -> str:
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    ap = argparse.ArgumentParser(description=(__doc__ or "").split("\n")[0])
     ap.add_argument("--smoke", action="store_true",
                     help="emit smoke-suffixed artifacts (no overwrite of full results)")
     ap.add_argument("--models", nargs="+", default=list(DEFAULT_MODELS))

@@ -25,7 +25,7 @@ except Exception:
     pass
 
 from experiment.paper.semantic.llm_clients import (
-    PRICING, LLMCallResult, build_client,
+    PRICING, LLMCallResult, build_client, resolve_model,
 )
 from experiment.paper.semantic.prompt_builder import (
     CONDITIONS, build_user_message, load_system_prompt, map_to_gold,
@@ -42,7 +42,11 @@ log = logging.getLogger("semantic_table")
 DATA_PATH = _PAPER_ROOT / "data" / "benchmark_semantic.jsonl"
 RESULTS_DIR = _PAPER_ROOT / "results"
 
-DEFAULT_MODELS = ("gpt-4o-mini", "gpt-4o")
+DEFAULT_MODELS = (
+    "gpt-4o-mini", "gpt-4o",
+    "gpt-5-min", "gpt-5-med",
+    "gpt-5.5-min", "gpt-5.5-med",
+)
 
 CSV_COLUMNS = [
     "instance_id", "source", "gold_label", "predicted_verdict", "raw_verdict",
@@ -337,7 +341,7 @@ def print_mini_table(summaries: dict[tuple[str, str], dict], models: tuple[str, 
 
 
 def parse_args() -> argparse.Namespace:
-    ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    ap = argparse.ArgumentParser(description=(__doc__ or "").split("\n")[0])
     g = ap.add_mutually_exclusive_group(required=True)
     g.add_argument("--smoke", action="store_true", help="10-instance smoke test")
     g.add_argument("--full", action="store_true", help="all 741 evaluable instances")
@@ -354,8 +358,9 @@ def parse_args() -> argparse.Namespace:
 async def main_async() -> int:
     args = parse_args()
     for m in args.models:
-        if m not in PRICING:
-            log.error(f"Unknown model {m!r}; allowed: {list(PRICING)}")
+        api_model, _ = resolve_model(m)
+        if api_model not in PRICING:
+            log.error(f"Unknown model {m!r}; allowed: {list(PRICING)} (with optional -min/-med suffix)")
             return 2
 
     records = load_evaluable()

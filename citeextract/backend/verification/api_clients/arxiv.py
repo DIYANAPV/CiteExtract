@@ -1,4 +1,5 @@
 
+import os
 import re
 from typing import Optional
 from xml.etree import ElementTree
@@ -14,11 +15,22 @@ BASE_URL = "https://export.arxiv.org/api/query"
 _NS = {"atom": "http://www.w3.org/2005/Atom"}
 
 
+def _arxiv_disabled() -> bool:
+    """True when the caller has explicitly disabled arXiv via env var.
+
+    Used to skip arXiv when the daily quota is exhausted. Same pattern as
+    the SERPAPI_KEY and CITEEXTRACT_SKIP_OPENALEX gates.
+    """
+    return os.environ.get("CITEEXTRACT_SKIP_ARXIV") == "1"
+
+
 async def search_by_title(
     title: str, client: httpx.AsyncClient,
     *,
     errors: Optional[list[str]] = None,
 ) -> Optional[dict]:
+    if _arxiv_disabled():
+        return None
     if not title or len(title.strip()) < 5:
         return None
 
@@ -54,6 +66,8 @@ async def search_by_authors_year(
     *,
     errors: Optional[list[str]] = None,
 ) -> Optional[dict]:
+    if _arxiv_disabled():
+        return None
     from citeextract.verification.matching import _author_tokens, author_containment
 
     surnames = sorted(_author_tokens(authors))

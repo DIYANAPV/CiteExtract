@@ -1,0 +1,178 @@
+22:54:34 [INFO] loaded 49 misrep cases
+22:54:34 [INFO] [1/49] skip — checkpoint exists: 0Nq1GvAGR0__30.json
+22:54:34 [INFO] [2/49] skip — checkpoint exists: 0XKZFK4hQt__32.json
+22:54:34 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2311.07700 "HTTP/1.1 302 Found"
+22:54:34 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2311.07700 "HTTP/1.1 200 OK"
+22:54:37 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+22:54:37 [INFO] [3/49] 0XKZFK4hQt/38 primary=CONTRADICTS SO=SUPPORTED agree=False cost=$0.0186 t=2.5s
+22:54:37 [INFO] HTTP Request: HEAD https://doi.org/10.18653/v1/2023.emnlp-main.810 "HTTP/1.1 302 Found"
+22:54:37 [INFO] HTTP Request: HEAD https://aclanthology.org/2023.emnlp-main.810 "HTTP/1.1 301 Moved Permanently"
+22:54:38 [INFO] HTTP Request: HEAD https://aclanthology.org/2023.emnlp-main.810/ "HTTP/1.1 200 OK"
+22:54:39 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+22:54:39 [INFO] [4/49] 0XKZFK4hQt/48 primary=CONTRADICTS SO=SUPPORTED agree=False cost=$0.0160 t=2.8s
+22:54:40 [INFO] HTTP Request: HEAD https://doi.org/10.1109/cvprw56347.2022.00090 "HTTP/1.1 302 Found"
+22:54:40 [INFO] HTTP Request: HEAD https://ieeexplore.ieee.org/document/9857277/ "HTTP/1.1 418 Unknown Code"
+22:54:40 [INFO] Dead DOI detected: 10.1109/cvprw56347.2022.00090 returned HTTP 418
+22:54:42 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+22:54:42 [INFO] [5/49] 59TL8MpBzX/7 primary=CONTRADICTS SO=NOT_SUPPORTED agree=True cost=$0.0193 t=3.0s
+22:54:43 [INFO] HTTP Request: HEAD https://doi.org/10.1109/cvpr52733.2024.00632 "HTTP/1.1 302 Found"
+22:54:43 [INFO] HTTP Request: HEAD https://ieeexplore.ieee.org/document/10655942/ "HTTP/1.1 418 Unknown Code"
+22:54:43 [INFO] Dead DOI detected: 10.1109/cvpr52733.2024.00632 returned HTTP 418
+22:54:46 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+22:54:46 [INFO] [6/49] 5xwyxupsLL/31 primary=CONTRADICTS SO=SUPPORTED agree=False cost=$0.0257 t=3.5s
+22:54:47 [INFO] HTTP Request: GET https://api.crossref.org/works/10.1101%2F2024.06.06.597716?mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+22:54:47 [INFO] HTTP Request: HEAD https://doi.org/10.1101/2024.06.06.597716 "HTTP/1.1 302 Found"
+22:54:47 [INFO] HTTP Request: HEAD http://biorxiv.org/lookup/doi/10.1101/2024.06.06.597716 "HTTP/1.1 302 Found"
+22:54:47 [INFO] HTTP Request: HEAD https://www.biorxiv.org/lookup/doi/10.1101/2024.06.06.597716 "HTTP/1.1 403 Forbidden"
+22:54:47 [INFO] Dead DOI detected: 10.1101/2024.06.06.597716 returned HTTP 403
+22:54:50 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+22:54:50 [INFO] [7/49] 9GN5Jsa3lv/19 primary=CONTRADICTS SO=NOT_SUPPORTED agree=True cost=$0.0312 t=4.5s
+22:54:51 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2306.10062 "HTTP/1.1 302 Found"
+22:54:51 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2306.10062 "HTTP/1.1 200 OK"
+22:54:58 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+22:54:58 [INFO] [8/49] 9GN5Jsa3lv/7 primary=CONTRADICTS SO=SUPPORTED agree=False cost=$0.0274 t=7.4s
+22:54:59 [INFO] HTTP Request: GET https://api.crossref.org/works/10.32614%2Fcran.package.madgrad?mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+22:54:59 [INFO] HTTP Request: HEAD https://doi.org/10.32614/cran.package.madgrad "HTTP/1.1 302 Found"
+22:54:59 [INFO] HTTP Request: HEAD https://cran.r-project.org/package=madgrad "HTTP/1.1 303 See Other"
+22:54:59 [INFO] HTTP Request: HEAD https://cran.r-project.org/web/packages/madgrad/index.html "HTTP/1.1 200 OK"
+22:55:01 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+22:55:01 [INFO] [9/49] 9GN5Jsa3lv/22 primary=CONTRADICTS SO=NOT_SUPPORTED agree=True cost=$0.0049 t=2.9s
+22:55:01 [INFO] HTTP Request: HEAD https://doi.org/10.1109/cvpr42600.2020.01289 "HTTP/1.1 302 Found"
+22:55:01 [INFO] HTTP Request: HEAD https://ieeexplore.ieee.org/document/9157610/ "HTTP/1.1 418 Unknown Code"
+22:55:01 [INFO] Dead DOI detected: 10.1109/cvpr42600.2020.01289 returned HTTP 418
+22:55:06 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+22:55:06 [INFO] [10/49] AmZ7uHDJiR/7 primary=CONTRADICTS SO=NOT_SUPPORTED agree=True cost=$0.0227 t=4.9s
+22:55:06 [INFO] HTTP Request: HEAD https://doi.org/10.1609/aaai.v36i8.20881 "HTTP/1.1 302 Found"
+22:55:07 [INFO] HTTP Request: HEAD https://ojs.aaai.org/index.php/AAAI/article/view/20881 "HTTP/1.1 200 OK"
+22:55:09 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+22:55:09 [INFO] [11/49] AuOZDp4gy7/36 primary=CONTRADICTS SO=SUPPORTED agree=False cost=$0.0202 t=3.6s
+22:55:09 [INFO] [12/49] skip — checkpoint exists: AuOZDp4gy7__36.json
+22:55:09 [INFO] [13/49] skip — checkpoint exists: AuOZDp4gy7__36.json
+22:55:09 [INFO] [14/49] skip — checkpoint exists: AuOZDp4gy7__36.json
+22:55:09 [INFO] HTTP Request: HEAD https://doi.org/10.1109/tpami.2023.3308189 "HTTP/1.1 302 Found"
+22:55:10 [INFO] HTTP Request: HEAD https://ieeexplore.ieee.org/document/10233092/ "HTTP/1.1 418 Unknown Code"
+22:55:10 [INFO] Dead DOI detected: 10.1109/tpami.2023.3308189 returned HTTP 418
+22:55:12 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+22:55:12 [INFO] [15/49] AuOZDp4gy7/9 primary=CONTRADICTS SO=NOT_SUPPORTED agree=True cost=$0.0360 t=2.7s
+22:55:12 [INFO] [16/49] skip — checkpoint exists: AuOZDp4gy7__9.json
+22:55:12 [INFO] [17/49] skip — checkpoint exists: AuOZDp4gy7__9.json
+22:55:12 [INFO] [18/49] skip — checkpoint exists: AuOZDp4gy7__9.json
+22:55:18 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+22:55:18 [INFO] [19/49] T4qJuQCFAK/10 primary=CONTRADICTS SO=NOT_SUPPORTED agree=True cost=$0.0262 t=5.8s
+22:55:18 [INFO] [20/49] skip — checkpoint exists: T4qJuQCFAK__10.json
+22:55:18 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arXiv.2403.07548 "HTTP/1.1 302 Found"
+22:55:18 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2403.07548 "HTTP/1.1 200 OK"
+22:55:26 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+22:55:26 [INFO] [21/49] a8sJEH4Cjb/68 primary=CONTRADICTS SO=SUPPORTED agree=False cost=$0.0304 t=8.5s
+22:55:27 [INFO] HTTP Request: HEAD https://doi.org/10.18653/v1/2023.blackboxnlp-1.24 "HTTP/1.1 302 Found"
+22:55:27 [INFO] HTTP Request: HEAD https://aclanthology.org/2023.blackboxnlp-1.24 "HTTP/1.1 301 Moved Permanently"
+22:55:29 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+22:55:29 [INFO] [22/49] btJUnAPQ7j/29 primary=CONTRADICTS SO=SUPPORTED agree=False cost=$0.0235 t=3.0s
+22:55:37 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+22:55:37 [INFO] [23/49] btJUnAPQ7j/42 primary=CONTRADICTS SO=NOT_SUPPORTED agree=True cost=$0.1398 t=8.1s
+22:55:37 [INFO] [24/49] skip — checkpoint exists: btJUnAPQ7j__42.json
+22:55:38 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arXiv.2211.01201 "HTTP/1.1 302 Found"
+22:55:38 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2211.01201 "HTTP/1.1 200 OK"
+22:55:46 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+22:55:46 [INFO] [25/49] cZzA2Z0ehX/9 primary=CONTRADICTS SO=SUPPORTED agree=False cost=$0.0488 t=8.4s
+22:55:50 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+22:55:50 [INFO] [26/49] fru52tkjHf/8 primary=CONTRADICTS SO=SUPPORTED agree=False cost=$0.0361 t=4.1s
+22:55:50 [INFO] HTTP Request: HEAD https://doi.org/10.21203/rs.3.rs-7480833/v1 "HTTP/1.1 302 Found"
+22:55:50 [INFO] HTTP Request: HEAD https://www.researchsquare.com/article/rs-7480833/v1 "HTTP/1.1 200 OK"
+22:55:55 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+22:55:55 [INFO] [27/49] fru52tkjHf/24 primary=CONTRADICTS SO=NOT_SUPPORTED agree=True cost=$0.0101 t=5.1s
+22:55:56 [INFO] HTTP Request: HEAD https://doi.org/10.1109/tmm.2024.3349865 "HTTP/1.1 302 Found"
+22:55:57 [INFO] HTTP Request: HEAD https://ieeexplore.ieee.org/document/10380775/ "HTTP/1.1 418 Unknown Code"
+22:55:57 [INFO] Dead DOI detected: 10.1109/tmm.2024.3349865 returned HTTP 418
+22:56:02 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+22:56:02 [INFO] [28/49] g42mGfR6We/40 primary=CONTRADICTS SO=NOT_SUPPORTED agree=True cost=$0.0242 t=7.2s
+22:56:02 [INFO] HTTP Request: HEAD https://doi.org/10.1214/23-aos2299 "HTTP/1.1 302 Found"
+22:56:03 [INFO] HTTP Request: HEAD https://projecteuclid.org/journals/annals-of-statistics/volume-51/issue-3/Universal-regression-with-adversarial-responses/10.1214/23-AOS2299.full "HTTP/1.1 200 OK"
+22:56:11 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+22:56:11 [INFO] [29/49] hDDe38BNsT/4 primary=CONTRADICTS SO=SUPPORTED agree=False cost=$0.0979 t=9.2s
+22:56:18 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+22:56:18 [INFO] [30/49] hKKbtN4cp9/54 primary=CONTRADICTS SO=SUPPORTED agree=False cost=$0.0438 t=6.7s
+22:56:22 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+22:56:22 [INFO] [31/49] iyu4sLQZvW/9 primary=CONTRADICTS SO=SUPPORTED agree=False cost=$0.0300 t=4.0s
+22:56:28 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+22:56:28 [INFO] [32/49] iyu4sLQZvW/35 primary=CONTRADICTS SO=SUPPORTED agree=False cost=$0.1023 t=5.6s
+22:56:28 [INFO] HTTP Request: HEAD https://doi.org/10.1007/s40304-018-0127-z "HTTP/1.1 302 Found"
+22:56:28 [INFO] HTTP Request: HEAD http://link.springer.com/10.1007/s40304-018-0127-z "HTTP/1.1 301 Moved Permanently"
+22:56:28 [INFO] HTTP Request: HEAD https://link.springer.com/article/10.1007/s40304-018-0127-z "HTTP/1.1 303 See Other"
+22:56:29 [INFO] HTTP Request: HEAD https://idp.springer.com/authorize?response_type=cookie&client_id=springerlink&redirect_uri=https%3A%2F%2Flink.springer.com%2Farticle%2F10.1007%2Fs40304-018-0127-z "HTTP/1.1 302 Found"
+22:56:29 [INFO] HTTP Request: HEAD https://link.springer.com/article/10.1007/s40304-018-0127-z "HTTP/1.1 200 OK"
+22:56:31 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+22:56:31 [INFO] [33/49] k4jg1QCw0e/9 primary=CONTRADICTS SO=SUPPORTED agree=False cost=$0.0112 t=3.1s
+22:56:31 [INFO] [34/49] skip — checkpoint exists: k4jg1QCw0e__9.json
+22:56:31 [INFO] HTTP Request: HEAD https://doi.org/10.1038/s41467-024-50620-6 "HTTP/1.1 302 Found"
+22:56:31 [INFO] HTTP Request: HEAD https://www.nature.com/articles/s41467-024-50620-6 "HTTP/1.1 303 See Other"
+22:56:31 [INFO] HTTP Request: HEAD https://idp.nature.com/authorize?response_type=cookie&client_id=grover&redirect_uri=https%3A%2F%2Fwww.nature.com%2Farticles%2Fs41467-024-50620-6 "HTTP/1.1 302 Found"
+22:56:31 [INFO] HTTP Request: HEAD https://idp.nature.com/transit?redirect_uri=https%3A%2F%2Fwww.nature.com%2Farticles%2Fs41467-024-50620-6&code=cb83ff91-34e4-4924-81ca-26480d25a437 "HTTP/1.1 302 Found"
+22:56:32 [INFO] HTTP Request: HEAD https://www.nature.com/articles/s41467-024-50620-6 "HTTP/1.1 200 OK"
+22:56:36 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+22:56:36 [INFO] [35/49] kND7h1kD53/26 primary=CONTRADICTS SO=NOT_SUPPORTED agree=True cost=$0.0357 t=5.3s
+22:56:37 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=E2Efold-3D%3A+End-to-End+Deep+Learning+Method+for+accurate+de+novo+RNA+3D+Structure+Prediction&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+22:56:37 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AE2Efold+3D+End+to+End+Deep+Learning+Method+for+accurate+de+novo+RNA+3D+Structure+Prediction&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+22:56:37 [WARNING] openalex: HTTP 429 (attempt 1/3), retrying in 120.0s
+22:58:37 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AE2Efold+3D+End+to+End+Deep+Learning+Method+for+accurate+de+novo+RNA+3D+Structure+Prediction&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+22:58:37 [WARNING] openalex: HTTP 429 (attempt 2/3), retrying in 120.0s
+23:00:38 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AE2Efold+3D+End+to+End+Deep+Learning+Method+for+accurate+de+novo+RNA+3D+Structure+Prediction&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+23:00:38 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=E2Efold+3D+End+to+End+Deep+Learning+Method+for+accurate+de+novo+RNA+3D+Structure+Prediction&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+23:00:39 [INFO] HTTP Request: GET https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=E2Efold+3D++End+to+End+Deep+Learning+Method+for+accurate+de+novo+RNA+3D+Structure+Prediction%5BTitle%5D&retmode=json&retmax=5 "HTTP/1.1 200 OK"
+23:00:39 [INFO] HTTP Request: GET https://export.arxiv.org/api/query?search_query=ti%3A%22E2Efold+3D+End+to+End+Deep+Learning+Method+for+accurate+de+novo+RNA+3D+Structure+Prediction%22&start=0&max_results=5 "HTTP/1.1 429 Unknown Error"
+23:00:39 [WARNING] arxiv: HTTP 429 (attempt 1/3), retrying in 1.0s
+23:00:42 [INFO] HTTP Request: GET https://export.arxiv.org/api/query?search_query=ti%3A%22E2Efold+3D+End+to+End+Deep+Learning+Method+for+accurate+de+novo+RNA+3D+Structure+Prediction%22&start=0&max_results=5 "HTTP/1.1 429 Unknown Error"
+23:00:42 [WARNING] arxiv: HTTP 429 (attempt 2/3), retrying in 2.0s
+23:00:45 [INFO] HTTP Request: GET https://export.arxiv.org/api/query?search_query=ti%3A%22E2Efold+3D+End+to+End+Deep+Learning+Method+for+accurate+de+novo+RNA+3D+Structure+Prediction%22&start=0&max_results=5 "HTTP/1.1 429 Unknown Error"
+23:00:47 [INFO] HTTP Request: GET https://api.openreview.net/notes/search?term=E2Efold-3D%3A+End-to-End+Deep+Learning+Method+for+accurate+de+novo+RNA+3D+Structure+Prediction&limit=10 "HTTP/1.1 200 OK"
+23:00:57 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+23:00:57 [INFO] [36/49] kND7h1kD53/65 primary=CONTRADICTS SO=NOT_SUPPORTED agree=True cost=$0.0298 t=261.3s
+23:00:58 [INFO] HTTP Request: HEAD https://doi.org/10.1145/3627673.3679604 "HTTP/1.1 302 Found"
+23:00:58 [INFO] HTTP Request: HEAD https://dl.acm.org/doi/10.1145/3627673.3679604 "HTTP/1.1 403 Forbidden"
+23:00:58 [INFO] Dead DOI detected: 10.1145/3627673.3679604 returned HTTP 403
+23:01:03 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+23:01:03 [INFO] [37/49] kND7h1kD53/79 primary=CONTRADICTS SO=NOT_SUPPORTED agree=True cost=$0.0287 t=5.7s
+23:01:03 [INFO] [38/49] skip — checkpoint exists: kND7h1kD53__65.json
+23:01:03 [INFO] HTTP Request: HEAD https://doi.org/10.1038/s42256-022-00571-8 "HTTP/1.1 302 Found"
+23:01:07 [INFO] HTTP Request: HEAD https://www.nature.com/articles/s42256-022-00571-8 "HTTP/1.1 200 OK"
+23:01:10 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+23:01:10 [INFO] [39/49] kND7h1kD53/74 primary=CONTRADICTS SO=NOT_SUPPORTED agree=True cost=$0.0223 t=7.5s
+23:01:11 [INFO] HTTP Request: HEAD https://doi.org/10.1109/icra57147.2024.10610665 "HTTP/1.1 302 Found"
+23:01:11 [INFO] HTTP Request: HEAD https://ieeexplore.ieee.org/document/10610665/ "HTTP/1.1 418 Unknown Code"
+23:01:11 [INFO] Dead DOI detected: 10.1109/icra57147.2024.10610665 returned HTTP 418
+23:01:15 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+23:01:15 [INFO] [40/49] qMm7tC1zvj/58 primary=CONTRADICTS SO=NOT_SUPPORTED agree=True cost=$0.0192 t=4.8s
+23:01:15 [INFO] HTTP Request: HEAD https://doi.org/10.1109/sp.2017.49 "HTTP/1.1 302 Found"
+23:01:15 [INFO] HTTP Request: HEAD http://ieeexplore.ieee.org/document/7958570/ "HTTP/1.1 301 Moved Permanently"
+23:01:16 [INFO] HTTP Request: HEAD https://ieeexplore.ieee.org/document/7958570/ "HTTP/1.1 418 Unknown Code"
+23:01:16 [INFO] Dead DOI detected: 10.1109/sp.2017.49 returned HTTP 418
+23:01:22 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+23:01:22 [INFO] [41/49] t77EZLjvd5/7 primary=CONTRADICTS SO=NOT_SUPPORTED agree=True cost=$0.0411 t=7.1s
+23:01:26 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+23:01:26 [INFO] [42/49] u2GzxdWLFW/28 primary=CONTRADICTS SO=SUPPORTED agree=False cost=$0.0246 t=3.9s
+23:01:26 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arXiv.2402.14987 "HTTP/1.1 302 Found"
+23:01:26 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2402.14987 "HTTP/1.1 200 OK"
+23:01:34 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+23:01:34 [INFO] [43/49] u2GzxdWLFW/10 primary=CONTRADICTS SO=SUPPORTED agree=False cost=$0.0456 t=7.9s
+23:01:34 [INFO] [44/49] skip — checkpoint exists: u2GzxdWLFW__28.json
+23:01:34 [INFO] [45/49] skip — checkpoint exists: u2GzxdWLFW__10.json
+23:01:34 [INFO] HTTP Request: HEAD https://doi.org/10.1109/iccv51070.2023.00307 "HTTP/1.1 302 Found"
+23:01:35 [INFO] HTTP Request: HEAD https://ieeexplore.ieee.org/document/10376934/ "HTTP/1.1 418 Unknown Code"
+23:01:35 [INFO] Dead DOI detected: 10.1109/iccv51070.2023.00307 returned HTTP 418
+23:01:38 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+23:01:38 [INFO] [46/49] uHGG3s0XyZ/16 primary=CONTRADICTS SO=SUPPORTED agree=False cost=$0.0194 t=3.8s
+23:01:38 [INFO] HTTP Request: HEAD https://doi.org/10.1109/cvpr52733.2024.02623 "HTTP/1.1 302 Found"
+23:01:38 [INFO] HTTP Request: HEAD https://ieeexplore.ieee.org/document/10656914/ "HTTP/1.1 418 Unknown Code"
+23:01:38 [INFO] Dead DOI detected: 10.1109/cvpr52733.2024.02623 returned HTTP 418
+23:01:41 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+23:01:41 [INFO] [47/49] uHGG3s0XyZ/5 primary=CONTRADICTS SO=NOT_SUPPORTED agree=True cost=$0.0170 t=3.0s
+23:01:41 [INFO] HTTP Request: HEAD https://doi.org/10.1109/cvpr52733.2024.00522 "HTTP/1.1 302 Found"
+23:01:41 [INFO] HTTP Request: HEAD https://ieeexplore.ieee.org/document/10658001/ "HTTP/1.1 418 Unknown Code"
+23:01:41 [INFO] Dead DOI detected: 10.1109/cvpr52733.2024.00522 returned HTTP 418
+23:01:48 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+23:01:48 [INFO] [48/49] uHGG3s0XyZ/10 primary=CONTRADICTS SO=NOT_SUPPORTED agree=True cost=$0.0252 t=6.9s
+23:01:48 [INFO] HTTP Request: HEAD https://doi.org/10.1609/icwsm.v14i1.7347 "HTTP/1.1 302 Found"
+23:01:49 [INFO] HTTP Request: HEAD https://ojs.aaai.org/index.php/ICWSM/article/view/7347 "HTTP/1.1 200 OK"
+23:01:51 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+23:01:51 [INFO] [49/49] z1Cvcovlms/12 primary=CONTRADICTS SO=NOT_SUPPORTED agree=True cost=$0.0211 t=3.5s
+23:01:51 [INFO] DONE — 49 cases, agreement: 24/49 (49.0%), errors: 0, total cost: $1.18

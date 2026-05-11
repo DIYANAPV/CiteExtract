@@ -20,9 +20,19 @@ CELLS: list[tuple[str, str, str]] = [
     ("gpt-4o-mini",           "llm_with_search", "gpt-4o-mini + web search"),
     ("gpt-4o",                "llm_only",        "gpt-4o"),
     ("gpt-4o",                "llm_with_search", "gpt-4o + web search"),
+    ("gpt-5-min",             "llm_only",        "gpt-5 (minimal)"),
+    ("gpt-5-min",             "llm_with_search", "gpt-5 + web search (minimal)"),
+    ("gpt-5-med",             "llm_only",        "gpt-5 (medium)"),
+    ("gpt-5-med",             "llm_with_search", "gpt-5 + web search (medium)"),
+    ("gpt-5.5-min",           "llm_only",        "gpt-5.5 (minimal)"),
+    ("gpt-5.5-min",           "llm_with_search", "gpt-5.5 + web search (minimal)"),
+    ("gpt-5.5-med",           "llm_only",        "gpt-5.5 (medium)"),
+    ("gpt-5.5-med",           "llm_with_search", "gpt-5.5 + web search (medium)"),
     ("Qwen3-8B",              "llm_only",        "Qwen3-8B"),
     ("Llama-3.1-8B-Instruct", "llm_only",        "Llama-3.1-8B-Instruct"),
-    ("our_system",            "production",      "CiteExtract pipeline (ours)"),
+    ("our_system",            "production",          "CiteExtract pipeline (gpt-4o-mini)"),
+    ("our_system",            "production_gpt5mini", "CiteExtract pipeline (gpt-5-mini)"),
+    ("our_system",            "production_gpt55med", "CiteExtract pipeline (gpt-5.5 med)"),
 ]
 
 
@@ -145,7 +155,7 @@ def _safe(s: str) -> str:
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    ap = argparse.ArgumentParser(description=(__doc__ or "").split("\n")[0])
     ap.add_argument("--smoke", action="store_true")
     args = ap.parse_args()
 

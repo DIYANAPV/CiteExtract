@@ -1,0 +1,21 @@
+paper_id,title,decision,openreview_url,pdf_path
+kND7h1kD53,DualEqui: A Dual-Space Hierarchical Equivariant Network for Large Biomolecules,NeurIPS 2025 poster,https://openreview.net/forum?id=kND7h1kD53,experiment/paper/prevalence/data/papers/kND7h1kD53.pdf
+fru52tkjHf,ASGO: Adaptive Structured Gradient Optimization,NeurIPS 2025 poster,https://openreview.net/forum?id=fru52tkjHf,experiment/paper/prevalence/data/papers/fru52tkjHf.pdf
+5g9qls1V7Q,Self-diffusion for Solving Inverse Problems,NeurIPS 2025 poster,https://openreview.net/forum?id=5g9qls1V7Q,experiment/paper/prevalence/data/papers/5g9qls1V7Q.pdf
+PBvlBI6c30,FlowMoE: A Scalable Pipeline Scheduling Framework for Distributed Mixture-of-Experts Training,NeurIPS 2025 poster,https://openreview.net/forum?id=PBvlBI6c30,experiment/paper/prevalence/data/papers/PBvlBI6c30.pdf
+MuhYHqLDZT,Gradient-Guided Epsilon Constraint Method for Online Continual Learning,NeurIPS 2025 poster,https://openreview.net/forum?id=MuhYHqLDZT,experiment/paper/prevalence/data/papers/MuhYHqLDZT.pdf
+um9kHMof0c,Better Estimation of the Kullback--Leibler Divergence Between Language Models,NeurIPS 2025 poster,https://openreview.net/forum?id=um9kHMof0c,experiment/paper/prevalence/data/papers/um9kHMof0c.pdf
+AuOZDp4gy7,AliO: Output Alignment Matters in Long-Term Time Series Forecasting,NeurIPS 2025 poster,https://openreview.net/forum?id=AuOZDp4gy7,experiment/paper/prevalence/data/papers/AuOZDp4gy7.pdf
+59TL8MpBzX,Unraveling Metameric Dilemma for Spectral Reconstruction: A High-Fidelity Approach via Semi-Supervised Learning,NeurIPS 2025 poster,https://openreview.net/forum?id=59TL8MpBzX,experiment/paper/prevalence/data/papers/59TL8MpBzX.pdf
+5xwyxupsLL,PipeFusion: Patch-level Pipeline Parallelism for Diffusion Transformers Inference,NeurIPS 2025 poster,https://openreview.net/forum?id=5xwyxupsLL,experiment/paper/prevalence/data/papers/5xwyxupsLL.pdf
+LP4Q7tPMbs,NormFit: A Lightweight Solution for Few-Shot Federated Learning with Non-IID Data,NeurIPS 2025 spotlight,https://openreview.net/forum?id=LP4Q7tPMbs,experiment/paper/prevalence/data/papers/LP4Q7tPMbs.pdf
+6h7HLx1kbH,On Union-Closedness of Language Generation,NeurIPS 2025 poster,https://openreview.net/forum?id=6h7HLx1kbH,experiment/paper/prevalence/data/papers/6h7HLx1kbH.pdf
+t77EZLjvd5,Enhancing CLIP Robustness via Cross-Modality Alignment,NeurIPS 2025 spotlight,https://openreview.net/forum?id=t77EZLjvd5,experiment/paper/prevalence/data/papers/t77EZLjvd5.pdf
+uHGG3s0XyZ,3D Visual Illusion Depth Estimation,NeurIPS 2025 poster,https://openreview.net/forum?id=uHGG3s0XyZ,experiment/paper/prevalence/data/papers/uHGG3s0XyZ.pdf
+qMm7tC1zvj,EfficientNav: Towards On-Device Object-Goal Navigation with Navigation Map Caching and Retrieval,NeurIPS 2025 poster,https://openreview.net/forum?id=qMm7tC1zvj,experiment/paper/prevalence/data/papers/qMm7tC1zvj.pdf
+63ljkCGMhE,VGGT-SLAM: Dense RGB SLAM Optimized on the SL(4) Manifold,NeurIPS 2025 poster,https://openreview.net/forum?id=63ljkCGMhE,experiment/paper/prevalence/data/papers/63ljkCGMhE.pdf
+T4qJuQCFAK,Activation-Informed Merging of Large Language Models,NeurIPS 2025 poster,https://openreview.net/forum?id=T4qJuQCFAK,experiment/paper/prevalence/data/papers/T4qJuQCFAK.pdf
+AmZ7uHDJiR,NFL-BA: Near-Field Light Bundle Adjustment for SLAM in Dynamic Lighting,NeurIPS 2025 poster,https://openreview.net/forum?id=AmZ7uHDJiR,experiment/paper/prevalence/data/papers/AmZ7uHDJiR.pdf
+g42mGfR6We,MoORE: SVD-based Model MoE-ization for Conflict- and Oblivion-Resistant Multi-Task Adaptation,NeurIPS 2025 poster,https://openreview.net/forum?id=g42mGfR6We,experiment/paper/prevalence/data/papers/g42mGfR6We.pdf
+0Nq1GvAGR0,A Driving-Style-Adaptive Framework  for Vehicle Trajectory Prediction,NeurIPS 2025 poster,https://openreview.net/forum?id=0Nq1GvAGR0,experiment/paper/prevalence/data/papers/0Nq1GvAGR0.pdf
+z1Cvcovlms,Sim-LLM: Optimizing LLM Inference at the Edge through Inter-Task KV Reuse,NeurIPS 2025 poster,https://openreview.net/forum?id=z1Cvcovlms,experiment/paper/prevalence/data/papers/z1Cvcovlms.pdf

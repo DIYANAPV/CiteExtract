@@ -1,0 +1,19 @@
+{
+  "paper_id": "AuOZDp4gy7",
+  "ref_id": "9",
+  "citing_sentence": "We\nTable 23 :23Full results of the proposed AliO method on the ECL, ETTh1, ETTh2, ETTm1, ETTm2, ILI, Traffix, and Weather datasets and GPT4TS[43].The results are reported in terms of MSE, TAM, MAE, MAPE, and RMSE.",
+  "cited_title": "Self-Supervised Contrastive Representation Learning for Semi-Supervised Time-Series Classification",
+  "cited_doi": "10.1109/tpami.2023.3308189",
+  "primary_verdict": "CONTRADICTS",
+  "primary_explanation": "Duplicate of the previous table citation: the paper being cited is about self-supervised contrastive methods for semi-supervised classification, not GPT4TS. The attribution therefore appears incorrect.",
+  "secondopinion_verdict": "NOT_SUPPORTED",
+  "secondopinion_reasoning": "The citing sentence claims that the results of the proposed AliO method on various datasets and GPT4TS are reported in terms of MSE, TAM, MAE, MAPE, and RMSE. However, the cited paper does not mention the AliO method or provide results in terms of these metrics for GPT4TS. The cited paper focuses on a novel framework for time-series representation learning using contrastive learning, without discussing the specific metrics or methods mentioned in the citing sentence.",
+  "secondopinion_confidence": "high",
+  "agrees": true,
+  "cited_text_chars": 55144,
+  "citing_context_chars": 4000,
+  "cited_text_source": "s2_fallback",
+  "model": "gpt-4o",
+  "cost_usd": 0.035958,
+  "error": null
+}

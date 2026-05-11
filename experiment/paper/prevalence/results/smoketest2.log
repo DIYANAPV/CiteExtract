@@ -1,0 +1,939 @@
+15:56:38 [INFO] processing 1 papers
+15:56:38 [INFO] [1/1] paper_id=kND7h1kD53
+15:56:38 [INFO] STAGE L1_parse seconds=0.069
+15:56:38 [INFO] Checking 86 references across scholarly databases...
+15:56:38 [INFO] HTTP Request: HEAD https://doi.org/10.4230/oasics.dx.2024.30 "HTTP/1.1 302 Found"
+15:56:38 [INFO] HTTP Request: HEAD https://doi.org/10.1126/science.1065659 "HTTP/1.1 302 Found"
+15:56:38 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2110.02905 "HTTP/1.1 302 Found"
+15:56:38 [INFO] HTTP Request: HEAD https://doi.org/10.1145/3627673.3679604 "HTTP/1.1 302 Found"
+15:56:38 [INFO] HTTP Request: HEAD https://doi.org/10.1093/nar/gkv716 "HTTP/1.1 302 Found"
+15:56:38 [INFO] HTTP Request: HEAD https://doi.org/10.1007/978-981-96-8180-8_32 "HTTP/1.1 302 Found"
+15:56:38 [INFO] HTTP Request: HEAD https://doi.org/10.1093/nar/28.1.235 "HTTP/1.1 302 Found"
+15:56:38 [INFO] HTTP Request: HEAD https://doi.org/10.1038/s41586-021-03819-2 "HTTP/1.1 302 Found"
+15:56:38 [INFO] HTTP Request: HEAD https://doi.org/10.3389/fbioe.2021.628137 "HTTP/1.1 302 Found"
+15:56:38 [INFO] HTTP Request: HEAD https://doi.org/10.1007/978-981-16-6054-2_5 "HTTP/1.1 302 Found"
+15:56:38 [INFO] HTTP Request: HEAD https://doi.org/10.1093/bioinformatics/btaf004 "HTTP/1.1 302 Found"
+15:56:38 [INFO] HTTP Request: HEAD https://doi.org/10.1038/s42256-021-00418-8 "HTTP/1.1 302 Found"
+15:56:38 [INFO] HTTP Request: HEAD https://doi.org/10.1109/tpami.2026.3684569 "HTTP/1.1 302 Found"
+15:56:38 [INFO] HTTP Request: HEAD https://doi.org/10.1093/bioinformatics/btac386 "HTTP/1.1 302 Found"
+15:56:38 [INFO] HTTP Request: HEAD https://doi.org/10.1021/acssynbio.8b00207 "HTTP/1.1 302 Found"
+15:56:38 [INFO] HTTP Request: HEAD https://doi.org/10.1007/s11704-025-41426-w "HTTP/1.1 302 Found"
+15:56:38 [INFO] HTTP Request: HEAD https://doi.org/10.52202/068431-1622 "HTTP/1.1 302 Found"
+15:56:38 [INFO] HTTP Request: HEAD https://doi.org/10.3389/frai.2020.580607 "HTTP/1.1 302 Found"
+15:56:38 [INFO] HTTP Request: HEAD https://doi.org/10.1101/2024.10.15.618385 "HTTP/1.1 302 Found"
+15:56:38 [INFO] HTTP Request: HEAD https://doi.org/10.52202/079017-0826 "HTTP/1.1 302 Found"
+15:56:38 [INFO] HTTP Request: HEAD https://doi.org/10.1021/acs.chemrev.7b00427 "HTTP/1.1 302 Found"
+15:56:38 [INFO] HTTP Request: HEAD https://doi.org/10.1038/s41467-024-50620-6 "HTTP/1.1 302 Found"
+15:56:38 [INFO] HTTP Request: HEAD https://doi.org/10.1093/benz/9780199773787.article.b00187341 "HTTP/1.1 302 Found"
+15:56:38 [INFO] HTTP Request: HEAD https://doi.org/10.5194/essd-2020-174-rc1 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.1706.08566 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2502.06914 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2003.03123 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://doi.org/10.52202/068431-0830 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2306.10759 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.1903.02428 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://doi.org/10.1038/s42256-022-00571-8 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2009.01411 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2207.09453 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2210.08353 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2106.08903 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2505.22560 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://doi.org/10.1016/0022-2836(73)90011-9 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2303.04791 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2104.13478 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://doi.org/10.1109/BigData62323.2024.10825716 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2311.01276 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2006.05205 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2102.09844 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2506.08936 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2102.03150 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2410.12459 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.1802.08219 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://doi.org/10.52202/075280-2070 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://doi.org/10.1038/nrd4278 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://doi.org/10.1126/science.abe5650 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2006.10503 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arXiv.2509.24655 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://doi.org/10.1016/j.fmre.2023.06.001 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2410.11933 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.1802.03690 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2007.02133 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2503.21681 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://doi.org/10.1016/j.bbrc.2020.08.116 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://doi.org/10.1126/science.273.5282.1678 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://doi.org/10.1109/bigdata55660.2022.10020519 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2203.12742 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2302.00049 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://doi.org/10.1101/2024.10.24.619978 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://doi.org/10.1101/2024.02.24.581671 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://doi.org/10.52202/079017-1821 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://doi.org/10.1016/j.jmb.2007.06.058 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://www.science.org/doi/10.1126/science.1065659 "HTTP/1.1 403 Forbidden"
+15:56:39 [INFO] Dead DOI detected: 10.1126/science.1065659 returned HTTP 403
+15:56:39 [INFO] HTTP Request: HEAD https://doi.org/10.52202/068431-1986 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://doi.org/10.52202/068431-0667 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2205.12454 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2211.15779 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://doi.org/10.1038/s41598-018-31289-6 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://doi.org/10.52202/079017-0826 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2206.14418 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://dl.acm.org/doi/10.1145/3627673.3679604 "HTTP/1.1 403 Forbidden"
+15:56:39 [INFO] Dead DOI detected: 10.1145/3627673.3679604 returned HTTP 403
+15:56:39 [INFO] HTTP Request: HEAD https://academic.oup.com/nar/article-lookup/doi/10.1093/nar/28.1.235 "HTTP/1.1 403 Forbidden"
+15:56:39 [INFO] HTTP Request: HEAD https://academic.oup.com/bioinformatics/article/doi/10.1093/bioinformatics/btaf004/7945663 "HTTP/1.1 403 Forbidden"
+15:56:39 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2407.01049 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://academic.oup.com/nar/article-lookup/doi/10.1093/nar/gkv716 "HTTP/1.1 403 Forbidden"
+15:56:39 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2009.06211 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://academic.oup.com/bioinformatics/article/38/14/3668/6604270 "HTTP/1.1 403 Forbidden"
+15:56:39 [INFO] HTTP Request: HEAD http://www.oxfordartonline.com/benezit/view/10.1093/benz/9780199773787.001.0001/acref-9780199773787-e-00187341 "HTTP/1.1 301 Moved Permanently"
+15:56:39 [INFO] Dead DOI detected: 10.1093/nar/28.1.235 returned HTTP 403
+15:56:39 [INFO] Dead DOI detected: 10.1093/bioinformatics/btaf004 returned HTTP 403
+15:56:39 [INFO] Dead DOI detected: 10.1093/nar/gkv716 returned HTTP 403
+15:56:39 [INFO] Dead DOI detected: 10.1093/bioinformatics/btac386 returned HTTP 403
+15:56:39 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2502.06914 "HTTP/1.1 200 OK"
+15:56:39 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2410.12459 "HTTP/1.1 200 OK"
+15:56:39 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2506.08936 "HTTP/1.1 200 OK"
+15:56:39 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2106.08903 "HTTP/1.1 200 OK"
+15:56:39 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2104.13478 "HTTP/1.1 200 OK"
+15:56:39 [INFO] HTTP Request: HEAD https://pubs.acs.org/doi/10.1021/acs.chemrev.7b00427 "HTTP/1.1 403 Forbidden"
+15:56:39 [INFO] HTTP Request: HEAD https://pubs.acs.org/doi/10.1021/acssynbio.8b00207 "HTTP/1.1 403 Forbidden"
+15:56:39 [INFO] Dead DOI detected: 10.1021/acs.chemrev.7b00427 returned HTTP 403
+15:56:39 [INFO] Dead DOI detected: 10.1021/acssynbio.8b00207 returned HTTP 403
+15:56:39 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2102.09844 "HTTP/1.1 200 OK"
+15:56:39 [INFO] HTTP Request: HEAD https://arxiv.org/abs/1903.02428 "HTTP/1.1 200 OK"
+15:56:39 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2006.05205 "HTTP/1.1 200 OK"
+15:56:39 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2505.22560 "HTTP/1.1 200 OK"
+15:56:39 [INFO] HTTP Request: HEAD https://arxiv.org/abs/1706.08566 "HTTP/1.1 200 OK"
+15:56:39 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2306.10759 "HTTP/1.1 200 OK"
+15:56:39 [INFO] HTTP Request: HEAD https://www.science.org/doi/10.1126/science.abe5650 "HTTP/1.1 403 Forbidden"
+15:56:39 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2009.01411 "HTTP/1.1 200 OK"
+15:56:39 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2303.04791 "HTTP/1.1 200 OK"
+15:56:39 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2003.03123 "HTTP/1.1 200 OK"
+15:56:39 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2207.09453 "HTTP/1.1 200 OK"
+15:56:39 [INFO] Dead DOI detected: 10.1126/science.abe5650 returned HTTP 403
+15:56:39 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2311.01276 "HTTP/1.1 200 OK"
+15:56:39 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2102.03150 "HTTP/1.1 200 OK"
+15:56:39 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2007.02133 "HTTP/1.1 200 OK"
+15:56:39 [INFO] HTTP Request: HEAD https://arxiv.org/abs/1802.08219 "HTTP/1.1 200 OK"
+15:56:39 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2006.10503 "HTTP/1.1 200 OK"
+15:56:39 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2410.11933 "HTTP/1.1 200 OK"
+15:56:39 [INFO] HTTP Request: HEAD https://essd.copernicus.org/preprints/essd-2020-174/essd-2020-174-RC1.pdf "HTTP/1.1 200 OK"
+15:56:39 [INFO] HTTP Request: HEAD https://www.science.org/doi/10.1126/science.273.5282.1678 "HTTP/1.1 403 Forbidden"
+15:56:39 [INFO] Dead DOI detected: 10.1126/science.273.5282.1678 returned HTTP 403
+15:56:39 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2203.12742 "HTTP/1.1 200 OK"
+15:56:39 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2503.21681 "HTTP/1.1 200 OK"
+15:56:39 [INFO] HTTP Request: HEAD https://arxiv.org/abs/1802.03690 "HTTP/1.1 200 OK"
+15:56:39 [INFO] HTTP Request: HEAD https://link.springer.com/10.1007/978-981-96-8180-8_32 "HTTP/1.1 301 Moved Permanently"
+15:56:39 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2110.02905 "HTTP/1.1 200 OK"
+15:56:39 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AGLora+A+benchmark+to+evaluate+the+ability+to+learn+long+range+dependencies+in+graphs&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:56:39 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AUnbiased+stochastic+proximal+solver+for+graph+neural+networks+with+equilibrium+states&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:56:39 [INFO] HTTP Request: HEAD https://link.springer.com/10.1007/978-981-16-6054-2_5 "HTTP/1.1 301 Moved Permanently"
+15:56:39 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2211.15779 "HTTP/1.1 200 OK"
+15:56:39 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2302.00049 "HTTP/1.1 200 OK"
+15:56:39 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2205.12454 "HTTP/1.1 200 OK"
+15:56:39 [INFO] HTTP Request: HEAD https://link.springer.com/10.1007/s11704-025-41426-w "HTTP/1.1 301 Moved Permanently"
+15:56:39 [INFO] HTTP Request: HEAD https://www.nature.com/articles/s41467-024-50620-6 "HTTP/1.1 303 See Other"
+15:56:39 [INFO] HTTP Request: HEAD https://www.nature.com/articles/nrd4278 "HTTP/1.1 303 See Other"
+15:56:39 [INFO] HTTP Request: HEAD https://www.nature.com/articles/s41586-021-03819-2 "HTTP/1.1 303 See Other"
+15:56:39 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2509.24655 "HTTP/1.1 200 OK"
+15:56:39 [INFO] HTTP Request: HEAD https://www.nature.com/articles/s42256-022-00571-8 "HTTP/1.1 303 See Other"
+15:56:39 [INFO] HTTP Request: HEAD https://www.nature.com/articles/s42256-021-00418-8 "HTTP/1.1 303 See Other"
+15:56:39 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2009.06211 "HTTP/1.1 200 OK"
+15:56:39 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2206.14418 "HTTP/1.1 200 OK"
+15:56:39 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2407.01049 "HTTP/1.1 200 OK"
+15:56:39 [INFO] HTTP Request: HEAD https://www.frontiersin.org/articles/10.3389/frai.2020.580607/full "HTTP/1.1 301 Moved Permanently"
+15:56:39 [INFO] HTTP Request: HEAD http://www.proceedings.com/075280-2070.html "HTTP/1.1 301 Moved Permanently"
+15:56:39 [INFO] HTTP Request: HEAD http://www.proceedings.com/068431-1622.html "HTTP/1.1 301 Moved Permanently"
+15:56:39 [INFO] HTTP Request: HEAD http://www.proceedings.com/079017-0826.html "HTTP/1.1 301 Moved Permanently"
+15:56:39 [INFO] HTTP Request: HEAD http://www.proceedings.com/068431-0830.html "HTTP/1.1 301 Moved Permanently"
+15:56:39 [INFO] HTTP Request: HEAD https://www.frontiersin.org/articles/10.3389/fbioe.2021.628137/full "HTTP/1.1 301 Moved Permanently"
+15:56:39 [INFO] HTTP Request: HEAD https://ieeexplore.ieee.org/document/11482500/ "HTTP/1.1 418 Unknown Code"
+15:56:39 [INFO] Dead DOI detected: 10.1109/tpami.2026.3684569 returned HTTP 418
+15:56:39 [INFO] HTTP Request: HEAD http://www.proceedings.com/079017-0826.html "HTTP/1.1 301 Moved Permanently"
+15:56:39 [INFO] HTTP Request: HEAD http://www.proceedings.com/079017-1821.html "HTTP/1.1 301 Moved Permanently"
+15:56:39 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2210.08353 "HTTP/1.1 200 OK"
+15:56:39 [INFO] HTTP Request: HEAD https://www.nature.com/articles/s41598-018-31289-6 "HTTP/1.1 303 See Other"
+15:56:39 [INFO] HTTP Request: HEAD http://www.proceedings.com/068431-1986.html "HTTP/1.1 301 Moved Permanently"
+15:56:39 [INFO] HTTP Request: HEAD http://www.proceedings.com/068431-0667.html "HTTP/1.1 301 Moved Permanently"
+15:56:39 [INFO] HTTP Request: HEAD https://idp.nature.com/authorize?response_type=cookie&client_id=grover&redirect_uri=https%3A%2F%2Fwww.nature.com%2Farticles%2Fnrd4278 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://idp.nature.com/authorize?response_type=cookie&client_id=grover&redirect_uri=https%3A%2F%2Fwww.nature.com%2Farticles%2Fs42256-022-00571-8 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://idp.nature.com/authorize?response_type=cookie&client_id=grover&redirect_uri=https%3A%2F%2Fwww.nature.com%2Farticles%2Fs41467-024-50620-6 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD http://biorxiv.org/lookup/doi/10.1101/2024.10.24.619978 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://idp.nature.com/authorize?response_type=cookie&client_id=grover&redirect_uri=https%3A%2F%2Fwww.nature.com%2Farticles%2Fs41586-021-03819-2 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://idp.nature.com/authorize?response_type=cookie&client_id=grover&redirect_uri=https%3A%2F%2Fwww.nature.com%2Farticles%2Fs42256-021-00418-8 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD http://biorxiv.org/lookup/doi/10.1101/2024.10.15.618385 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD http://biorxiv.org/lookup/doi/10.1101/2024.02.24.581671 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://link.springer.com/article/10.1007/s11704-025-41426-w "HTTP/1.1 303 See Other"
+15:56:39 [INFO] HTTP Request: HEAD https://link.springer.com/chapter/10.1007/978-981-16-6054-2_5 "HTTP/1.1 303 See Other"
+15:56:39 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3ASpherical+message+passing+for+3d+molecular+graphs&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:56:39 [INFO] HTTP Request: HEAD https://link.springer.com/chapter/10.1007/978-981-96-8180-8_32 "HTTP/1.1 303 See Other"
+15:56:39 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AScalable+and+effective+implicit+graph+neural+networks+on+large+graphs&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:56:39 [INFO] HTTP Request: HEAD https://www.oxfordartonline.com/benezit/view/10.1093/benz/9780199773787.001.0001/acref-9780199773787-e-00187341 "HTTP/1.1 302 "
+15:56:39 [INFO] HTTP Request: HEAD https://linkinghub.elsevier.com/retrieve/pii/0022283673900119 "HTTP/1.1 200 "
+15:56:39 [INFO] HTTP Request: HEAD https://linkinghub.elsevier.com/retrieve/pii/S2667325823001796 "HTTP/1.1 200 "
+15:56:39 [INFO] HTTP Request: HEAD https://linkinghub.elsevier.com/retrieve/pii/S0022283607008509 "HTTP/1.1 200 "
+15:56:39 [INFO] HTTP Request: HEAD https://linkinghub.elsevier.com/retrieve/pii/S0006291X20317216 "HTTP/1.1 200 "
+15:56:39 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Do+transformers+really+perform+badly+for+graph+representation&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:56:39 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3Ad+End+to+end+deep+learning+method+for+accurate+de+novo+rna+3d+structure+prediction&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:56:39 [INFO] HTTP Request: HEAD https://idp.nature.com/authorize?response_type=cookie&client_id=grover&redirect_uri=https%3A%2F%2Fwww.nature.com%2Farticles%2Fs41598-018-31289-6 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://idp.nature.com/transit?redirect_uri=https%3A%2F%2Fwww.nature.com%2Farticles%2Fs41586-021-03819-2&code=c2ec2548-7317-4fd4-8ba4-7ba0033cfb9f "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://idp.nature.com/transit?redirect_uri=https%3A%2F%2Fwww.nature.com%2Farticles%2Fnrd4278&code=060a3b19-c23d-4883-aa94-e8d776deb275 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://idp.nature.com/transit?redirect_uri=https%3A%2F%2Fwww.nature.com%2Farticles%2Fs42256-021-00418-8&code=67824e47-bbcc-4137-b2fa-765169352e3f "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://www.biorxiv.org/lookup/doi/10.1101/2024.10.24.619978 "HTTP/1.1 403 Forbidden"
+15:56:39 [INFO] HTTP Request: HEAD https://www.biorxiv.org/lookup/doi/10.1101/2024.10.15.618385 "HTTP/1.1 403 Forbidden"
+15:56:39 [INFO] HTTP Request: HEAD https://www.biorxiv.org/lookup/doi/10.1101/2024.02.24.581671 "HTTP/1.1 403 Forbidden"
+15:56:39 [INFO] HTTP Request: HEAD https://idp.nature.com/transit?redirect_uri=https%3A%2F%2Fwww.nature.com%2Farticles%2Fs41467-024-50620-6&code=00da3386-5330-408b-b110-4814594eb91b "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://idp.nature.com/transit?redirect_uri=https%3A%2F%2Fwww.nature.com%2Farticles%2Fs42256-022-00571-8&code=7b393c00-0987-47a3-a793-a726a62aea3c "HTTP/1.1 302 Found"
+15:56:39 [INFO] Dead DOI detected: 10.1101/2024.10.24.619978 returned HTTP 403
+15:56:39 [INFO] Dead DOI detected: 10.1101/2024.10.15.618385 returned HTTP 403
+15:56:39 [INFO] Dead DOI detected: 10.1101/2024.02.24.581671 returned HTTP 403
+15:56:39 [INFO] HTTP Request: HEAD https://idp.springer.com/authorize?response_type=cookie&client_id=springerlink&redirect_uri=https%3A%2F%2Flink.springer.com%2Fchapter%2F10.1007%2F978-981-16-6054-2_5 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://idp.springer.com/authorize?response_type=cookie&client_id=springerlink&redirect_uri=https%3A%2F%2Flink.springer.com%2Farticle%2F10.1007%2Fs11704-025-41426-w "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://ieeexplore.ieee.org/document/10825716/ "HTTP/1.1 418 Unknown Code"
+15:56:39 [INFO] Dead DOI detected: 10.1109/BigData62323.2024.10825716 returned HTTP 418
+15:56:39 [INFO] HTTP Request: HEAD https://idp.springer.com/authorize?response_type=cookie&client_id=springerlink&redirect_uri=https%3A%2F%2Flink.springer.com%2Fchapter%2F10.1007%2F978-981-96-8180-8_32 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://drops.dagstuhl.de/entities/document/10.4230/OASIcs.DX.2024.30 "HTTP/1.1 200 OK"
+15:56:39 [INFO] HTTP Request: HEAD https://oup2-idp.sams-sigma.com/authorize?scope=license_lite+openid+offline_access+profile+email+profile_extended&response_type=code&ip_address=217.255.94.219&redirect_uri=https%3A%2F%2Fwww.oxfordartonline.com%2Foidc_callback&state=tWuyBXxuQP-FQ8yFByUXUwmkQqgYkvzN64HcS2zKAp0redirect%3D%2Fbenezit%2Fview%2F10.1093%2Fbenz%2F9780199773787.001.0001%2Facref-9780199773787-e-00187341&auth_token=eyJlbmMiOiJBMTI4R0NNIiwiYWxnIjoiUlNBLU9BRVAtMjU2In0.Mrao34JzTSGCNFe4cnmas-FCqmxNlPaowjDg8tqDoJqUquYnSlgRHh4R1qVkN7smFfJfzw6hXA_tmg35KdweCEWQsQk4u3EH2-xf5VWs6wyQNSwcEVwHRbtbnK03hzNSVErQHvixUTG2zvI2LD5dlruzk7IV6Ea9jZd7BDzXEKlCasGEvo0-U2TQmbQ-bldDqdTiRopmvmItlXS7Rc7uKtqgN8nY1ZRBQ_n9YQx7hK5UJzdrv_6rYQQo7J5jvtZWs4BMZVtyEruYJtIfvP14zTvhV0k7-br2wVebl9xe2CDV54wiT6xRJvMmefwU-JptbGOSekiLL-b2xo8W6oiDkw.Lmh8ao2pAHrkEPLt.ZREKu5gLncBoF05999jTZn7j-Opt3bNBK7XZDbXYLdK9szIJ7baY-Er6kzeQ6dfiC8RRpXQm-k6nW5-roKRCIIOvao9trM7y6y50Ltn6CKQyF9kPQErjo_C8_c6iIhBffs9L5G4bJ5KkZ7T_GaDFhrCBHNp3pDzvRqRRsPepeTvN_lp04k8o3jgEN4pgff2tPVrUL_9r3g.c4a0yub4De7yUoc_Qcu80g&prompt=none&nonce=ORV4fSrjSqC4tHMcBpVu_MeHfSy5_gjDYVDJ-UTw_nU&client_id=OAO "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: HEAD https://ieeexplore.ieee.org/document/10020519/ "HTTP/1.1 418 Unknown Code"
+15:56:39 [INFO] Dead DOI detected: 10.1109/bigdata55660.2022.10020519 returned HTTP 418
+15:56:39 [INFO] HTTP Request: HEAD https://idp.nature.com/transit?redirect_uri=https%3A%2F%2Fwww.nature.com%2Farticles%2Fs41598-018-31289-6&code=cf68dbba-0ca5-4040-9594-afddc654f016 "HTTP/1.1 302 Found"
+15:56:39 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AProtein+Structure+Prediction+and+Structural+Genomics&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:56:39 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3ATuning+the+performance+of+synthetic+riboswitches+using+machine+learning&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:56:39 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AEnvironment+and+exposure+to+solvent+of+protein+atoms+Lysozyme+and+insulin&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:56:39 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3ARnasolo+a+repository+of+cleaned+pdb+derived+rna+3d+structures&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:56:39 [INFO] HTTP Request: HEAD https://www.oxfordartonline.com/oidc_callback?error=login_required&state=tWuyBXxuQP-FQ8yFByUXUwmkQqgYkvzN64HcS2zKAp0redirect%3D%2Fbenezit%2Fview%2F10.1093%2Fbenz%2F9780199773787.001.0001%2Facref-9780199773787-e-00187341 "HTTP/1.1 302 "
+15:56:39 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3ADssr+an+integrated+software+tool+for+dissecting+the+spatial+structure+of+rna&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:56:39 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AHyperhelm+Hyperbolic+hierarchy+encoding+for+mrna+language+modeling&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:56:39 [INFO] HTTP Request: HEAD https://www.proceedings.com/068431-1622.html "HTTP/1.1 200 OK"
+15:56:39 [INFO] HTTP Request: HEAD https://www.frontiersin.org/journals/artificial-intelligence/articles/10.3389/frai.2020.580607/full "HTTP/1.1 200 OK"
+15:56:39 [INFO] HTTP Request: HEAD https://www.proceedings.com/068431-0667.html "HTTP/1.1 200 OK"
+15:56:39 [INFO] HTTP Request: HEAD https://www.proceedings.com/075280-2070.html "HTTP/1.1 200 OK"
+15:56:39 [INFO] HTTP Request: HEAD https://www.proceedings.com/079017-1821.html "HTTP/1.1 200 OK"
+15:56:39 [INFO] HTTP Request: HEAD https://www.nature.com/articles/s42256-021-00418-8 "HTTP/1.1 200 OK"
+15:56:39 [INFO] HTTP Request: HEAD https://www.proceedings.com/079017-0826.html "HTTP/1.1 200 OK"
+15:56:39 [INFO] HTTP Request: HEAD https://www.nature.com/articles/s41586-021-03819-2 "HTTP/1.1 200 OK"
+15:56:39 [INFO] HTTP Request: HEAD https://www.nature.com/articles/nrd4278 "HTTP/1.1 200 OK"
+15:56:40 [INFO] HTTP Request: HEAD https://www.nature.com/articles/s42256-022-00571-8 "HTTP/1.1 200 OK"
+15:56:40 [INFO] HTTP Request: HEAD https://www.oxfordartonline.com/benezit/view/10.1093/benz/9780199773787.001.0001/acref-9780199773787-e-00187341 "HTTP/1.1 301 "
+15:56:40 [INFO] HTTP Request: HEAD https://www.proceedings.com/079017-0826.html "HTTP/1.1 200 OK"
+15:56:40 [INFO] HTTP Request: HEAD https://link.springer.com/article/10.1007/s11704-025-41426-w "HTTP/1.1 200 OK"
+15:56:40 [INFO] HTTP Request: HEAD https://www.frontiersin.org/journals/bioengineering-and-biotechnology/articles/10.3389/fbioe.2021.628137/full "HTTP/1.1 200 OK"
+15:56:40 [INFO] HTTP Request: HEAD https://www.proceedings.com/068431-1986.html "HTTP/1.1 200 OK"
+15:56:40 [INFO] HTTP Request: HEAD https://www.proceedings.com/068431-0830.html "HTTP/1.1 200 OK"
+15:56:40 [INFO] HTTP Request: HEAD https://link.springer.com/chapter/10.1007/978-981-16-6054-2_5 "HTTP/1.1 200 OK"
+15:56:40 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AEvaluating+and+learning+from+rna+pseudotorsional+space+quantitative+validation+of+a+reduced+representation+for+rna+structure&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:56:40 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3ARNA+structure+determination+From+2D+to+3D&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:56:40 [INFO] HTTP Request: HEAD https://www.nature.com/articles/s41467-024-50620-6 "HTTP/1.1 200 OK"
+15:56:40 [INFO] HTTP Request: HEAD https://www.nature.com/articles/s41598-018-31289-6 "HTTP/1.1 200 OK"
+15:56:40 [INFO] HTTP Request: HEAD https://link.springer.com/chapter/10.1007/978-981-96-8180-8_32 "HTTP/1.1 200 OK"
+15:56:40 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3ARNA+dependent+RNA+polymerase+Structure+mechanism+and+drug+discovery+for+COVID+19&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:56:40 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3ABridging+biomolecular+modalities+for+knowledge+transfer+in+bio+language+models&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:56:40 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3ADeeprnatwist+Language+model+guided+rna+torsion+angle+prediction+with+attention+inception+network&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:56:40 [INFO] Existence check progress: 17/86
+15:56:40 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3ALong+range+graph+benchmark&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:56:40 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3ARibonanza+deep+learning+of+rna+structure+through+dual+crowdsourcing&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:56:40 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Implicit+graph+neural+networks+A+monotone+operator+viewpoint&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 429 "
+15:56:40 [WARNING] semantic_scholar: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:56:40 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AGraph+Neural+Networks+for+Maximum+Constraint+Satisfaction&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:56:40 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3ASE+3+Equivariant+Neural+Network+for+3D+Graphs&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:56:40 [INFO] HTTP Request: HEAD https://www.oxfordartonline.com/benezit/display/10.1093/benz/9780199773787.001.0001/acref-9780199773787-e-00187341 "HTTP/1.1 200 "
+15:56:40 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3ATransformers+over+Directed+Acyclic+Graphs&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:56:40 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AEfficient+and+Scalable+Implicit+Graph+Neural+Networks+with+Virtual+Equilibrium&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:56:40 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AGeometric+deep+learning+on+molecular+representations&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:56:40 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AEquivariant+Graph+Hierarchy+Based+Neural+Networks&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:56:40 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AAre+High+Degree+Representations+Really+Unnecessary+in+Equivariant+Graph+Neural+Networks&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:56:40 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AEnhancing+graph+transformers+with+hierarchical+distance+structural+encoding&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:56:40 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AmRNA+based+therapeutics+developing+a+new+class+of+drugs&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:56:41 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AAre+highdegree+representations+really+unnecessary+in+equivariant+graph+neural+networks+arXiv+preprint&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:56:41 [INFO] Existence check progress: 34/86
+15:56:41 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AThe+limitless+future+of+rna+therapeutics&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:56:41 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AA+survey+of+geometric+graph+neural+networks+data+structures+models+and+applications&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:56:41 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AMACE+Higher+Order+Equivariant+Message+Passing+Neural+Networks+for+Fast+and+Accurate+Force+Fields&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:56:41 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Representing+long+range+context+for+graph+neural+networks+with+global+attention&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:56:41 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AOn+the+expressive+power+of+geometric+graph+neural+networks&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:56:41 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3ANodeformer+A+scalable+graph+structure+learning+transformer+for+node+classification&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:56:41 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AA+euclidean+transformer+for+fast+and+stable+machine+learned+force+fields&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:56:41 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3ARole+of+solvent+accessibility+for+aggregation+prone+patches+in+protein+folding&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:56:41 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AEfficient+and+Diverse+De+Novo+Protein+Backbone+Design+with+SE+3+Equivariant+Diffusion&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:56:41 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Shape+aware+graph+spectral+learning&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 429 "
+15:56:41 [WARNING] semantic_scholar: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:56:43 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=The+protein+data+bank&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:56:44 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Rna+torsionbert+leveraging+language+models+for+rna+3d+torsion+angles+prediction&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:56:45 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Unizyme+A+unified+protein+cleavage+site+predictor+enhanced+with+enzyme+active+site+knowledge&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:56:46 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=HELM+Hierarchical+encoding+for+mRNA+language+modeling&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:56:47 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Biolangfusion+Multimodal+fusion+of+dna+mrna+and+protein+language+models&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:56:48 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Gemnet+Universal+directional+graph+neural+networks+for+molecules&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:56:49 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Geometric+deep+learning+Grids+groups+graphs+geodesics+and+gauges&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:56:50 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Rna+structural+dynamics+as+captured+by+molecular+simulations+a+comprehensive+overview&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:56:50 [INFO] Existence check progress: 51/86
+15:56:52 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=E+n+equivariant+graph+neural+networks&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:56:52 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Fast+graph+representation+learning+with+PyTorch+Geometric&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:56:53 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=On+the+bottleneck+of+graph+neural+networks+and+its+practical+implications&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:56:54 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Geometric+hyena+networks+for+large+scale+equivariant+learning&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:56:55 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Schnet+A+continuous+filter+convolutional+neural+network+for+modeling+quantum+interactions&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:56:56 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Sgformer+Simplifying+and+empowering+transformers+for+large+graph+representations&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:56:57 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Geometric+deep+learning+of+rna+structure&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:56:58 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Learning+from+protein+structure+with+geometric+vector+perceptrons&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:56:59 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Ewald+based+long+range+message+passing+for+molecular+graphs&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:57:00 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Directional+message+passing+for+molecular+graphs&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:57:01 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Euclidean+neural+networks&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:57:02 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Neural+atoms+Propagating+long+range+interaction+in+molecular+graphs+through+efficient+communication+channel&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:57:03 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Equivariant+message+passing+for+the+prediction+of+tensorial+properties+and+molecular+spectra&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:57:05 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Simple+and+deep+graph+convolutional+networks&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:57:05 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Tensor+field+networks+Rotation+and+translation+equivariant+neural+networks+for+3d+point+clouds&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:57:06 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Se+3+transformers+3d+roto+translation+equivariant+attention+networks&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:57:07 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Beyond+sequence+Impact+of+geometric+context+for+RNA+property+prediction&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:57:07 [INFO] Existence check progress: 68/86
+15:57:08 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Crystal+structure+of+a+group+i+ribozyme+domain+principles+of+rna+packing&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:57:09 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Accelerating+bayesian+optimization+for+biological+sequence+design+with+denoising+autoencoders&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:57:10 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=A+comprehensive+benchmark+for+rna+3d+structure+function+modeling&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:57:11 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=On+the+generalization+of+equivariance+and+convolution+in+neural+networks+to+the+action+of+compact+groups&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:57:12 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Geometric+and+physical+quantities+improve+e+3+equivariant+message+passing&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:57:13 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Revisiting+over+smoothing+and+over+squashing+using+ollivier+ricci+curvature&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:57:15 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Transformers+meet+directed+graphs&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:57:15 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Recipe+for+a+General+Powerful+Scalable+Graph+Transformer&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:57:16 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Implicit+graph+neural+networks&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:57:17 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Optimization+induced+graph+implicit+nonlinear+diffusion&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:57:18 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=SE+3+hyena+operator+for+scalable+equivariant+learning&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:57:19 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Fast+and+Distributed+Equivariant+Graph+Neural+Networks+by+Virtual+Node+Learning&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:57:20 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Multiscale+graph+neural+networks+with+implicit+layers&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:57:21 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Optuna+A+next+generation+hyperparameter+optimization+framework&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:57:23 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Highly+accurate+protein+structure+prediction+with+alphafold&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:57:23 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Deep+learning+models+for+predicting+rna+degradation+via+dual+crowdsourcing&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:57:24 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Implicit+graph+neural+networks+A+monotone+operator+viewpoint&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:57:24 [INFO] Existence check progress: 85/86
+15:57:25 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Shape+aware+graph+spectral+learning&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:57:25 [INFO] Existence check complete: 83/86 references found
+15:57:25 [INFO] STAGE L2_existence seconds=47.202 refs=86
+15:57:25 [INFO] STAGE L3_metadata seconds=0.014 refs=86
+15:57:25 [INFO] fetch_and_chunk: 67 refs, max_workers=15
+15:57:26 [INFO] HTTP Request: GET http://arxiv.org/abs/1903.02428 "HTTP/1.1 301 Moved Permanently"
+15:57:26 [INFO] HTTP Request: GET http://arxiv.org/abs/2106.08903 "HTTP/1.1 301 Moved Permanently"
+15:57:26 [INFO] HTTP Request: GET http://arxiv.org/abs/2006.10503 "HTTP/1.1 301 Moved Permanently"
+15:57:26 [INFO] HTTP Request: GET http://arxiv.org/abs/2207.09453 "HTTP/1.1 301 Moved Permanently"
+15:57:26 [INFO] HTTP Request: GET https://arxiv.org/abs/1903.02428 "HTTP/1.1 200 OK"
+15:57:26 [INFO] HTTP Request: GET https://arxiv.org/abs/2106.08903 "HTTP/1.1 200 OK"
+15:57:26 [INFO] HTTP Request: GET https://arxiv.org/abs/2006.10503 "HTTP/1.1 200 OK"
+15:57:26 [INFO] HTTP Request: GET https://arxiv.org/abs/2207.09453 "HTTP/1.1 200 OK"
+15:57:26 [INFO] HTTP Request: GET https://doi.org/10.1093/bioinformatics/btaf004 "HTTP/1.1 302 Found"
+15:57:26 [INFO] HTTP Request: GET https://arxiv.org/pdf/1903.02428 "HTTP/1.1 200 OK"
+15:57:26 [INFO] HTTP Request: GET https://arxiv.org/pdf/2106.08903 "HTTP/1.1 200 OK"
+15:57:26 [INFO] HTTP Request: GET https://arxiv.org/pdf/2207.09453 "HTTP/1.1 200 OK"
+15:57:26 [INFO] HTTP Request: GET https://arxiv.org/pdf/2006.10503 "HTTP/1.1 200 OK"
+15:57:26 [INFO] HTTP Request: GET https://academic.oup.com/bioinformatics/article/doi/10.1093/bioinformatics/btaf004/7945663 "HTTP/1.1 403 Forbidden"
+15:57:26 [INFO] HTTP Request: GET https://api.unpaywall.org/v2/10.1016/j.fmre.2023.06.001?email=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:57:26 [INFO] HTTP Request: GET https://api.unpaywall.org/v2/10.1126/science.1065659?email=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:57:26 [INFO] HTTP Request: GET https://api.unpaywall.org/v2/10.1093/nar/28.1.235?email=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:57:26 [INFO] HTTP Request: GET https://api.unpaywall.org/v2/10.1126/science.273.5282.1678?email=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:57:26 [INFO] HTTP Request: GET https://api.unpaywall.org/v2/10.1093/bioinformatics/btac386?email=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:57:26 [INFO] HTTP Request: GET https://api.unpaywall.org/v2/10.1109/BigData62323.2024.10825716?email=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:57:26 [INFO] HTTP Request: GET https://api.unpaywall.org/v2/10.1038/s41467-024-50620-6?email=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:57:26 [INFO] HTTP Request: GET https://api.unpaywall.org/v2/10.1021/acssynbio.8b00207?email=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:57:26 [INFO] HTTP Request: GET https://api.unpaywall.org/v2/10.1109/bigdata55660.2022.10020519?email=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:57:26 [INFO] HTTP Request: GET https://api.unpaywall.org/v2/10.1101/2024.10.24.619978?email=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:57:26 [INFO] HTTP Request: GET https://doi.org/10.1093/bioinformatics/btac386 "HTTP/1.1 302 Found"
+15:57:26 [INFO] HTTP Request: GET https://www.biorxiv.org/content/biorxiv/early/2024/10/29/2024.10.24.619978.full.pdf "HTTP/1.1 403 Forbidden"
+15:57:26 [INFO] HTTP Request: GET https://academic.oup.com/bioinformatics/article/38/14/3668/6604270 "HTTP/1.1 403 Forbidden"
+15:57:26 [INFO] HTTP Request: GET https://pmc.ncbi.nlm.nih.gov/articles/PMC11197651/pdf/main.pdf "HTTP/1.1 200 OK"
+15:57:26 [INFO] HTTP Request: GET https://www.nature.com/articles/s41467-024-50620-6.pdf "HTTP/1.1 303 See Other"
+15:57:26 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/DOI:10.1126/science.1065659?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 200 OK"
+15:57:26 [INFO] HTTP Request: GET https://api.unpaywall.org/v2/10.1093/bioinformatics/btaf004?email=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:57:26 [INFO] HTTP Request: GET https://idp.nature.com/authorize?response_type=cookie&client_id=grover&redirect_uri=https%3A%2F%2Fwww.nature.com%2Farticles%2Fs41467-024-50620-6.pdf "HTTP/1.1 302 Found"
+15:57:26 [INFO] HTTP Request: GET https://idp.nature.com/transit?redirect_uri=https%3A%2F%2Fwww.nature.com%2Farticles%2Fs41467-024-50620-6.pdf&code=d7678f5f-f79a-4022-b648-328a9da18462 "HTTP/1.1 302 Found"
+15:57:26 [INFO] HTTP Request: GET https://academic.oup.com/bioinformatics/advance-article-pdf/doi/10.1093/bioinformatics/btaf004/61381586/btaf004.pdf "HTTP/1.1 403 Forbidden"
+15:57:27 [INFO] HTTP Request: GET https://www.nature.com/articles/s41467-024-50620-6.pdf "HTTP/1.1 200 OK"
+15:57:27 [INFO] HTTP Request: GET https://export.arxiv.org/api/query?search_query=ti%3A%22SE+3+Equivariant+Neural+Network+for+3D+Graphs%22&start=0&max_results=5 "HTTP/1.1 429 Unknown Error"
+15:57:27 [WARNING] arxiv: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:57:28 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/DOI:10.1093/nar/28.1.235?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 200 OK"
+15:57:28 [INFO] HTTP Request: GET http://arxiv.org/abs/2009.06211 "HTTP/1.1 301 Moved Permanently"
+15:57:28 [INFO] HTTP Request: GET https://arxiv.org/abs/2009.06211 "HTTP/1.1 200 OK"
+15:57:28 [INFO] HTTP Request: GET https://www.ncbi.nlm.nih.gov/pmc/articles/PMC102472 "HTTP/1.1 301 Moved Permanently"
+15:57:28 [INFO] HTTP Request: GET https://pmc.ncbi.nlm.nih.gov/articles/PMC102472 "HTTP/1.1 301 Moved Permanently"
+15:57:28 [INFO] HTTP Request: GET https://pmc.ncbi.nlm.nih.gov/articles/PMC102472/ "HTTP/1.1 200 OK"
+15:57:28 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/DOI:10.1126/science.273.5282.1678?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 200 OK"
+15:57:28 [INFO] HTTP Request: GET https://arxiv.org/pdf/2009.06211 "HTTP/1.1 200 OK"
+15:57:28 [INFO] HTTP Request: GET https://pmc.ncbi.nlm.nih.gov/articles/PMC102472/pdf/gkd090.pdf "HTTP/1.1 200 OK"
+15:57:28 [INFO] HTTP Request: GET https://api.unpaywall.org/v2/10.1007/s11704-025-41426-w?email=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:57:29 [INFO] HTTP Request: GET https://link.springer.com/content/pdf/10.1007/s11704-025-41426-w.pdf "HTTP/1.1 303 See Other"
+15:57:29 [INFO] HTTP Request: GET https://idp.springer.com/authorize?response_type=cookie&client_id=springerlink&redirect_uri=https%3A%2F%2Flink.springer.com%2Fcontent%2Fpdf%2F10.1007%2Fs11704-025-41426-w.pdf "HTTP/1.1 302 Found"
+15:57:29 [INFO] HTTP Request: GET https://api.unpaywall.org/v2/10.52202/068431-0667?email=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:57:29 [INFO] HTTP Request: GET https://export.arxiv.org/pdf/2202.10643 "HTTP/1.1 429 Unknown Error"
+15:57:29 [INFO] HTTP Request: GET https://link.springer.com/content/pdf/10.1007/s11704-025-41426-w.pdf "HTTP/1.1 200 OK"
+15:57:29 [INFO] HTTP Request: GET https://export.arxiv.org/api/query?search_query=ti%3A%22Protein+Structure+Prediction+and+Structural+Genomics%22&start=0&max_results=5 "HTTP/1.1 429 Unknown Error"
+15:57:29 [WARNING] arxiv: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:57:29 [INFO] HTTP Request: GET https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7473028 "HTTP/1.1 301 Moved Permanently"
+15:57:30 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/DOI:10.1021/acssynbio.8b00207?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 200 OK"
+15:57:30 [INFO] HTTP Request: GET https://pmc.ncbi.nlm.nih.gov/articles/PMC7473028 "HTTP/1.1 301 Moved Permanently"
+15:57:30 [INFO] HTTP Request: GET https://pmc.ncbi.nlm.nih.gov/articles/PMC7473028/ "HTTP/1.1 200 OK"
+15:57:30 [INFO] HTTP Request: GET https://doi.org/10.1021/acssynbio.8b00207.s001 "HTTP/1.1 302 Found"
+15:57:30 [INFO] HTTP Request: GET https://pubs.acs.org/doi/suppl/10.1021/acssynbio.8b00207/suppl_file/sb8b00207_si_001.pdf "HTTP/1.1 403 Forbidden"
+15:57:30 [INFO] HTTP Request: GET https://pmc.ncbi.nlm.nih.gov/articles/PMC7473028/pdf/main.pdf "HTTP/1.1 200 OK"
+15:57:30 [INFO] HTTP Request: GET https://api.unpaywall.org/v2/10.1007/978-981-16-6054-2_5?email=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:57:30 [INFO] HTTP Request: GET https://api.unpaywall.org/v2/10.1016/j.bbrc.2020.08.116?email=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:57:30 [INFO] HTTP Request: GET https://www.ncbi.nlm.nih.gov/pmc/articles/7473028 "HTTP/1.1 301 Moved Permanently"
+15:57:30 [INFO] HTTP Request: GET https://pmc.ncbi.nlm.nih.gov/articles/7473028 "HTTP/1.1 301 Moved Permanently"
+15:57:31 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/DOI:10.1109/bigdata55660.2022.10020519?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 200 OK"
+15:57:31 [INFO] HTTP Request: GET https://pmc.ncbi.nlm.nih.gov/articles/7473028/ "HTTP/1.1 301 Moved Permanently"
+15:57:31 [INFO] HTTP Request: GET https://doi.org/10.1038/s41586-021-03819-2 "HTTP/1.1 302 Found"
+15:57:31 [INFO] HTTP Request: GET https://pmc.ncbi.nlm.nih.gov/articles/PMC7473028/ "HTTP/1.1 200 OK"
+15:57:31 [INFO] HTTP Request: GET https://pmc.ncbi.nlm.nih.gov/articles/PMC7473028/pdf/main.pdf "HTTP/1.1 200 OK"
+15:57:31 [INFO] HTTP Request: GET https://www.nature.com/articles/s41586-021-03819-2 "HTTP/1.1 200 OK"
+15:57:31 [INFO] HTTP Request: GET https://www.nature.com/articles/s41586-021-03819-2.pdf "HTTP/1.1 200 OK"
+15:57:32 [INFO] HTTP Request: GET https://export.arxiv.org/pdf/2202.10643 "HTTP/1.1 429 Unknown Error"
+15:57:32 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/DOI:10.1101/2024.10.24.619978?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 404 Not Found"
+15:57:32 [INFO] HTTP Request: GET https://export.arxiv.org/api/query?search_query=ti%3A%22SE+3+Equivariant+Neural+Network+for+3D+Graphs%22&start=0&max_results=5 "HTTP/1.1 429 Unknown Error"
+15:57:32 [WARNING] arxiv: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:57:33 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/DOI:10.1093/bioinformatics/btac386?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 200 OK"
+15:57:33 [INFO] HTTP Request: GET https://doi.org/10.1093/bioinformatics/btac386 "HTTP/1.1 302 Found"
+15:57:33 [INFO] HTTP Request: GET https://academic.oup.com/bioinformatics/article/38/14/3668/6604270 "HTTP/1.1 403 Forbidden"
+15:57:34 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/DOI:10.1016/j.fmre.2023.06.001?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 200 OK"
+15:57:34 [INFO] HTTP Request: GET https://doi.org/10.1016/j.fmre.2023.06.001 "HTTP/1.1 302 Found"
+15:57:34 [INFO] HTTP Request: GET https://linkinghub.elsevier.com/retrieve/pii/S2667325823001796 "HTTP/1.1 200 "
+15:57:34 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/DOI:10.1093/bioinformatics/btaf004?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 429 "
+15:57:34 [WARNING] semantic_scholar: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:57:34 [INFO] HTTP Request: GET http://arxiv.org/abs/2502.06914 "HTTP/1.1 301 Moved Permanently"
+15:57:34 [INFO] HTTP Request: GET https://arxiv.org/abs/2502.06914 "HTTP/1.1 200 OK"
+15:57:34 [INFO] HTTP Request: GET https://arxiv.org/pdf/2502.06914 "HTTP/1.1 200 OK"
+15:57:35 [INFO] HTTP Request: GET https://export.arxiv.org/api/query?search_query=ti%3A%22Crystal+Structure+of+a+Group+I+Ribozyme+Domain+Principles+of+RNA+Packing%22&start=0&max_results=5 "HTTP/1.1 200 OK"
+15:57:35 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/DOI:10.1007/978-981-16-6054-2_5?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 200 OK"
+15:57:37 [INFO] HTTP Request: GET https://export.arxiv.org/pdf/2202.10643 "HTTP/1.1 200 OK"
+15:57:37 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=DeepRNA+Twist+Language+Model+guided+RNA+Torsion+Angle+Prediction+with+Attention+Inception+Network&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:57:37 [INFO] HTTP Request: GET http://arxiv.org/abs/2210.08353 "HTTP/1.1 301 Moved Permanently"
+15:57:37 [INFO] HTTP Request: GET https://arxiv.org/abs/2210.08353 "HTTP/1.1 200 OK"
+15:57:37 [INFO] HTTP Request: GET https://arxiv.org/pdf/2210.08353 "HTTP/1.1 200 OK"
+15:57:37 [INFO] HTTP Request: GET https://export.arxiv.org/pdf/2102.05013 "HTTP/1.1 429 Unknown Error"
+15:57:38 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/DOI:10.1093/bioinformatics/btaf004?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 200 OK"
+15:57:38 [INFO] HTTP Request: GET https://doi.org/10.1093/bioinformatics/btaf004 "HTTP/1.1 302 Found"
+15:57:38 [INFO] HTTP Request: GET https://academic.oup.com/bioinformatics/article/doi/10.1093/bioinformatics/btaf004/7945663 "HTTP/1.1 403 Forbidden"
+15:57:38 [INFO] HTTP Request: GET https://export.arxiv.org/api/query?search_query=ti%3A%22The+Protein+Data+Bank%22&start=0&max_results=5 "HTTP/1.1 200 OK"
+15:57:39 [INFO] HTTP Request: GET https://api.unpaywall.org/v2/10.1093/nar/gkv716?email=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:57:39 [INFO] HTTP Request: GET https://academic.oup.com/nar/article-pdf/43/21/e142/17435026/gkv716.pdf "HTTP/1.1 403 Forbidden"
+15:57:39 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/DOI:10.1093/nar/gkv716?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 200 OK"
+15:57:39 [INFO] HTTP Request: GET https://academic.oup.com/nar/article-pdf/43/21/e142/17435026/gkv716.pdf "HTTP/1.1 403 Forbidden"
+15:57:39 [INFO] HTTP Request: GET https://api.unpaywall.org/v2/10.52202/079017-1821?email=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:57:40 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/DOI:10.52202/079017-1821?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 404 Not Found"
+15:57:40 [INFO] HTTP Request: GET https://export.arxiv.org/pdf/2102.05013 "HTTP/1.1 200 OK"
+15:57:41 [INFO] HTTP Request: GET https://export.arxiv.org/api/query?search_query=ti%3A%22Tuning+the+Performance+of+Synthetic+Riboswitches+using+Machine+Learning%22&start=0&max_results=5 "HTTP/1.1 429 Unknown Error"
+15:57:41 [WARNING] arxiv: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:57:42 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Enhancing+Graph+Transformers+with+Hierarchical+Distance+Structural+Encoding&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:57:44 [INFO] HTTP Request: GET https://export.arxiv.org/pdf/2102.05013 "HTTP/1.1 200 OK"
+15:57:45 [INFO] HTTP Request: GET http://arxiv.org/abs/2506.08936 "HTTP/1.1 301 Moved Permanently"
+15:57:45 [INFO] HTTP Request: GET https://arxiv.org/abs/2506.08936 "HTTP/1.1 200 OK"
+15:57:45 [INFO] HTTP Request: GET https://arxiv.org/pdf/2506.08936 "HTTP/1.1 200 OK"
+15:57:47 [INFO] HTTP Request: GET http://arxiv.org/abs/2505.22560 "HTTP/1.1 301 Moved Permanently"
+15:57:47 [INFO] HTTP Request: GET https://arxiv.org/abs/2505.22560 "HTTP/1.1 200 OK"
+15:57:47 [INFO] HTTP Request: GET https://export.arxiv.org/api/query?search_query=ti%3A%22Efficient+and+Scalable+Implicit+Graph+Neural+Networks+with+Virtual+Equilibrium%22&start=0&max_results=5 "HTTP/1.1 200 OK"
+15:57:47 [INFO] HTTP Request: GET http://arxiv.org/abs/2407.01049 "HTTP/1.1 301 Moved Permanently"
+15:57:47 [INFO] HTTP Request: GET https://arxiv.org/abs/2407.01049 "HTTP/1.1 200 OK"
+15:57:47 [INFO] HTTP Request: GET https://arxiv.org/pdf/2407.01049 "HTTP/1.1 200 OK"
+15:57:48 [INFO] HTTP Request: GET https://arxiv.org/pdf/2505.22560 "HTTP/1.1 200 OK"
+15:57:49 [INFO] HTTP Request: GET http://arxiv.org/abs/2211.15779 "HTTP/1.1 301 Moved Permanently"
+15:57:49 [INFO] HTTP Request: GET https://arxiv.org/abs/2211.15779 "HTTP/1.1 200 OK"
+15:57:49 [INFO] HTTP Request: GET https://arxiv.org/pdf/2211.15779 "HTTP/1.1 200 OK"
+15:57:51 [INFO] HTTP Request: GET https://api.unpaywall.org/v2/10.1101/2024.10.15.618385?email=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:57:51 [INFO] HTTP Request: GET https://www.biorxiv.org/content/biorxiv/early/2024/10/17/2024.10.15.618385.full.pdf "HTTP/1.1 403 Forbidden"
+15:57:52 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/DOI:10.1101/2024.10.15.618385?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 200 OK"
+15:57:52 [INFO] HTTP Request: GET https://www.biorxiv.org/content/biorxiv/early/2024/10/17/2024.10.15.618385.full.pdf "HTTP/1.1 403 Forbidden"
+15:57:52 [INFO] HTTP Request: GET http://arxiv.org/abs/2205.12454 "HTTP/1.1 301 Moved Permanently"
+15:57:52 [INFO] HTTP Request: GET https://arxiv.org/abs/2205.12454 "HTTP/1.1 200 OK"
+15:57:52 [INFO] HTTP Request: GET https://arxiv.org/pdf/2205.12454 "HTTP/1.1 200 OK"
+15:57:53 [INFO] HTTP Request: GET https://export.arxiv.org/api/query?search_query=ti%3A%22RNAsolo+a+repository+of+cleaned+PDB+derived+RNA+3D+structures%22&start=0&max_results=5 "HTTP/1.1 200 OK"
+15:57:53 [INFO] HTTP Request: GET https://api.unpaywall.org/v2/10.1038/nrd4278?email=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:57:54 [INFO] HTTP Request: GET https://www.nature.com/articles/nrd4278.pdf "HTTP/1.1 200 OK"
+15:57:55 [INFO] HTTP Request: GET http://arxiv.org/abs/2102.09844 "HTTP/1.1 301 Moved Permanently"
+15:57:55 [INFO] HTTP Request: GET https://arxiv.org/abs/2102.09844 "HTTP/1.1 200 OK"
+15:57:55 [INFO] HTTP Request: GET https://arxiv.org/pdf/2102.09844 "HTTP/1.1 200 OK"
+15:57:56 [WARNING] get_full_text: ref_id=1 exceeded 30s fetch budget; returning abstract_only.
+15:57:56 [WARNING] get_full_text: ref_id=6 exceeded 30s fetch budget; returning abstract_only.
+15:57:56 [WARNING] get_full_text: ref_id=7 exceeded 30s fetch budget; returning abstract_only.
+15:57:56 [WARNING] get_full_text: ref_id=11 exceeded 30s fetch budget; returning abstract_only.
+15:57:56 [WARNING] get_full_text: ref_id=22 exceeded 30s fetch budget; returning abstract_only.
+15:57:56 [WARNING] get_full_text: ref_id=33 exceeded 30s fetch budget; returning abstract_only.
+15:57:56 [INFO] HTTP Request: GET http://arxiv.org/abs/1706.08566 "HTTP/1.1 301 Moved Permanently"
+15:57:56 [INFO] HTTP Request: GET http://arxiv.org/pdf/2207.01586v1 "HTTP/1.1 301 Moved Permanently"
+15:57:56 [INFO] HTTP Request: GET http://arxiv.org/abs/2203.12742 "HTTP/1.1 301 Moved Permanently"
+15:57:56 [INFO] HTTP Request: GET https://arxiv.org/abs/1706.08566 "HTTP/1.1 200 OK"
+15:57:56 [INFO] HTTP Request: GET http://arxiv.org/abs/1802.08219 "HTTP/1.1 301 Moved Permanently"
+15:57:56 [INFO] HTTP Request: GET https://arxiv.org/abs/1802.08219 "HTTP/1.1 200 OK"
+15:57:56 [INFO] HTTP Request: GET https://api.unpaywall.org/v2/10.1016/0022-2836(73)90011-9?email=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:57:56 [INFO] HTTP Request: GET https://arxiv.org/abs/2203.12742 "HTTP/1.1 200 OK"
+15:57:56 [INFO] HTTP Request: GET https://arxiv.org/pdf/2207.01586v1 "HTTP/1.1 200 OK"
+15:57:56 [INFO] HTTP Request: GET https://arxiv.org/pdf/1802.08219 "HTTP/1.1 200 OK"
+15:57:56 [INFO] HTTP Request: GET https://arxiv.org/pdf/1706.08566 "HTTP/1.1 200 OK"
+15:57:56 [INFO] HTTP Request: GET https://arxiv.org/pdf/2203.12742 "HTTP/1.1 200 OK"
+15:57:56 [INFO] HTTP Request: GET https://doi.org/10.1021/acs.chemrev.7b00427 "HTTP/1.1 302 Found"
+15:57:56 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/DOI:10.1016/0022-2836(73)90011-9?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 200 OK"
+15:57:56 [INFO] HTTP Request: GET https://pubs.acs.org/doi/10.1021/acs.chemrev.7b00427 "HTTP/1.1 403 Forbidden"
+15:57:56 [INFO] HTTP Request: GET https://api.unpaywall.org/v2/10.1021/acs.chemrev.7b00427?email=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:57:56 [INFO] HTTP Request: GET https://export.arxiv.org/api/query?search_query=ti%3A%22Unbiased+Stochastic+Proximal+Solver+for+Graph+Neural+Networks+with+Equilibrium+States%22&start=0&max_results=5 "HTTP/1.1 429 Unknown Error"
+15:57:56 [WARNING] arxiv: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:57:56 [INFO] HTTP Request: GET https://pubs.acs.org/doi/pdf/10.1021/acs.chemrev.7b00427 "HTTP/1.1 403 Forbidden"
+15:57:57 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/DOI:10.1021/acs.chemrev.7b00427?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 200 OK"
+15:57:58 [INFO] HTTP Request: GET https://pubs.acs.org/doi/pdf/10.1021/acs.chemrev.7b00427 "HTTP/1.1 403 Forbidden"
+15:57:58 [INFO] HTTP Request: GET https://www.frontiersin.org/articles/10.3389/frai.2020.580607/pdf "HTTP/1.1 301 Moved Permanently"
+15:57:58 [INFO] HTTP Request: GET https://www.frontiersin.org/journals/artificial-intelligence/articles/10.3389/frai.2020.580607/pdf "HTTP/1.1 200 OK"
+15:57:58 [INFO] HTTP Request: GET https://www.osti.gov/biblio/1817245 "HTTP/1.1 200 "
+15:57:58 [INFO] HTTP Request: GET https://api.unpaywall.org/v2/10.1126/science.abe5650?email=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:57:59 [INFO] HTTP Request: GET https://www.osti.gov/biblio/1817245 "HTTP/1.1 200 "
+15:57:59 [INFO] HTTP Request: GET https://api.unpaywall.org/v2/10.48550/arXiv.2509.24655?email=diyanapv%40gmail.com "HTTP/1.1 404 Not Found"
+15:57:59 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/DOI:10.1126/science.abe5650?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 200 OK"
+15:57:59 [INFO] HTTP Request: GET https://www.science.org/cms/asset/9ac645c8-bd25-4d12-b3b7-300def43d3a3/science.abe5650.v1.pdf "HTTP/1.1 403 Forbidden"
+15:57:59 [WARNING] get_full_text: ref_id=38 exceeded 30s fetch budget; returning abstract_only.
+15:57:59 [INFO] HTTP Request: GET https://api.unpaywall.org/v2/10.1016/j.jmb.2007.06.058?email=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:57:59 [INFO] HTTP Request: GET https://doi.org/10.1038/s42256-022-00571-8 "HTTP/1.1 302 Found"
+15:57:59 [INFO] HTTP Request: GET https://export.arxiv.org/pdf/2509.24655 "HTTP/1.1 200 OK"
+15:58:00 [INFO] HTTP Request: GET https://www.ncbi.nlm.nih.gov/pmc/articles/2720064 "HTTP/1.1 301 Moved Permanently"
+15:58:00 [INFO] HTTP Request: GET https://pmc.ncbi.nlm.nih.gov/articles/2720064 "HTTP/1.1 301 Moved Permanently"
+15:58:00 [INFO] HTTP Request: GET https://www.nature.com/articles/s42256-022-00571-8 "HTTP/1.1 200 OK"
+15:58:00 [INFO] HTTP Request: GET https://pmc.ncbi.nlm.nih.gov/articles/2720064/ "HTTP/1.1 301 Moved Permanently"
+15:58:00 [WARNING] get_full_text: ref_id=40 exceeded 30s fetch budget; returning abstract_only.
+15:58:00 [INFO] HTTP Request: GET http://arxiv.org/abs/2306.10759 "HTTP/1.1 301 Moved Permanently"
+15:58:00 [INFO] HTTP Request: GET https://arxiv.org/abs/2306.10759 "HTTP/1.1 200 OK"
+15:58:00 [INFO] HTTP Request: GET https://api.unpaywall.org/v2/10.52202/068431-1986?email=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:58:00 [INFO] HTTP Request: GET https://arxiv.org/pdf/2306.10759 "HTTP/1.1 200 OK"
+15:58:00 [INFO] HTTP Request: GET https://www.nature.com/articles/s42256-022-00571-8.pdf "HTTP/1.1 200 OK"
+15:58:00 [INFO] HTTP Request: GET https://pmc.ncbi.nlm.nih.gov/articles/PMC2720064/ "HTTP/1.1 200 OK"
+15:58:00 [INFO] HTTP Request: GET https://pmc.ncbi.nlm.nih.gov/articles/PMC2720064/pdf/nihms30871.pdf "HTTP/1.1 200 OK"
+15:58:01 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/DOI:10.52202/068431-1986?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 404 Not Found"
+15:58:02 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/DOI:10.1016/j.jmb.2007.06.058?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 200 OK"
+15:58:02 [INFO] HTTP Request: GET https://europepmc.org/articles/pmc2720064?pdf=render "HTTP/1.1 302 Found"
+15:58:02 [INFO] HTTP Request: GET https://europepmc.org/api/getPdf?pmcid=PMC2720064 "HTTP/1.1 500 "
+15:58:02 [INFO] HTTP Request: GET https://api.unpaywall.org/v2/10.1145/3627673.3679604?email=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:58:02 [INFO] HTTP Request: GET https://export.arxiv.org/api/query?search_query=ti%3A%22DSSR+an+integrated+software+tool+for+dissecting+the+spatial+structure+of+RNA%22&start=0&max_results=5 "HTTP/1.1 429 Unknown Error"
+15:58:02 [WARNING] arxiv: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:58:02 [INFO] HTTP Request: GET http://arxiv.org/abs/2410.11933 "HTTP/1.1 301 Moved Permanently"
+15:58:03 [INFO] HTTP Request: GET https://arxiv.org/abs/2410.11933 "HTTP/1.1 200 OK"
+15:58:03 [INFO] HTTP Request: GET https://arxiv.org/pdf/2410.11933 "HTTP/1.1 200 OK"
+15:58:03 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Representing+Long+Range+Context+for+Graph+Neural+Networks+with+Global+Attention&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:58:03 [INFO] HTTP Request: GET http://arxiv.org/abs/2410.12459 "HTTP/1.1 301 Moved Permanently"
+15:58:03 [INFO] HTTP Request: GET https://arxiv.org/abs/2410.12459 "HTTP/1.1 200 OK"
+15:58:03 [INFO] HTTP Request: GET https://arxiv.org/pdf/2410.12459 "HTTP/1.1 200 OK"
+15:58:04 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=NodeFormer+A+Scalable+Graph+Structure+Learning+Transformer+for+Node+Classification&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:58:04 [INFO] HTTP Request: GET http://arxiv.org/pdf/2306.08385 "HTTP/1.1 301 Moved Permanently"
+15:58:04 [INFO] HTTP Request: GET https://europepmc.org/articles/pmc2720064?pdf=render "HTTP/1.1 302 Found"
+15:58:04 [INFO] HTTP Request: GET https://europepmc.org/api/getPdf?pmcid=PMC2720064 "HTTP/1.1 500 "
+15:58:04 [WARNING] get_full_text: ref_id=46 exceeded 30s fetch budget; returning abstract_only.
+15:58:04 [INFO] HTTP Request: GET https://arxiv.org/pdf/2306.08385 "HTTP/1.1 200 OK"
+15:58:05 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/DOI:10.1145/3627673.3679604?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 200 OK"
+15:58:05 [WARNING] get_full_text: ref_id=48 exceeded 30s fetch budget; returning abstract_only.
+15:58:05 [INFO] HTTP Request: GET https://arxiv.org/pdf/2310.10064 "HTTP/1.1 200 OK"
+15:58:05 [INFO] HTTP Request: GET https://api.unpaywall.org/v2/10.1007/978-981-96-8180-8_32?email=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:58:06 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Do+Transformers+Really+Perform+Badly+for+Graph+Representation&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:58:08 [WARNING] get_full_text: ref_id=51 exceeded 30s fetch budget; returning abstract_only.
+15:58:08 [INFO] HTTP Request: GET https://europepmc.org/articles/pmc2720064?pdf=render "HTTP/1.1 302 Found"
+15:58:08 [INFO] HTTP Request: GET https://export.arxiv.org/api/query?search_query=ti%3A%22Bridging+biomolecular+modalities+for+knowledge+transfer+in+bio+language+models%22&start=0&max_results=5 "HTTP/1.1 429 Unknown Error"
+15:58:08 [WARNING] arxiv: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:58:08 [INFO] HTTP Request: GET https://europepmc.org/api/getPdf?pmcid=PMC2720064 "HTTP/1.1 500 "
+15:58:09 [WARNING] get_full_text: ref_id=52 exceeded 30s fetch budget; returning abstract_only.
+15:58:11 [INFO] HTTP Request: GET https://export.arxiv.org/api/query?search_query=ti%3A%22Environment+and+exposure+to+solvent+of+protein+atoms+Lysozyme+and+insulin%22&start=0&max_results=5 "HTTP/1.1 429 Unknown Error"
+15:58:11 [WARNING] arxiv: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:58:17 [INFO] HTTP Request: GET https://export.arxiv.org/api/query?search_query=ti%3A%22Geometric+deep+learning+of+RNA+structure%22&start=0&max_results=5 "HTTP/1.1 429 Unknown Error"
+15:58:17 [WARNING] arxiv: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:58:20 [WARNING] get_full_text: ref_id=59 exceeded 30s fetch budget; returning abstract_only.
+15:58:23 [INFO] HTTP Request: GET https://export.arxiv.org/api/query?search_query=ti%3A%22GLoRa+A+Benchmark+to+Evaluate+the+Ability+to+Learn+Long+Range+Dependencies+in+Graphs%22&start=0&max_results=5 "HTTP/1.1 429 Unknown Error"
+15:58:23 [WARNING] arxiv: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:58:26 [WARNING] get_full_text: ref_id=66 exceeded 30s fetch budget; returning abstract_only.
+15:58:26 [WARNING] get_full_text: ref_id=67 exceeded 30s fetch budget; returning abstract_only.
+15:58:26 [INFO] HTTP Request: GET https://export.arxiv.org/api/query?search_query=ti%3A%22Efficient+and+Diverse+De+Novo+Protein+Backbone+Design+with+SE+3+Equivariant+Diffusion%22&start=0&max_results=5 "HTTP/1.1 429 Unknown Error"
+15:58:26 [WARNING] arxiv: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:58:28 [WARNING] get_full_text: ref_id=71 exceeded 30s fetch budget; returning abstract_only.
+15:58:29 [WARNING] get_full_text: ref_id=73 exceeded 30s fetch budget; returning abstract_only.
+15:58:30 [WARNING] get_full_text: ref_id=77 exceeded 30s fetch budget; returning abstract_only.
+15:58:33 [INFO] HTTP Request: GET https://export.arxiv.org/api/query?search_query=ti%3A%22GLoRa+A+Benchmark+to+Evaluate+the+Ability+to+Learn+Long+Range+Dependencies+in+Graphs%22&start=0&max_results=5 "HTTP/1.1 429 Unknown Error"
+15:58:33 [WARNING] arxiv: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:58:34 [WARNING] get_full_text: ref_id=84 exceeded 30s fetch budget; returning abstract_only.
+15:58:34 [WARNING] get_full_text: ref_id=86 exceeded 30s fetch budget; returning abstract_only.
+15:58:35 [WARNING] get_full_text: ref_id=87 exceeded 30s fetch budget; returning abstract_only.
+15:58:37 [INFO] Triage complete: {'NEEDS_CLAIM': 55, 'NEEDS_BOTH': 12, 'CLEAR_VALID': 13, 'CLEAR_FABRICATED': 3, 'NEEDS_METADATA': 3}
+15:58:37 [INFO] STAGE agentic_triage seconds=1.869 refs=86
+15:58:37 [INFO] Agentic triage: 16 clear-cut, 70 need agents (meta=3, claim=55, both=12)
+15:58:37 [INFO] pre_retrieve: using 67 pre-fetched fulltexts (fetch ran in parallel with L3)
+15:58:37 [INFO] Pre-retrieving passages for 67 references (concurrency=15)
+15:58:37 [DEBUG] Building index from IDs objects
+15:58:39 [INFO] Loading dense model: all-MiniLM-L6-v2
+15:58:39 [INFO] Use pytorch device_name: cpu
+15:58:39 [INFO] Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+15:58:39 [INFO] HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/modules.json "HTTP/1.1 307 Temporary Redirect"
+15:58:39 [INFO] HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/c9745ed1d9f207416be6d2e6f8de32d1f16199bf/modules.json "HTTP/1.1 200 OK"
+15:58:40 [INFO] HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/config_sentence_transformers.json "HTTP/1.1 307 Temporary Redirect"
+15:58:40 [INFO] HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/c9745ed1d9f207416be6d2e6f8de32d1f16199bf/config_sentence_transformers.json "HTTP/1.1 200 OK"
+15:58:40 [INFO] HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/config_sentence_transformers.json "HTTP/1.1 307 Temporary Redirect"
+15:58:40 [INFO] HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/c9745ed1d9f207416be6d2e6f8de32d1f16199bf/config_sentence_transformers.json "HTTP/1.1 200 OK"
+15:58:40 [INFO] HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/README.md "HTTP/1.1 307 Temporary Redirect"
+15:58:40 [INFO] HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/c9745ed1d9f207416be6d2e6f8de32d1f16199bf/README.md "HTTP/1.1 200 OK"
+15:58:40 [INFO] HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/modules.json "HTTP/1.1 307 Temporary Redirect"
+15:58:40 [INFO] HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/c9745ed1d9f207416be6d2e6f8de32d1f16199bf/modules.json "HTTP/1.1 200 OK"
+15:58:40 [INFO] HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/sentence_bert_config.json "HTTP/1.1 307 Temporary Redirect"
+15:58:40 [INFO] HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/c9745ed1d9f207416be6d2e6f8de32d1f16199bf/sentence_bert_config.json "HTTP/1.1 200 OK"
+15:58:41 [INFO] HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/adapter_config.json "HTTP/1.1 404 Not Found"
+15:58:41 [INFO] HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+15:58:41 [INFO] HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/c9745ed1d9f207416be6d2e6f8de32d1f16199bf/config.json "HTTP/1.1 200 OK"
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|██████████| 103/103 [00:00<00:00, 11266.48it/s]
+[1mBertModel LOAD REPORT[0m from: sentence-transformers/all-MiniLM-L6-v2
+Key                     | Status     |  | 
+------------------------+------------+--+-
+embeddings.position_ids | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+15:58:41 [INFO] HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+15:58:41 [INFO] HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/c9745ed1d9f207416be6d2e6f8de32d1f16199bf/config.json "HTTP/1.1 200 OK"
+15:58:41 [INFO] HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/tokenizer_config.json "HTTP/1.1 307 Temporary Redirect"
+15:58:41 [INFO] HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/c9745ed1d9f207416be6d2e6f8de32d1f16199bf/tokenizer_config.json "HTTP/1.1 200 OK"
+15:58:41 [INFO] HTTP Request: GET https://huggingface.co/api/models/sentence-transformers/all-MiniLM-L6-v2/tree/main/additional_chat_templates?recursive=false&expand=false "HTTP/1.1 404 Not Found"
+15:58:41 [INFO] HTTP Request: GET https://huggingface.co/api/models/sentence-transformers/all-MiniLM-L6-v2/tree/main?recursive=true&expand=false "HTTP/1.1 200 OK"
+15:58:42 [INFO] HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/1_Pooling/config.json "HTTP/1.1 307 Temporary Redirect"
+15:58:42 [INFO] HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/c9745ed1d9f207416be6d2e6f8de32d1f16199bf/1_Pooling%2Fconfig.json "HTTP/1.1 200 OK"
+15:58:42 [INFO] HTTP Request: GET https://huggingface.co/api/models/sentence-transformers/all-MiniLM-L6-v2 "HTTP/1.1 200 OK"
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 78.09it/s]
+15:58:44 [INFO] Loading CrossEncoder reranker: cross-encoder/ms-marco-MiniLM-L-12-v2
+15:58:44 [INFO] HTTP Request: HEAD https://huggingface.co/cross-encoder/ms-marco-MiniLM-L-12-v2/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+15:58:44 [INFO] HTTP Request: HEAD https://huggingface.co/cross-encoder/ms-marco-MiniLM-L12-v2/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+15:58:44 [INFO] HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/cross-encoder/ms-marco-MiniLM-L12-v2/7b0235231ca2674cb8ca8f022859a6eba2b1c968/config.json "HTTP/1.1 200 OK"
+Loading weights:   0%|          | 0/201 [00:00<?, ?it/s]Loading weights: 100%|██████████| 201/201 [00:00<00:00, 11110.96it/s]
+[1mBertForSequenceClassification LOAD REPORT[0m from: cross-encoder/ms-marco-MiniLM-L-12-v2
+Key                          | Status     |  | 
+-----------------------------+------------+--+-
+bert.embeddings.position_ids | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+15:58:44 [INFO] HTTP Request: HEAD https://huggingface.co/cross-encoder/ms-marco-MiniLM-L-12-v2/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+15:58:45 [INFO] HTTP Request: HEAD https://huggingface.co/cross-encoder/ms-marco-MiniLM-L12-v2/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+15:58:45 [INFO] HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/cross-encoder/ms-marco-MiniLM-L12-v2/7b0235231ca2674cb8ca8f022859a6eba2b1c968/config.json "HTTP/1.1 200 OK"
+15:58:45 [INFO] HTTP Request: HEAD https://huggingface.co/cross-encoder/ms-marco-MiniLM-L-12-v2/resolve/main/tokenizer_config.json "HTTP/1.1 307 Temporary Redirect"
+15:58:45 [INFO] HTTP Request: HEAD https://huggingface.co/cross-encoder/ms-marco-MiniLM-L12-v2/resolve/main/tokenizer_config.json "HTTP/1.1 307 Temporary Redirect"
+15:58:45 [INFO] HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/cross-encoder/ms-marco-MiniLM-L12-v2/7b0235231ca2674cb8ca8f022859a6eba2b1c968/tokenizer_config.json "HTTP/1.1 200 OK"
+15:58:45 [INFO] HTTP Request: GET https://huggingface.co/api/models/cross-encoder/ms-marco-MiniLM-L-12-v2/tree/main/additional_chat_templates?recursive=false&expand=false "HTTP/1.1 307 Temporary Redirect"
+15:58:45 [INFO] HTTP Request: GET https://huggingface.co/api/models/cross-encoder/ms-marco-MiniLM-L12-v2/tree/main/additional_chat_templates?recursive=false&expand=false "HTTP/1.1 404 Not Found"
+15:58:46 [INFO] HTTP Request: GET https://huggingface.co/api/models/cross-encoder/ms-marco-MiniLM-L-12-v2/tree/main?recursive=true&expand=false "HTTP/1.1 307 Temporary Redirect"
+15:58:46 [INFO] HTTP Request: GET https://huggingface.co/api/models/cross-encoder/ms-marco-MiniLM-L12-v2/tree/main?recursive=true&expand=false "HTTP/1.1 200 OK"
+15:58:46 [INFO] HTTP Request: HEAD https://huggingface.co/cross-encoder/ms-marco-MiniLM-L-12-v2/resolve/main/README.md "HTTP/1.1 307 Temporary Redirect"
+15:58:46 [INFO] HTTP Request: HEAD https://huggingface.co/cross-encoder/ms-marco-MiniLM-L12-v2/resolve/main/README.md "HTTP/1.1 307 Temporary Redirect"
+15:58:46 [INFO] HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/cross-encoder/ms-marco-MiniLM-L12-v2/7b0235231ca2674cb8ca8f022859a6eba2b1c968/README.md "HTTP/1.1 200 OK"
+15:58:46 [INFO] Use pytorch device: cpu
+15:58:46 [INFO] HTTP Request: GET https://huggingface.co/api/models/cross-encoder/ms-marco-MiniLM-L-12-v2 "HTTP/1.1 307 Temporary Redirect"
+15:58:47 [INFO] HTTP Request: GET https://huggingface.co/api/models/cross-encoder/ms-marco-MiniLM-L12-v2 "HTTP/1.1 200 OK"
+15:58:47 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 81.07it/s]
+15:58:49 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 100.66it/s]
+15:58:50 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 67.18it/s]
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 58.45it/s]
+15:58:53 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 76.51it/s]
+15:58:55 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 64.44it/s]
+15:58:56 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 67.55it/s]
+15:58:58 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 43.83it/s]
+15:59:00 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 54.69it/s]
+15:59:02 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 44.52it/s]
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 53.10it/s]
+15:59:05 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 50.28it/s]
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 79.48it/s]
+15:59:06 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 87.62it/s]
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 65.42it/s]
+15:59:08 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 51.92it/s]
+15:59:10 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 83.70it/s]
+15:59:12 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 65.53it/s]
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 98.60it/s]
+15:59:14 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 67.04it/s]
+15:59:15 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 84.39it/s]
+15:59:17 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 71.89it/s]
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 56.29it/s]
+15:59:21 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 45.40it/s]
+15:59:22 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 52.56it/s]
+15:59:24 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 62.14it/s]
+15:59:27 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 114.68it/s]
+15:59:28 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 74.96it/s]
+15:59:30 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 61.06it/s]
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 82.43it/s]
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 69.49it/s]
+15:59:32 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 63.85it/s]
+15:59:34 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 55.30it/s]
+15:59:36 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 62.27it/s]
+15:59:38 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 85.45it/s]
+15:59:39 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 68.44it/s]
+15:59:42 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 64.90it/s]
+15:59:43 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 51.09it/s]
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 93.39it/s]
+15:59:46 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 66.06it/s]
+15:59:48 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 76.90it/s]
+15:59:50 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 64.46it/s]
+15:59:51 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 65.18it/s]
+15:59:56 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 118.25it/s]
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 125.11it/s]
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 82.62it/s]
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 97.17it/s]
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 112.92it/s]
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 116.76it/s]
+15:59:59 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 49.03it/s]
+16:00:01 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 63.70it/s]
+16:00:03 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 86.17it/s]
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 55.40it/s]
+16:00:06 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 70.92it/s]
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 56.28it/s]
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=1 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=2 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=3 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=4 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=5 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=6 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=7 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=8 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=9 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=10 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=11 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=12 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=13 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=14 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=15 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=16 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=17 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=18 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=19 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=20 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=21 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=22 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=23 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=24 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=25 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=26 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=27 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=28 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=29 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=30 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=31 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=32 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=33 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=34 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=35 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=36 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=37 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=38 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=39 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=40 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=41 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=42 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=43 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=44 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=45 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=46 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=47 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=48 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=49 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=50 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=51 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=52 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=53 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=54 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=55 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=56 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=57 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=58 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=59 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=60 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=61 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=62 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=63 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=64 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=65 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=66 total=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve.progress seconds=0 done=67 total=67
+16:00:08 [INFO] STAGE pre_retrieve.retrieve_block seconds=91.222 refs=67
+16:00:08 [INFO] STAGE pre_retrieve.index_build_total seconds=62.319 refs=67
+16:00:08 [INFO] STAGE pre_retrieve.retrieve_total seconds=28.749 refs=67
+16:00:08 [INFO] STAGE agentic_pre_retrieve seconds=91.223 refs=86
+16:00:17 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:00:18 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:00:18 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:00:19 [INFO] HTTP Request: GET https://api.crossref.org/works/10.1093%2Fbenz%2F9780199773787.article.b00187341?mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+16:00:19 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/ARXIV:2011.14115?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 200 OK"
+16:00:26 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:00:27 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:00:29 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:00:29 [WARNING] MetadataAgent hit max_tool_rounds (3)
+16:00:32 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:00:43 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:00:46 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:00:48 [INFO] HTTP Request: GET https://serpapi.com/search?engine=google_scholar&q=Ussing%2C+Stefan+or+Stephan+Peter+Johannes+Hjort&api_key=d950b619d2527f002d7edd9af09976a7c8295cee554f8eb26d94e457056f1bd3&num=3 "HTTP/1.1 200 OK"
+16:01:02 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:01:26 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:01:26 [INFO] STAGE agentic_metadata_dispatch seconds=169.084 count=3 concurrency=15
+16:01:31 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:01:32 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:01:33 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:01:33 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:01:33 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:01:33 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:01:33 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:01:33 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:01:35 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:01:36 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:01:36 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:01:36 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:01:38 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:01:38 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:01:39 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:01:40 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:01:40 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:01:40 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:01:40 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:01:40 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:01:41 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:01:42 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:01:43 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:01:44 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:01:44 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:01:45 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:01:45 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:01:45 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:01:47 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:01:48 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:01:48 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:01:49 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:01:49 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:01:49 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:01:49 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:01:50 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:01:50 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:01:52 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:01:52 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:01:53 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:01:53 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:01:54 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:01:54 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:01:56 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:01:56 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:01:57 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:01:57 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:01:58 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:01:58 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:01:58 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:02:00 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:02:00 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:02:01 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:02:01 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:02:06 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:02:06 [INFO] STAGE agentic_claim_dispatch seconds=39.622 count=55 concurrency=15
+16:02:09 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:02:09 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:02:10 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:02:10 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=On+the+expressive+power+of+geometric+graph+neural+networks&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+16:02:10 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:02:10 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AOn+the+expressive+power+of+geometric+graph+neural+networks&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+16:02:10 [INFO] HTTP Request: GET https://api.crossref.org/works/10.1093%2Fnar%2F28.1.235?mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+16:02:10 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:02:11 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Implicit+Graph+Neural+Networks+A+Monotone+Operator+Viewpoint&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 429 "
+16:02:11 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:02:11 [WARNING] semantic_scholar: HTTP 429 (attempt 1/3), retrying in 1.0s
+16:02:11 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:02:12 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:02:12 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:02:12 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Optuna+A+next+generation+hyperparameter+optimization+framework&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+16:02:12 [INFO] HTTP Request: GET https://api.crossref.org/works/10.3389%2Ffrai.2020.580607?mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+16:02:13 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:02:13 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:02:14 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Optimization+Induced+Graph+Implicit+Nonlinear+Diffusion&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+16:02:14 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AOptimization+Induced+Graph+Implicit+Nonlinear+Diffusion&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+16:02:14 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:02:14 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Implicit+Graph+Neural+Networks+A+Monotone+Operator+Viewpoint&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+16:02:14 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:02:15 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/ARXIV:2006.10503?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 200 OK"
+16:02:15 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AImplicit+Graph+Neural+Networks+A+Monotone+Operator+Viewpoint&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+16:02:15 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:02:15 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3ASE+3+Transformers+3D+Roto+Translation+Equivariant+Attention+Networks&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+16:02:15 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:02:16 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:02:16 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AOptuna+A+next+generation+hyperparameter+optimization+framework&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+16:02:16 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/DOI:10.3389/frai.2020.580607?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 429 "
+16:02:16 [WARNING] semantic_scholar: HTTP 429 (attempt 1/3), retrying in 1.0s
+16:02:16 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:02:16 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:02:17 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/DOI:10.1093/nar/28.1.235?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 200 OK"
+16:02:17 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:02:18 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:02:18 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/DOI:10.3389/frai.2020.580607?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 200 OK"
+16:02:18 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:02:19 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:02:19 [WARNING] MetadataAgent hit max_tool_rounds (3)
+16:02:19 [INFO] HTTP Request: GET https://api.crossref.org/works/10.1145%2F3292500.3330701?mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+16:02:19 [WARNING] MetadataAgent hit max_tool_rounds (3)
+16:02:19 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:02:22 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:02:22 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:02:24 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:02:25 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:02:25 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:02:25 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:02:25 [INFO] HTTP Request: GET https://api.crossref.org/works/10.1007%2F978-981-16-6054-2_5?mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+16:02:25 [WARNING] MetadataAgent hit max_tool_rounds (3)
+16:02:26 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:02:26 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:02:26 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:02:28 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:02:29 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:02:29 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:02:30 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:02:32 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:02:36 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:02:37 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:02:38 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:02:38 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:02:38 [WARNING] claim verdict count mismatch for 3: 5 verdicts, 6 citations
+16:02:40 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:02:42 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:02:43 [INFO] HTTP Request: GET https://serpapi.com/search?engine=google_scholar&q=On+the+expressive+power+of+geometric+graph+neural+networks&api_key=d950b619d2527f002d7edd9af09976a7c8295cee554f8eb26d94e457056f1bd3&num=3 "HTTP/1.1 200 OK"
+16:02:44 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:02:45 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:02:47 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:02:53 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:02:55 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:03:05 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:03:09 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:03:12 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:03:14 [INFO] HTTP Request: GET https://serpapi.com/search?engine=google_scholar&q=Graph+Neural+Networks+for+Maximum+Constraint+Satisfaction&api_key=d950b619d2527f002d7edd9af09976a7c8295cee554f8eb26d94e457056f1bd3&num=3 "HTTP/1.1 200 OK"
+16:03:27 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:03:41 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+16:03:41 [INFO] STAGE agentic_both_dispatch seconds=95.743 count=12 concurrency=15
+16:03:41 [INFO] STAGE L5_agentic seconds=376.082 refs=86
+16:03:41 [INFO] STAGE L4_from_agentic seconds=0.002 refs=86
+16:03:41 [INFO] report_cache: saved 5be0ad1105cf4758f06e
+16:03:41 [INFO] STAGE pipeline_total seconds=423.392 mode=agentic file=kND7h1kD53.pdf
+16:03:41 [INFO] [kND7h1kD53] done in 423.4s | refs=93 full=40 abs=9 none=21 | sup=64 misrep=6 neutral=19 no_verdict=4 | $0.0000
+16:03:41 [INFO] done — summary at /home/diyana-muhammed/Desktop/PhD/code/checkcitation/experiment/paper/prevalence/results/run_summary.json

@@ -1,0 +1,19 @@
+{
+  "paper_id": "kND7h1kD53",
+  "ref_id": "65",
+  "citing_sentence": "3D RNA structures are generated using RhoFold [65] following prior works [57].",
+  "cited_title": "E2Efold-3D: End-to-End Deep Learning Method for accurate de novo RNA 3D Structure Prediction",
+  "cited_doi": null,
+  "primary_verdict": "CONTRADICTS",
+  "primary_explanation": "The cited paper (reference [65]) is E2Efold-3D, which introduces a different method named E2Efold-3D for de novo RNA 3D structure prediction. It does not present or document a tool called RhoFold, so citing it as the source for RhoFold is incorrect.",
+  "secondopinion_verdict": "NOT_SUPPORTED",
+  "secondopinion_reasoning": "The cited paper does not mention RhoFold or its use in generating 3D RNA structures. Instead, it introduces E2Efold-3D, a deep learning-based method for RNA 3D structure prediction. The paper discusses the challenges of RNA structure determination and the development of computational methods, but RhoFold is not referenced or described as part of their methodology.",
+  "secondopinion_confidence": "high",
+  "agrees": true,
+  "cited_text_chars": 43888,
+  "citing_context_chars": 4078,
+  "cited_text_source": "oa_url",
+  "model": "gpt-4o",
+  "cost_usd": 0.029825,
+  "error": null
+}

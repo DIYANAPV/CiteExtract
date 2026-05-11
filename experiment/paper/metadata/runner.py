@@ -18,6 +18,19 @@ _REPO_ROOT = _PAPER_ROOT.parent.parent
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
+# `citeextract/config/` is a YAML data directory at the repo root that Python
+# would otherwise treat as a namespace package, shadowing `citeextract.config`
+# (a real module at `citeextract/backend/config.py`). The editable install's
+# finder maps `citeextract` -> `citeextract/backend` correctly, but it is
+# *appended* to sys.meta_path so PathFinder wins. Promote it to position 0.
+try:
+    import __editable___citeextract_0_1_0_finder as _ef  # type: ignore
+    if _ef._EditableFinder in sys.meta_path:
+        sys.meta_path.remove(_ef._EditableFinder)
+    sys.meta_path.insert(0, _ef._EditableFinder)
+except ImportError:
+    pass
+
 try:
     from dotenv import load_dotenv
     load_dotenv(_REPO_ROOT / ".env", override=False)
@@ -53,8 +66,24 @@ DEFAULT_CELLS: list[tuple[str, str]] = [
     ("gpt-4o-mini", "llm_with_search"),
     ("gpt-4o", "llm_only"),
     ("gpt-4o", "llm_with_search"),
+    ("gpt-5-min", "llm_only"),
+    ("gpt-5-min", "llm_with_search"),
+    ("gpt-5-med", "llm_only"),
+    ("gpt-5-med", "llm_with_search"),
+    ("gpt-5.5-min", "llm_only"),
+    ("gpt-5.5-min", "llm_with_search"),
+    ("gpt-5.5-med", "llm_only"),
+    ("gpt-5.5-med", "llm_with_search"),
     ("our_system", "production"),
+    ("our_system", "production_gpt55med"),
+    ("our_system", "production_gpt5mini"),
 ]
+
+PRODUCTION_VARIANTS: dict[str, dict] = {
+    "production":          {"agent_model": "gpt-4o-mini", "pricing": (0.15, 0.60)},
+    "production_gpt55med": {"agent_model": "gpt-5.5",     "pricing": (5.00, 30.00)},
+    "production_gpt5mini": {"agent_model": "gpt-5-mini",  "pricing": (0.25,  2.00)},
+}
 
 CSV_COLUMNS = [
     "instance_id", "source", "gold_label", "predicted_verdict", "raw_verdict",
@@ -317,20 +346,26 @@ async def run_production_cell(
     *,
     concurrency: int,
     resume: bool,
+    variant: str = "production",
 ) -> list[Row]:
-    csv_path = _csv_path("our_system", "production")
-    partial_path = _partial_path("our_system", "production")
+    cfg = PRODUCTION_VARIANTS[variant]
+    agent_model: str = cfg["agent_model"]
+    in_rate, out_rate = cfg["pricing"]
+    cell_id = f"our_system | {variant} ({agent_model})"
+
+    csv_path = _csv_path("our_system", variant)
+    partial_path = _partial_path("our_system", variant)
 
     completed = load_completed_ids(partial_path) if resume else set()
     todo = [r for r in records if r["instance_id"] not in completed]
     if not todo:
-        log.info(f"[our_system | production] all done; regenerating CSV from partial")
+        log.info(f"[{cell_id}] all done; regenerating CSV from partial")
         rows = _read_partial_as_rows(partial_path, records)
         write_csv(csv_path, rows)
         return rows
 
     if completed:
-        log.info(f"[our_system | production] resume: {len(completed)} already in partial")
+        log.info(f"[{cell_id}] resume: {len(completed)} already in partial")
 
     from openai import AsyncOpenAI
     from citeextract.verification.cache import APICache
@@ -353,7 +388,7 @@ async def run_production_cell(
                     return MetadataAgent(
                         openai_client=openai_client,
                         tool_executor=tool_exec,
-                        model="gpt-4o-mini",
+                        model=agent_model,
                         temperature=0.0,
                         max_tool_rounds=3,
                         cost_tracker=CostTracker(),
@@ -365,6 +400,13 @@ async def run_production_cell(
                     cache=cache,
                     metadata_agent_factory=_agent_factory,
                 )
+                # Recompute cost using this variant's pricing — CostTracker
+                # uses config.toml's global rates (gpt-4o-mini), so the
+                # pres.cost_usd would otherwise be wrong for gpt-5/5.5/-mini.
+                cost_recomputed = (
+                    pres.prompt_tokens * in_rate / 1_000_000
+                    + pres.completion_tokens * out_rate / 1_000_000
+                )
                 row = Row(
                     instance_id=rec["instance_id"], source=rec["source"],
                     gold_label=rec["gold_label"],
@@ -374,7 +416,7 @@ async def run_production_cell(
                     raw_response="",
                     prompt_tokens=pres.prompt_tokens,
                     completion_tokens=pres.completion_tokens,
-                    cost_usd=round(pres.cost_usd, 6),
+                    cost_usd=round(cost_recomputed, 6),
                     latency_seconds=round(pres.latency_seconds, 3),
                     triage_route=pres.triage_route,
                     metadata_agent_called=pres.metadata_agent_called,
@@ -392,12 +434,12 @@ async def run_production_cell(
                 row = await fut
                 cell_rows.append(row)
             except Exception as e:
-                log.error(f"[our_system | production] task crashed: {e}")
+                log.error(f"[{cell_id}] task crashed: {e}")
             done += 1
             if done % 5 == 0 or done == len(todo):
                 el = time.perf_counter() - t0
                 rate = done / el if el else 0
-                log.info(f"[our_system | production] {done}/{len(todo)} ({rate:.1f}/s)")
+                log.info(f"[{cell_id}] {done}/{len(todo)} ({rate:.1f}/s)")
         return cell_rows
 
     async with httpx.AsyncClient(follow_redirects=True, timeout=httpx.Timeout(60.0)) as http_client:
@@ -406,7 +448,7 @@ async def run_production_cell(
     rows = _read_partial_as_rows(partial_path, records)
     write_csv(csv_path, rows)
     el = time.perf_counter() - t0
-    log.info(f"[our_system | production] cell done in {el:.1f}s; CSV: {csv_path}")
+    log.info(f"[{cell_id}] cell done in {el:.1f}s; CSV: {csv_path}")
     return rows
 
 
@@ -452,7 +494,7 @@ def print_mini_table(summaries: dict[str, dict]) -> None:
 
 
 def parse_args() -> argparse.Namespace:
-    ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    ap = argparse.ArgumentParser(description=(__doc__ or "").split("\n")[0])
     g = ap.add_mutually_exclusive_group(required=True)
     g.add_argument("--smoke", action="store_true")
     g.add_argument("--full", action="store_true")
@@ -500,6 +542,7 @@ async def main_async() -> int:
                 sample,
                 concurrency=args.production_concurrency,
                 resume=not args.no_resume,
+                variant=condition,
             )
         else:
             rows = await run_llm_cell(

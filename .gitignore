@@ -6,6 +6,7 @@ experiment/*
 !experiment/paper/**
 experiment/paper/**/__pycache__/
 
+Paper/*
 # Python build artefacts
 __pycache__/
 *.py[cod]

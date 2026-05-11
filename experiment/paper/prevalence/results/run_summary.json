@@ -1,0 +1,137 @@
+{
+  "n_papers": 20,
+  "n_ok": 2,
+  "n_skipped": 16,
+  "n_failed": 2,
+  "total_cost_usd": 0.131752,
+  "results": [
+    {
+      "paper_id": "kND7h1kD53",
+      "status": "skipped",
+      "n_citations": 93
+    },
+    {
+      "paper_id": "fru52tkjHf",
+      "status": "skipped",
+      "n_citations": 76
+    },
+    {
+      "paper_id": "5g9qls1V7Q",
+      "status": "failed",
+      "error": "InputTooLargeError('File is 26.0MB, exceeds 20MB limit.')",
+      "elapsed_s": 0.0
+    },
+    {
+      "paper_id": "PBvlBI6c30",
+      "status": "skipped",
+      "n_citations": 57
+    },
+    {
+      "paper_id": "MuhYHqLDZT",
+      "status": "skipped",
+      "n_citations": 62
+    },
+    {
+      "paper_id": "um9kHMof0c",
+      "status": "skipped",
+      "n_citations": 48
+    },
+    {
+      "paper_id": "AuOZDp4gy7",
+      "status": "skipped",
+      "n_citations": 169
+    },
+    {
+      "paper_id": "59TL8MpBzX",
+      "status": "skipped",
+      "n_citations": 53
+    },
+    {
+      "paper_id": "5xwyxupsLL",
+      "status": "skipped",
+      "n_citations": 30
+    },
+    {
+      "paper_id": "LP4Q7tPMbs",
+      "status": "skipped",
+      "n_citations": 40
+    },
+    {
+      "paper_id": "6h7HLx1kbH",
+      "status": "skipped",
+      "n_citations": 53
+    },
+    {
+      "paper_id": "t77EZLjvd5",
+      "status": "skipped",
+      "n_citations": 30
+    },
+    {
+      "paper_id": "uHGG3s0XyZ",
+      "status": "skipped",
+      "n_citations": 49
+    },
+    {
+      "paper_id": "qMm7tC1zvj",
+      "status": "skipped",
+      "n_citations": 88
+    },
+    {
+      "paper_id": "63ljkCGMhE",
+      "status": "failed",
+      "error": "InputTooLargeError('File is 24.7MB, exceeds 20MB limit.')",
+      "elapsed_s": 0.0
+    },
+    {
+      "paper_id": "T4qJuQCFAK",
+      "status": "skipped",
+      "n_citations": 38
+    },
+    {
+      "paper_id": "AmZ7uHDJiR",
+      "status": "skipped",
+      "n_citations": 80
+    },
+    {
+      "paper_id": "g42mGfR6We",
+      "status": "skipped",
+      "n_citations": 112
+    },
+    {
+      "paper_id": "0Nq1GvAGR0",
+      "status": "ok",
+      "n_citations": 71,
+      "coverage": {
+        "full_text": 30,
+        "abstract_only": 5,
+        "not_found": 27
+      },
+      "verdicts": {
+        "supported": 57,
+        "misrep": 1,
+        "neutral": 8,
+        "none": 5
+      },
+      "cost_usd": 0.091701,
+      "elapsed_s": 379.9
+    },
+    {
+      "paper_id": "z1Cvcovlms",
+      "status": "ok",
+      "n_citations": 44,
+      "coverage": {
+        "full_text": 13,
+        "abstract_only": 0,
+        "not_found": 18
+      },
+      "verdicts": {
+        "supported": 34,
+        "misrep": 2,
+        "neutral": 2,
+        "none": 6
+      },
+      "cost_usd": 0.040051,
+      "elapsed_s": 203.3
+    }
+  ]
+}

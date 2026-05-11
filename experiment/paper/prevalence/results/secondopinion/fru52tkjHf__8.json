@@ -1,0 +1,19 @@
+{
+  "paper_id": "fru52tkjHf",
+  "ref_id": "8",
+  "citing_sentence": "[Bernstein et al., 2018], may fail to converge [Karimireddy et al., 2019].",
+  "cited_title": "signSGD: compressed optimisation for non-convex problems",
+  "cited_doi": null,
+  "primary_verdict": "CONTRADICTS",
+  "primary_explanation": "The signSGD paper presents convergence results and convergence-rate theorems for SIGNSGD/SIGNUM under its assumptions and argues SIGNSGD achieves SGD-level convergence; it does not state that SignSGD may fail to converge in the general sense. Using Bernstein et al. to support the claim that SignSGD \"may fail to converge\" is therefore not supported by the cited paper (and in fact the paper offers positive convergence results), so the citation is inappropriate for that negative claim.",
+  "secondopinion_verdict": "SUPPORTED",
+  "secondopinion_reasoning": "The cited paper by Bernstein et al. (2018) discusses the convergence properties of SIGNSGD, noting that it can fail to converge under certain conditions. Specifically, the paper states that 'the sign of the stochastic gradient is a biased approximation to the true gradient, making it more challenging to analyse compared to standard SGD.' This aligns with the citing sentence's claim that SIGNSGD may fail to converge.",
+  "secondopinion_confidence": "high",
+  "agrees": false,
+  "cited_text_chars": 48475,
+  "citing_context_chars": 4074,
+  "cited_text_source": "arxiv",
+  "model": "gpt-4o",
+  "cost_usd": 0.036077,
+  "error": null
+}

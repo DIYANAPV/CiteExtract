@@ -1,5 +1,6 @@
 
 import logging
+import os
 from typing import Optional
 
 import httpx
@@ -18,6 +19,10 @@ async def search_by_title(
     *,
     errors: Optional[list[str]] = None,
 ) -> Optional[dict]:
+    # Allow callers to fully skip OpenReview (e.g. when its API is rate-limiting
+    # all requests). Same pattern as the SERPAPI / OpenAlex / arXiv gates.
+    if os.environ.get("CITEEXTRACT_SKIP_OPENREVIEW") == "1":
+        return None
     if not title or len(title.strip()) < 5:
         return None
 

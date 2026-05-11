@@ -1,0 +1,19 @@
+{
+  "paper_id": "z1Cvcovlms",
+  "ref_id": "12",
+  "citing_sentence": "Among them, REDDIT [12] contains the comments of 50 high-quality subreddits from the REDDIT PushShift data dumps (from 2006 to 2023), and we use the data collected after 2020 to ensure the up-to-dateness.",
+  "cited_title": "The Pushshift Reddit Dataset",
+  "cited_doi": "10.1609/icwsm.v14i1.7347",
+  "primary_verdict": "CONTRADICTS",
+  "primary_explanation": "The Pushshift Reddit paper documents a complete dump of Reddit submissions and comments spanning June 2005 to April 2019 and reports billions of comments across millions of subreddits. It does not describe a curated set of \"50 high-quality subreddits,\" nor does it cover data through 2023; therefore it does not support the citing sentence's claim about 50 subreddits or the 2006–2023 timeframe (or using data after 2020).",
+  "secondopinion_verdict": "NOT_SUPPORTED",
+  "secondopinion_reasoning": "The cited paper describes the Pushshift Reddit dataset, which includes data from 2005 to 2019, but does not mention any data collected after 2020. The citing sentence claims that data collected after 2020 is used, which is not supported by the information provided in the cited paper.",
+  "secondopinion_confidence": "high",
+  "agrees": true,
+  "cited_text_chars": 30633,
+  "citing_context_chars": 4100,
+  "cited_text_source": "unpaywall",
+  "model": "gpt-4o",
+  "cost_usd": 0.021063,
+  "error": null
+}

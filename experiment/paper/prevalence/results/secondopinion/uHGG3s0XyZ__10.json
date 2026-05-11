@@ -1,0 +1,19 @@
+{
+  "paper_id": "uHGG3s0XyZ",
+  "ref_id": "10",
+  "citing_sentence": "The former methods predict the disparity update and iteratively approximate the GT value in a GRU framework [27,24,16,48,5,10].",
+  "cited_title": "Neural Markov Random Field for Stereo Matching",
+  "cited_doi": "10.1109/cvpr52733.2024.00522",
+  "primary_verdict": "CONTRADICTS",
+  "primary_explanation": "The cited paper (10) presents a neural MRF approach for stereo matching, not a GRU-based iterative disparity-update method. The paper's own summary describes a data-driven MRF model and places the work in cost-volume / MRF-style approaches (not GRU iterative refinement), so it does not support being cited as an example of GRU-based iterative disparity prediction.",
+  "secondopinion_verdict": "NOT_SUPPORTED",
+  "secondopinion_reasoning": "The cited paper does not mention the use of a GRU framework for predicting disparity updates or iteratively approximating the GT value. Instead, it focuses on a Neural MRF model and a Disparity Proposal Network for stereo matching. The paper discusses neural message passing and embedding mean-field inference but does not reference GRU-based methods or iterative approximation of GT values.",
+  "secondopinion_confidence": "high",
+  "agrees": true,
+  "cited_text_chars": 36418,
+  "citing_context_chars": 4100,
+  "cited_text_source": "s2_fallback",
+  "model": "gpt-4o",
+  "cost_usd": 0.025157,
+  "error": null
+}

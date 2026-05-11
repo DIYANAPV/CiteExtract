@@ -1,0 +1,295 @@
+{
+  "n_total_citations": 2772,
+  "n_paper_found": 2253,
+  "n_full_text": 1188,
+  "n_in_scope": 1157,
+  "coverage_pct": {
+    "paper_found": 81.28,
+    "full_text": 42.86,
+    "in_scope": 41.74
+  },
+  "headline": {
+    "n_misrep": 49,
+    "rate_pct": 4.24,
+    "ci_low_pct": 3.11,
+    "ci_high_pct": 5.45,
+    "bootstrap_resamples": 10000
+  },
+  "verdict_breakdown": {
+    "SUPPORTS": 824,
+    "NEUTRAL": 284,
+    "CONTRADICTS": 49
+  },
+  "full_text_source_breakdown": {
+    "abstract_only": 1065,
+    "s2_fallback": 279,
+    "unpaywall": 389,
+    "none": 519,
+    "arxiv": 292,
+    "oa_url": 130,
+    "html_meta_pdf": 91,
+    "arxiv_fallback": 7
+  },
+  "stratifications": {
+    "by_paper_decision": {
+      "NeurIPS 2025 poster": {
+        "n_total": 2415,
+        "n_in_scope": 980,
+        "n_misrep": 42,
+        "rate_pct": 4.29,
+        "ci_low_pct": 3.06,
+        "ci_high_pct": 5.61
+      },
+      "NeurIPS 2025 spotlight": {
+        "n_total": 357,
+        "n_in_scope": 177,
+        "n_misrep": 7,
+        "rate_pct": 3.95,
+        "ci_low_pct": 1.13,
+        "ci_high_pct": 6.78
+      }
+    },
+    "by_cited_year_band": {
+      "unknown": {
+        "n_total": 558,
+        "n_in_scope": 1,
+        "n_misrep": 0,
+        "rate_pct": 0.0,
+        "ci_low_pct": null,
+        "ci_high_pct": null
+      },
+      "2020-2023": {
+        "n_total": 877,
+        "n_in_scope": 576,
+        "n_misrep": 28,
+        "rate_pct": 4.86,
+        "ci_low_pct": 3.12,
+        "ci_high_pct": 6.77
+      },
+      "2024-2025": {
+        "n_total": 723,
+        "n_in_scope": 322,
+        "n_misrep": 14,
+        "rate_pct": 4.35,
+        "ci_low_pct": 2.17,
+        "ci_high_pct": 6.83
+      },
+      "2015-2019": {
+        "n_total": 343,
+        "n_in_scope": 201,
+        "n_misrep": 7,
+        "rate_pct": 3.48,
+        "ci_low_pct": 1.0,
+        "ci_high_pct": 5.97
+      },
+      "<=2014": {
+        "n_total": 271,
+        "n_in_scope": 57,
+        "n_misrep": 0,
+        "rate_pct": 0.0,
+        "ci_low_pct": 0.0,
+        "ci_high_pct": 0.0
+      }
+    },
+    "by_full_text_source": {
+      "abstract_only": {
+        "n_total": 1065,
+        "n_in_scope": 0,
+        "n_misrep": 0,
+        "rate_pct": 0.0,
+        "ci_low_pct": null,
+        "ci_high_pct": null
+      },
+      "s2_fallback": {
+        "n_total": 279,
+        "n_in_scope": 277,
+        "n_misrep": 15,
+        "rate_pct": 5.42,
+        "ci_low_pct": 2.89,
+        "ci_high_pct": 8.3
+      },
+      "unpaywall": {
+        "n_total": 389,
+        "n_in_scope": 362,
+        "n_misrep": 13,
+        "rate_pct": 3.59,
+        "ci_low_pct": 1.93,
+        "ci_high_pct": 5.52
+      },
+      "none": {
+        "n_total": 519,
+        "n_in_scope": 0,
+        "n_misrep": 0,
+        "rate_pct": 0.0,
+        "ci_low_pct": null,
+        "ci_high_pct": null
+      },
+      "arxiv": {
+        "n_total": 292,
+        "n_in_scope": 291,
+        "n_misrep": 13,
+        "rate_pct": 4.47,
+        "ci_low_pct": 2.41,
+        "ci_high_pct": 6.87
+      },
+      "oa_url": {
+        "n_total": 130,
+        "n_in_scope": 129,
+        "n_misrep": 4,
+        "rate_pct": 3.1,
+        "ci_low_pct": 0.78,
+        "ci_high_pct": 6.2
+      },
+      "html_meta_pdf": {
+        "n_total": 91,
+        "n_in_scope": 91,
+        "n_misrep": 3,
+        "rate_pct": 3.3,
+        "ci_low_pct": 0.0,
+        "ci_high_pct": 7.69
+      },
+      "arxiv_fallback": {
+        "n_total": 7,
+        "n_in_scope": 7,
+        "n_misrep": 1,
+        "rate_pct": 14.29,
+        "ci_low_pct": null,
+        "ci_high_pct": null
+      }
+    }
+  },
+  "per_paper": {
+    "n_papers_with_in_scope_data": 17,
+    "median_rate_pct": 4.76,
+    "min_rate_pct": 0.0,
+    "max_rate_pct": 20.51,
+    "papers": [
+      {
+        "paper_id": "AuOZDp4gy7",
+        "n_total": 169,
+        "n_in_scope": 39,
+        "n_misrep": 8,
+        "rate_pct": 20.51
+      },
+      {
+        "paper_id": "5xwyxupsLL",
+        "n_total": 30,
+        "n_in_scope": 6,
+        "n_misrep": 1,
+        "rate_pct": 16.67
+      },
+      {
+        "paper_id": "uHGG3s0XyZ",
+        "n_total": 49,
+        "n_in_scope": 23,
+        "n_misrep": 3,
+        "rate_pct": 13.04
+      },
+      {
+        "paper_id": "kND7h1kD53",
+        "n_total": 93,
+        "n_in_scope": 56,
+        "n_misrep": 5,
+        "rate_pct": 8.93
+      },
+      {
+        "paper_id": "T4qJuQCFAK",
+        "n_total": 38,
+        "n_in_scope": 24,
+        "n_misrep": 2,
+        "rate_pct": 8.33
+      },
+      {
+        "paper_id": "fru52tkjHf",
+        "n_total": 76,
+        "n_in_scope": 25,
+        "n_misrep": 2,
+        "rate_pct": 8.0
+      },
+      {
+        "paper_id": "t77EZLjvd5",
+        "n_total": 30,
+        "n_in_scope": 14,
+        "n_misrep": 1,
+        "rate_pct": 7.14
+      },
+      {
+        "paper_id": "z1Cvcovlms",
+        "n_total": 44,
+        "n_in_scope": 20,
+        "n_misrep": 1,
+        "rate_pct": 5.0
+      },
+      {
+        "paper_id": "AmZ7uHDJiR",
+        "n_total": 80,
+        "n_in_scope": 21,
+        "n_misrep": 1,
+        "rate_pct": 4.76
+      },
+      {
+        "paper_id": "59TL8MpBzX",
+        "n_total": 53,
+        "n_in_scope": 24,
+        "n_misrep": 1,
+        "rate_pct": 4.17
+      },
+      {
+        "paper_id": "qMm7tC1zvj",
+        "n_total": 88,
+        "n_in_scope": 34,
+        "n_misrep": 1,
+        "rate_pct": 2.94
+      },
+      {
+        "paper_id": "0Nq1GvAGR0",
+        "n_total": 71,
+        "n_in_scope": 35,
+        "n_misrep": 1,
+        "rate_pct": 2.86
+      },
+      {
+        "paper_id": "g42mGfR6We",
+        "n_total": 112,
+        "n_in_scope": 63,
+        "n_misrep": 1,
+        "rate_pct": 1.59
+      },
+      {
+        "paper_id": "LP4Q7tPMbs",
+        "n_total": 40,
+        "n_in_scope": 24,
+        "n_misrep": 0,
+        "rate_pct": 0.0
+      },
+      {
+        "paper_id": "MuhYHqLDZT",
+        "n_total": 62,
+        "n_in_scope": 27,
+        "n_misrep": 0,
+        "rate_pct": 0.0
+      },
+      {
+        "paper_id": "PBvlBI6c30",
+        "n_total": 57,
+        "n_in_scope": 19,
+        "n_misrep": 0,
+        "rate_pct": 0.0
+      },
+      {
+        "paper_id": "um9kHMof0c",
+        "n_total": 48,
+        "n_in_scope": 18,
+        "n_misrep": 0,
+        "rate_pct": 0.0
+      },
+      {
+        "paper_id": "6h7HLx1kbH",
+        "n_total": 53,
+        "n_in_scope": 0,
+        "n_misrep": 0,
+        "rate_pct": null
+      }
+    ]
+  }
+}

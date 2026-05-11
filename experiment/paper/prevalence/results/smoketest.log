@@ -1,0 +1,1125 @@
+15:44:57 [INFO] processing 1 papers
+15:44:57 [INFO] [1/1] paper_id=kND7h1kD53
+15:45:20 [INFO] citation_recovery: resolved=146 orphan_linked=0 orphan_dropped=3 regex_added=143 regex_dropped=1 final=149
+15:45:20 [INFO] link_vote marker='[15,' grobid=15 rule=15 llm=None final=15 conf=high
+15:45:20 [INFO] link_vote marker='41,' grobid=41 rule=41 llm=None final=41 conf=high
+15:45:20 [INFO] link_vote marker='10,' grobid=10 rule=10 llm=None final=10 conf=high
+15:45:20 [INFO] link_vote marker='61,' grobid=61 rule=61 llm=None final=61 conf=high
+15:45:20 [INFO] link_vote marker='38,' grobid=38 rule=38 llm=None final=38 conf=high
+15:45:20 [INFO] link_vote marker='7]' grobid=7 rule=7 llm=None final=7 conf=high
+15:45:20 [INFO] link_vote marker='[45,' grobid=45 rule=45 llm=None final=45 conf=high
+15:45:20 [INFO] link_vote marker='82,' grobid=82 rule=82 llm=None final=82 conf=high
+15:45:20 [INFO] link_vote marker='81,' grobid=81 rule=81 llm=None final=81 conf=high
+15:45:20 [INFO] link_vote marker='56,' grobid=56 rule=56 llm=None final=56 conf=high
+15:45:20 [INFO] link_vote marker='87,' grobid=87 rule=87 llm=None final=87 conf=high
+15:45:20 [INFO] link_vote marker='83,' grobid=83 rule=83 llm=None final=83 conf=high
+15:45:20 [INFO] link_vote marker='72,' grobid=72 rule=72 llm=None final=72 conf=high
+15:45:20 [INFO] link_vote marker='59,' grobid=59 rule=59 llm=None final=59 conf=high
+15:45:20 [INFO] link_vote marker='55]' grobid=55 rule=55 llm=None final=55 conf=high
+15:45:20 [INFO] link_vote marker='[36,' grobid=36 rule=36 llm=None final=36 conf=high
+15:45:20 [INFO] link_vote marker='71,' grobid=71 rule=71 llm=None final=71 conf=high
+15:45:20 [INFO] link_vote marker='5]' grobid=5 rule=5 llm=None final=5 conf=high
+15:45:20 [INFO] link_vote marker='[80,' grobid=80 rule=80 llm=None final=80 conf=high
+15:45:20 [INFO] link_vote marker='62,' grobid=62 rule=62 llm=None final=62 conf=high
+15:45:20 [INFO] link_vote marker='23,' grobid=23 rule=23 llm=None final=23 conf=high
+15:45:20 [INFO] link_vote marker='35]' grobid=35 rule=35 llm=None final=35 conf=high
+15:45:20 [INFO] link_vote marker='[22]' grobid=22 rule=22 llm=None final=22 conf=high
+15:45:20 [INFO] link_vote marker='[62,' grobid=62 rule=62 llm=None final=62 conf=high
+15:45:20 [INFO] link_vote marker='63,' grobid=63 rule=63 llm=None final=63 conf=high
+15:45:20 [INFO] link_vote marker='12,' grobid=12 rule=12 llm=None final=12 conf=high
+15:45:20 [INFO] link_vote marker='16,' grobid=16 rule=16 llm=None final=16 conf=high
+15:45:20 [INFO] link_vote marker='6]' grobid=6 rule=6 llm=None final=6 conf=high
+15:45:20 [INFO] link_vote marker='[69,' grobid=69 rule=69 llm=None final=69 conf=high
+15:45:20 [INFO] link_vote marker='13,' grobid=13 rule=13 llm=None final=13 conf=high
+15:45:20 [INFO] link_vote marker='27]' grobid=27 rule=27 llm=None final=27 conf=high
+15:45:20 [INFO] link_vote marker='[26]' grobid=26 rule=26 llm=None final=26 conf=high
+15:45:20 [INFO] link_vote marker='[17,' grobid=17 rule=17 llm=None final=17 conf=high
+15:45:20 [INFO] link_vote marker='6]' grobid=6 rule=6 llm=None final=6 conf=high
+15:45:20 [INFO] link_vote marker='[66,' grobid=66 rule=66 llm=None final=66 conf=high
+15:45:20 [INFO] link_vote marker='68]' grobid=68 rule=68 llm=None final=68 conf=high
+15:45:20 [INFO] link_vote marker='[63]' grobid=63 rule=63 llm=None final=63 conf=high
+15:45:20 [INFO] link_vote marker='[30]' grobid=30 rule=30 llm=None final=30 conf=high
+15:45:20 [INFO] link_vote marker='[28]' grobid=28 rule=28 llm=None final=28 conf=high
+15:45:20 [INFO] link_vote marker='[50]' grobid=50 rule=50 llm=None final=50 conf=high
+15:45:20 [INFO] link_vote marker='[62]' grobid=62 rule=62 llm=None final=62 conf=high
+15:45:20 [INFO] link_vote marker='[64]' grobid=64 rule=64 llm=None final=64 conf=high
+15:45:20 [INFO] link_vote marker='[39]' grobid=39 rule=39 llm=None final=39 conf=high
+15:45:20 [INFO] link_vote marker='[40]' grobid=40 rule=40 llm=None final=40 conf=high
+15:45:20 [INFO] link_vote marker='(3)' grobid=3 rule=3 llm=None final=3 conf=high
+15:45:20 [INFO] link_vote marker='(3)' grobid=3 rule=3 llm=None final=3 conf=high
+15:45:20 [INFO] link_vote marker='[69]' grobid=69 rule=69 llm=None final=69 conf=high
+15:45:20 [INFO] link_vote marker='[27]' grobid=27 rule=27 llm=None final=27 conf=high
+15:45:20 [INFO] link_vote marker='[9]' grobid=9 rule=9 llm=None final=9 conf=high
+15:45:20 [INFO] link_vote marker='[16]' grobid=16 rule=16 llm=None final=16 conf=high
+15:45:20 [INFO] link_vote marker='[6]' grobid=6 rule=6 llm=None final=6 conf=high
+15:45:20 [INFO] link_vote marker='[18,' grobid=18 rule=18 llm=None final=18 conf=high
+15:45:20 [INFO] link_vote marker='58]' grobid=58 rule=58 llm=None final=58 conf=high
+15:45:20 [INFO] link_vote marker='[24,' grobid=24 rule=24 llm=None final=24 conf=high
+15:45:20 [INFO] link_vote marker='70,' grobid=70 rule=70 llm=None final=70 conf=high
+15:45:20 [INFO] link_vote marker='86]' grobid=86 rule=86 llm=None final=86 conf=high
+15:45:20 [INFO] link_vote marker='[17]' grobid=17 rule=17 llm=None final=17 conf=high
+15:45:20 [INFO] link_vote marker='[63]' grobid=63 rule=63 llm=None final=63 conf=high
+15:45:20 [INFO] link_vote marker='[62]' grobid=62 rule=62 llm=None final=62 conf=high
+15:45:20 [INFO] link_vote marker='[39]' grobid=39 rule=39 llm=None final=39 conf=high
+15:45:20 [INFO] link_vote marker='[69]' grobid=69 rule=69 llm=None final=69 conf=high
+15:45:20 [INFO] link_vote marker='[85]' grobid=85 rule=85 llm=None final=85 conf=high
+15:45:20 [INFO] link_vote marker='[17]' grobid=17 rule=17 llm=None final=17 conf=high
+15:45:20 [INFO] link_vote marker='[6]' grobid=6 rule=6 llm=None final=6 conf=high
+15:45:20 [INFO] link_vote marker='[40]' grobid=40 rule=40 llm=None final=40 conf=high
+15:45:20 [INFO] link_vote marker='[40]' grobid=40 rule=40 llm=None final=40 conf=high
+15:45:20 [INFO] link_vote marker='[4]' grobid=4 rule=4 llm=None final=4 conf=high
+15:45:20 [INFO] link_vote marker='[17]' grobid=17 rule=17 llm=None final=17 conf=high
+15:45:20 [INFO] link_vote marker='[40]' grobid=40 rule=40 llm=None final=40 conf=high
+15:45:20 [INFO] link_vote marker='[21]' grobid=21 rule=21 llm=None final=21 conf=high
+15:45:20 [INFO] link_vote marker='[67]' grobid=67 rule=67 llm=None final=67 conf=high
+15:45:20 [INFO] link_vote marker='[57]' grobid=57 rule=57 llm=None final=57 conf=high
+15:45:20 [INFO] link_vote marker='[74]' grobid=74 rule=74 llm=None final=74 conf=high
+15:45:20 [INFO] link_vote marker='[37]' grobid=37 rule=37 llm=None final=37 conf=high
+15:45:20 [INFO] link_vote marker='[33]' grobid=33 rule=33 llm=None final=33 conf=high
+15:45:20 [INFO] link_vote marker='[65]' grobid=65 rule=65 llm=None final=65 conf=high
+15:45:20 [INFO] link_vote marker='[57]' grobid=57 rule=57 llm=None final=57 conf=high
+15:45:20 [INFO] link_vote marker='[57]' grobid=57 rule=57 llm=None final=57 conf=high
+15:45:20 [INFO] link_vote marker='[73]' grobid=73 rule=73 llm=None final=73 conf=high
+15:45:20 [INFO] link_vote marker='[3]' grobid=3 rule=3 llm=None final=3 conf=high
+15:45:20 [INFO] link_vote marker='[66,' grobid=66 rule=66 llm=None final=66 conf=high
+15:45:20 [INFO] link_vote marker='54]' grobid=54 rule=54 llm=None final=54 conf=high
+15:45:20 [INFO] link_vote marker='[68]' grobid=68 rule=68 llm=None final=68 conf=high
+15:45:20 [INFO] link_vote marker='[68]' grobid=68 rule=68 llm=None final=68 conf=high
+15:45:20 [INFO] link_vote marker='[41]' grobid=41 rule=41 llm=None final=41 conf=high
+15:45:20 [INFO] link_vote marker='[2]' grobid=2 rule=2 llm=None final=2 conf=high
+15:45:20 [INFO] link_vote marker='[51]' grobid=51 rule=51 llm=None final=51 conf=high
+15:45:20 [INFO] link_vote marker='[1,' grobid=1 rule=1 llm=None final=1 conf=high
+15:45:20 [INFO] link_vote marker='11]' grobid=11 rule=11 llm=None final=11 conf=high
+15:45:20 [INFO] link_vote marker='[1]' grobid=1 rule=1 llm=None final=1 conf=high
+15:45:20 [INFO] link_vote marker='[63]' grobid=63 rule=63 llm=None final=63 conf=high
+15:45:20 [INFO] link_vote marker='[30,' grobid=30 rule=30 llm=None final=30 conf=high
+15:45:20 [INFO] link_vote marker='29,' grobid=29 rule=29 llm=None final=29 conf=high
+15:45:20 [INFO] link_vote marker='42]' grobid=42 rule=42 llm=None final=42 conf=high
+15:45:20 [INFO] link_vote marker='[28]' grobid=28 rule=28 llm=None final=28 conf=high
+15:45:20 [INFO] link_vote marker='[50]' grobid=50 rule=50 llm=None final=50 conf=high
+15:45:20 [INFO] link_vote marker='[62]' grobid=62 rule=62 llm=None final=62 conf=high
+15:45:20 [INFO] link_vote marker='[39]' grobid=39 rule=39 llm=None final=39 conf=high
+15:45:20 [INFO] link_vote marker='[64]' grobid=64 rule=64 llm=None final=64 conf=high
+15:45:20 [INFO] link_vote marker='[40]' grobid=40 rule=40 llm=None final=40 conf=high
+15:45:20 [INFO] link_vote marker='[69]' grobid=69 rule=69 llm=None final=69 conf=high
+15:45:20 [INFO] link_vote marker='[27]' grobid=27 rule=27 llm=None final=27 conf=high
+15:45:20 [INFO] link_vote marker='[12]' grobid=12 rule=12 llm=None final=12 conf=high
+15:45:20 [INFO] link_vote marker='[9]' grobid=9 rule=9 llm=None final=9 conf=high
+15:45:20 [INFO] link_vote marker='[16]' grobid=16 rule=16 llm=None final=16 conf=high
+15:45:20 [INFO] link_vote marker='[6]' grobid=6 rule=6 llm=None final=6 conf=high
+15:45:20 [INFO] link_vote marker='[18,' grobid=18 rule=18 llm=None final=18 conf=high
+15:45:20 [INFO] link_vote marker='58]' grobid=58 rule=58 llm=None final=58 conf=high
+15:45:20 [INFO] link_vote marker='[24,' grobid=24 rule=24 llm=None final=24 conf=high
+15:45:20 [INFO] link_vote marker='70,' grobid=70 rule=70 llm=None final=70 conf=high
+15:45:20 [INFO] link_vote marker='86,' grobid=86 rule=86 llm=None final=86 conf=high
+15:45:20 [INFO] link_vote marker='79]' grobid=79 rule=79 llm=None final=79 conf=high
+15:45:20 [INFO] link_vote marker='[34,' grobid=34 rule=34 llm=None final=34 conf=high
+15:45:20 [INFO] link_vote marker='49]' grobid=49 rule=49 llm=None final=49 conf=high
+15:45:20 [INFO] link_vote marker='[20,' grobid=20 rule=20 llm=None final=20 conf=high
+15:45:20 [INFO] link_vote marker='8]' grobid=8 rule=8 llm=None final=8 conf=high
+15:45:20 [INFO] link_vote marker='[19,' grobid=19 rule=19 llm=None final=19 conf=high
+15:45:20 [INFO] link_vote marker='8]' grobid=8 rule=8 llm=None final=8 conf=high
+15:45:20 [INFO] link_vote marker='[48,' grobid=48 rule=48 llm=None final=48 conf=high
+15:45:20 [INFO] link_vote marker='46]' grobid=46 rule=46 llm=None final=46 conf=high
+15:45:20 [INFO] link_vote marker='[77,' grobid=77 rule=77 llm=None final=77 conf=high
+15:45:20 [INFO] link_vote marker='84,' grobid=84 rule=84 llm=None final=84 conf=high
+15:45:20 [INFO] link_vote marker='60]' grobid=60 rule=60 llm=None final=60 conf=high
+15:45:20 [INFO] link_vote marker='[75,' grobid=75 rule=75 llm=None final=75 conf=high
+15:45:20 [INFO] link_vote marker='76,' grobid=76 rule=76 llm=None final=76 conf=high
+15:45:20 [INFO] link_vote marker='52]' grobid=52 rule=52 llm=None final=52 conf=high
+15:45:20 [INFO] link_vote marker='[32,' grobid=32 rule=32 llm=None final=32 conf=high
+15:45:20 [INFO] link_vote marker='53]' grobid=53 rule=53 llm=None final=53 conf=high
+15:45:20 [INFO] link_vote marker='[23]' grobid=23 rule=23 llm=None final=23 conf=high
+15:45:20 [INFO] link_vote marker='[31]' grobid=31 rule=31 llm=None final=31 conf=high
+15:45:20 [INFO] link_vote marker='[14,' grobid=14 rule=14 llm=None final=14 conf=high
+15:45:20 [INFO] link_vote marker='43]' grobid=43 rule=43 llm=None final=43 conf=high
+15:45:20 [INFO] link_vote marker='(3)' grobid=3 rule=3 llm=None final=3 conf=high
+15:45:20 [INFO] link_vote marker='[78]' grobid=78 rule=78 llm=None final=78 conf=high
+15:45:20 [INFO] link_vote marker='[47]' grobid=47 rule=47 llm=None final=47 conf=high
+15:45:20 [INFO] link_vote marker='[44]' grobid=44 rule=44 llm=None final=44 conf=high
+15:45:20 [INFO] link_vote marker='[40]' grobid=40 rule=40 llm=None final=40 conf=high
+15:45:20 [INFO] link_vote marker='[65]' grobid=65 rule=65 llm=None final=65 conf=high
+15:45:20 [INFO] link_vote marker='[37]' grobid=37 rule=37 llm=None final=37 conf=high
+15:45:20 [INFO] link_vote marker='[33]' grobid=33 rule=33 llm=None final=33 conf=high
+15:45:20 [INFO] link_vote marker='[2]' grobid=2 rule=2 llm=None final=2 conf=high
+15:45:20 [INFO] link_vote marker='[2]' grobid=2 rule=2 llm=None final=2 conf=high
+15:45:20 [INFO] link_vote marker='[66]' grobid=66 rule=66 llm=None final=66 conf=high
+15:45:20 [INFO] link_vote marker='[68]' grobid=68 rule=68 llm=None final=68 conf=high
+15:45:20 [INFO] link_vote marker='[41]' grobid=41 rule=41 llm=None final=41 conf=high
+15:45:20 [INFO] link_vote marker='[25]' grobid=25 rule=25 llm=None final=25 conf=high
+15:45:20 [INFO] link_vote marker='[3]' grobid=3 rule=3 llm=None final=3 conf=high
+15:45:20 [INFO] link_vote marker='[3]' grobid=3 rule=3 llm=None final=3 conf=high
+15:45:20 [INFO] link_vote marker='[74]' grobid=74 rule=74 llm=None final=74 conf=high
+15:45:20 [INFO] link_stats n=149 medium=0 low=0 disagreements=0
+15:45:20 [INFO] STAGE L1_parse seconds=23.580
+15:45:21 [INFO] Checking 86 references across scholarly databases...
+15:45:21 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/ARXIV:arXiv:2104.13478?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 404 Not Found"
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Optimization-induced+graph+implicit+nonlinear+diffusion&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:21 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works/10.1109%2Fbigdata55660.2022.10020519?mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works/10.52202%2F079017-0826?mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:21 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:21 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Accelerating+bayesian+optimization+for+biological+sequence+design+with+denoising+autoencoders&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:21 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Simple+and+deep+graph+convolutional+networks&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Nodeformer%3A+A+scalable+graph+structure+learning+transformer+for+node+classification&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:21 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:21 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=SE%283%29-hyena+operator+for+scalable+equivariant+learning&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:21 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Spherical+message+passing+for+3d+molecular+graphs&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Evaluating+and+learning+from+rna+pseudotorsional+space%3A+quantitative+validation+of+a+reduced+representation+for+rna+structure&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:21 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:21 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Fast+graph+representation+learning+with+PyTorch+Geometric&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:21 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works/10.52202%2F068431-0830?mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:21 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works/10.1126%2Fscience.1065659?mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Geometric+deep+learning+of+rna+structure&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:21 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Optuna%3A+A+next-generation+hyperparameter+optimization+framework&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:21 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works/10.1016%2Fj.bbrc.2020.08.116?mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:21 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works/10.1007%2F978-981-96-8180-8_32?mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Highly+accurate+protein+structure+prediction+with+alphafold&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=The+limitless+future+of+rna+therapeutics&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=A+euclidean+transformer+for+fast+and+stable+machine+learned+force+fields&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:21 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:21 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:21 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Equivariant+message+passing+for+the+prediction+of+tensorial+properties+and+molecular+spectra&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works/10.1016%2Fj.fmre.2023.06.001?mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:21 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:21 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:21 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Beyond+sequence%3A+Impact+of+geometric+context+for+RNA+property+prediction&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:21 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Enhancing+graph+transformers+with+hierarchical+distance+structural+encoding&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=On+the+expressive+power+of+geometric+graph+neural+networks&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:21 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:21 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Crystal+structure+of+a+group+i+ribozyme+domain%3A+principles+of+rna+packing&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Sgformer%3A+Simplifying+and+empowering+transformers+for+large-graph+representations&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:21 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:21 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works/10.1109%2Fbigdata62323.2024.10825716?mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Rna+structural+dynamics+as+captured+by+molecular+simulations%3A+a+comprehensive+overview&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Biolangfusion%3A+Multimodal+fusion+of+dna%2C+mrna%2C+and+protein+language+models&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works/10.52202%2F068431-0667?mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works/10.1038%2Fs42256-021-00418-8?mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:21 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:21 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:21 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:21 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Unbiased+stochastic+proximal+solver+for+graph+neural+networks+with+equilibrium+states&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Shape-aware+graph+spectral+learning&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works/10.1007%2Fs11704-025-41426-w?mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Ribonanza%3A+deep+learning+of+rna+structure+through+dual+crowdsourcing&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Rna-torsionbert%3A+leveraging+language+models+for+rna+3d+torsion+angles+prediction&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=HARMONY%3A+A+multi-representation+framework+for+RNA+property+prediction&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:21 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:21 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:21 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:21 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:21 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:21 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Multiscale+graph+neural+networks+with+implicit+layers&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:21 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works/10.1038%2Fnrd4278?mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:21 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Recipe+for+a+General%2C+Powerful%2C+Scalable+Graph+Transformer&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:21 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Rnasolo%3A+a+repository+of+cleaned+pdb-derived+rna+3d+structures&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Schnet%3A+A+continuous-filter+convolutional+neural+network+for+modeling+quantum+interactions&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:21 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Implicit+graph+neural+networks&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:21 [INFO] HTTP Request: HEAD https://doi.org/10.1126/science.1065659 "HTTP/1.1 302 Found"
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Implicit+graph+neural+networks%3A+A+monotone+operator+viewpoint&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Se+%283%29-transformers%3A+3d+roto-translation+equivariant+attention+networks&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works/10.1016%2F0022-2836%2873%2990011-9?mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:21 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Long+range+graph+benchmark&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Dssr%3A+an+integrated+software+tool+for+dissecting+the+spatial+structure+of+rna&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=HELM%3A+Hierarchical+encoding+for+mRNA+language+modeling&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:21 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=The+protein+data+bank&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=On+the+bottleneck+of+graph+neural+networks+and+its+practical+implications&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:21 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Tuning+the+performance+of+synthetic+riboswitches+using+machine+learning&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Hyperhelm%3A+Hyperbolic+hierarchy+encoding+for+mrna+language+modeling&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:21 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:21 [INFO] HTTP Request: HEAD https://www.science.org/doi/10.1126/science.1065659 "HTTP/1.1 403 Forbidden"
+15:45:21 [INFO] Dead DOI detected: 10.1126/science.1065659 returned HTTP 403
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Representing+long-range+context+for+graph+neural+networks+with+global+attention&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=On+the+generalization+of+equivariance+and+convolution+in+neural+networks+to+the+action+of+compact+groups&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:21 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Do+transformers+really+perform+badly+for+graph+representation%3F&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:21 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:21 [INFO] HTTP Request: HEAD https://doi.org/10.1093/bioinformatics/btac386 "HTTP/1.1 302 Found"
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Ewald-based+long-range+message+passing+for+molecular+graphs&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:21 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Scalable+and+effective+implicit+graph+neural+networks+on+large+graphs&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:21 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:21 [INFO] HTTP Request: HEAD https://doi.org/10.52202/068431-1622 "HTTP/1.1 302 Found"
+15:45:21 [INFO] HTTP Request: HEAD https://doi.org/10.1038/s42256-021-00418-8 "HTTP/1.1 302 Found"
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Transformers+meet+directed+graphs&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:21 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:21 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=E+%28n%29+equivariant+graph+neural+networks&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:21 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:21 [INFO] HTTP Request: HEAD https://doi.org/10.1021/acssynbio.8b00207 "HTTP/1.1 302 Found"
+15:45:21 [INFO] HTTP Request: HEAD https://academic.oup.com/bioinformatics/article/38/14/3668/6604270 "HTTP/1.1 403 Forbidden"
+15:45:21 [INFO] Dead DOI detected: 10.1093/bioinformatics/btac386 returned HTTP 403
+15:45:21 [INFO] HTTP Request: HEAD https://doi.org/10.1093/nar/gkv716 "HTTP/1.1 302 Found"
+15:45:22 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Deeprnatwist%3A+Language+model+guided+rna+torsion+angle+prediction+with+attention-inception+network&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:22 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:22 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Bridging+biomolecular+modalities+for+knowledge+transfer+in+bio-language+models&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:22 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:22 [INFO] HTTP Request: GET https://api.crossref.org/works/10.5194%2Fessd-2020-174-rc1?mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:22 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:22 [INFO] HTTP Request: HEAD https://pubs.acs.org/doi/10.1021/acssynbio.8b00207 "HTTP/1.1 403 Forbidden"
+15:45:22 [INFO] Dead DOI detected: 10.1021/acssynbio.8b00207 returned HTTP 403
+15:45:22 [INFO] HTTP Request: HEAD https://academic.oup.com/nar/article-lookup/doi/10.1093/nar/gkv716 "HTTP/1.1 403 Forbidden"
+15:45:22 [INFO] Dead DOI detected: 10.1093/nar/gkv716 returned HTTP 403
+15:45:22 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=GLora%3A+A+benchmark+to+evaluate+the+ability+to+learn+long-range+dependencies+in+graphs&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:22 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:22 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Geometric+hyena+networks+for+large-scale+equivariant+learning&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:22 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:22 [INFO] HTTP Request: GET https://api.crossref.org/works/10.52202%2F075280-2070?mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:22 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:22 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Gemnet%3A+Universal+directional+graph+neural+networks+for+molecules&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:22 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:22 [INFO] HTTP Request: HEAD https://www.nature.com/articles/s42256-021-00418-8 "HTTP/1.1 303 See Other"
+15:45:22 [INFO] HTTP Request: GET https://api.crossref.org/works/10.3389%2Ffrai.2020.580607?mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:22 [INFO] HTTP Request: GET https://api.crossref.org/works/10.1038%2Fs41598-018-31289-6?mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:22 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:22 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:22 [INFO] HTTP Request: GET https://api.crossref.org/works/10.1093%2Fbenz%2F9780199773787.article.b00187341?mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:22 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:22 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Revisiting+over-smoothing+and+over-squashing+using+ollivier-ricci+curvature&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:22 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:22 [INFO] HTTP Request: HEAD https://idp.nature.com/authorize?response_type=cookie&client_id=grover&redirect_uri=https%3A%2F%2Fwww.nature.com%2Farticles%2Fs42256-021-00418-8 "HTTP/1.1 302 Found"
+15:45:22 [INFO] HTTP Request: GET https://api.crossref.org/works/10.1109%2Ftpami.2026.3684569?mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:22 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:22 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Deep+learning+models+for+predicting+rna+degradation+via+dual+crowdsourcing&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:22 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:22 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Geometric+deep+learning%3A+Grids%2C+groups%2C+graphs%2C+geodesics%2C+and+gauges&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:22 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:22 [INFO] HTTP Request: HEAD https://idp.nature.com/transit?redirect_uri=https%3A%2F%2Fwww.nature.com%2Farticles%2Fs42256-021-00418-8&code=06530026-e571-459d-b94d-7d7de9e0e74c "HTTP/1.1 302 Found"
+15:45:22 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AImplicit+graph+neural+networks&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:22 [INFO] HTTP Request: HEAD http://www.proceedings.com/068431-1622.html "HTTP/1.1 301 Moved Permanently"
+15:45:22 [INFO] HTTP Request: GET https://api.crossref.org/works/10.52202%2F079017-0826?mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:22 [INFO] HTTP Request: GET https://api.crossref.org/works/10.1109%2Fbigdata55660.2022.10020519?mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:22 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:22 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:22 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/ARXIV:arXiv:2003.03123?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 404 Not Found"
+15:45:22 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Accelerating+bayesian+optimization+for+biological+sequence+design+with+denoising+autoencoders&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:22 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Optimization-induced+graph+implicit+nonlinear+diffusion&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:22 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:22 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:22 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Evaluating+and+learning+from+rna+pseudotorsional+space%3A+quantitative+validation+of+a+reduced+representation+for+rna+structure&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:22 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:22 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Nodeformer%3A+A+scalable+graph+structure+learning+transformer+for+node+classification&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:22 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:22 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Simple+and+deep+graph+convolutional+networks&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:22 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:22 [INFO] HTTP Request: HEAD https://www.nature.com/articles/s42256-021-00418-8 "HTTP/1.1 200 OK"
+15:45:22 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3ADssr+an+integrated+software+tool+for+dissecting+the+spatial+structure+of+rna&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:22 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2009.06211 "HTTP/1.1 302 Found"
+15:45:22 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3ARepresenting+long+range+context+for+graph+neural+networks+with+global+attention&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:22 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AThe+protein+data+bank&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:22 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AImplicit+graph+neural+networks+A+monotone+operator+viewpoint&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:22 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3ASe+3+transformers+3d+roto+translation+equivariant+attention+networks&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:22 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2009.06211 "HTTP/1.1 200 OK"
+15:45:22 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3ATuning+the+performance+of+synthetic+riboswitches+using+machine+learning&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:22 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AProtein+Structure+Prediction+and+Structural+Genomics&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:22 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=SE%283%29-hyena+operator+for+scalable+equivariant+learning&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:22 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:22 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3ARnasolo+a+repository+of+cleaned+pdb+derived+rna+3d+structures&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:22 [INFO] HTTP Request: GET https://api.crossref.org/works/10.52202%2F068431-0830?mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:22 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:22 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Spherical+message+passing+for+3d+molecular+graphs&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:22 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Fast+graph+representation+learning+with+PyTorch+Geometric&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:22 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:22 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:22 [INFO] HTTP Request: GET https://api.crossref.org/works/10.1016%2Fj.bbrc.2020.08.116?mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:22 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Optuna%3A+A+next-generation+hyperparameter+optimization+framework&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:22 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:22 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:22 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Geometric+deep+learning+of+rna+structure&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:22 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:22 [INFO] HTTP Request: GET https://api.crossref.org/works/10.1016%2Fj.fmre.2023.06.001?mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:22 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=On+the+expressive+power+of+geometric+graph+neural+networks&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:22 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:22 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:22 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Equivariant+message+passing+for+the+prediction+of+tensorial+properties+and+molecular+spectra&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:22 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Enhancing+graph+transformers+with+hierarchical+distance+structural+encoding&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:22 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Highly+accurate+protein+structure+prediction+with+alphafold&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:23 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=The+limitless+future+of+rna+therapeutics&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:23 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=A+euclidean+transformer+for+fast+and+stable+machine+learned+force+fields&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:23 [INFO] HTTP Request: GET https://api.crossref.org/works/10.1007%2F978-981-96-8180-8_32?mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:23 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:23 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:23 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:23 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:23 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:23 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:23 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Beyond+sequence%3A+Impact+of+geometric+context+for+RNA+property+prediction&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:23 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:23 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Sgformer%3A+Simplifying+and+empowering+transformers+for+large-graph+representations&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:23 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:23 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Crystal+structure+of+a+group+i+ribozyme+domain%3A+principles+of+rna+packing&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:23 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Directional+message+passing+for+molecular+graphs&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:23 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:23 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:23 [INFO] HTTP Request: GET https://api.crossref.org/works/10.52202%2F068431-0667?mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:23 [INFO] HTTP Request: GET https://api.crossref.org/works/10.1109%2Fbigdata62323.2024.10825716?mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:23 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Rna+structural+dynamics+as+captured+by+molecular+simulations%3A+a+comprehensive+overview&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:23 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Biolangfusion%3A+Multimodal+fusion+of+dna%2C+mrna%2C+and+protein+language+models&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:23 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:23 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:23 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:23 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:23 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Unbiased+stochastic+proximal+solver+for+graph+neural+networks+with+equilibrium+states&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:23 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:23 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2006.10503 "HTTP/1.1 302 Found"
+15:45:23 [INFO] HTTP Request: HEAD https://www.proceedings.com/068431-1622.html "HTTP/1.1 200 OK"
+15:45:23 [INFO] HTTP Request: HEAD https://doi.org/10.1093/nar/28.1.235 "HTTP/1.1 302 Found"
+15:45:23 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Shape-aware+graph+spectral+learning&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:23 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:23 [INFO] HTTP Request: GET https://api.crossref.org/works/10.1007%2Fs11704-025-41426-w?mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:23 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:23 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Ribonanza%3A+deep+learning+of+rna+structure+through+dual+crowdsourcing&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:23 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:23 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Rna-torsionbert%3A+leveraging+language+models+for+rna+3d+torsion+angles+prediction&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:23 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2006.10503 "HTTP/1.1 200 OK"
+15:45:23 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:23 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=HARMONY%3A+A+multi-representation+framework+for+RNA+property+prediction&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:23 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:23 [INFO] HTTP Request: HEAD https://academic.oup.com/nar/article-lookup/doi/10.1093/nar/28.1.235 "HTTP/1.1 403 Forbidden"
+15:45:23 [INFO] Dead DOI detected: 10.1093/nar/28.1.235 returned HTTP 403
+15:45:23 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Multiscale+graph+neural+networks+with+implicit+layers&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:23 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:23 [INFO] HTTP Request: GET https://api.crossref.org/works/10.1038%2Fnrd4278?mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:23 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:23 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Recipe+for+a+General%2C+Powerful%2C+Scalable+Graph+Transformer&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:23 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:23 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Schnet%3A+A+continuous-filter+convolutional+neural+network+for+modeling+quantum+interactions&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:23 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:23 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AGeometric+deep+learning+on+molecular+representations&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:23 [INFO] HTTP Request: GET https://api.crossref.org/works/10.1016%2F0022-2836%2873%2990011-9?mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:23 [INFO] HTTP Request: GET https://api.crossref.org/works/10.5194%2Fessd-2020-174-rc1?mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:23 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:23 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=HELM%3A+Hierarchical+encoding+for+mRNA+language+modeling&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:23 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:23 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=On+the+bottleneck+of+graph+neural+networks+and+its+practical+implications&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:23 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:23 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Hyperhelm%3A+Hyperbolic+hierarchy+encoding+for+mrna+language+modeling&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:23 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:23 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Geometric+hyena+networks+for+large-scale+equivariant+learning&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:23 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:23 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=On+the+generalization+of+equivariance+and+convolution+in+neural+networks+to+the+action+of+compact+groups&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:23 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:23 [INFO] HTTP Request: GET https://api.crossref.org/works/10.52202%2F075280-2070?mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:23 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:23 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Gemnet%3A+Universal+directional+graph+neural+networks+for+molecules&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:23 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Do+transformers+really+perform+badly+for+graph+representation%3F&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:23 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:23 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:23 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Ewald-based+long-range+message+passing+for+molecular+graphs&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:23 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:23 [INFO] HTTP Request: GET https://api.crossref.org/works/10.1038%2Fs41598-018-31289-6?mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:23 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:23 [INFO] HTTP Request: HEAD https://doi.org/10.1016/0022-2836(73)90011-9 "HTTP/1.1 302 Found"
+15:45:23 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Transformers+meet+directed+graphs&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:23 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:23 [INFO] HTTP Request: GET https://api.crossref.org/works/10.3389%2Ffrai.2020.580607?mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:23 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:23 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Scalable+and+effective+implicit+graph+neural+networks+on+large+graphs&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:23 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:23 [INFO] HTTP Request: GET https://api.crossref.org/works/10.1093%2Fbenz%2F9780199773787.article.b00187341?mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:23 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:23 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=E+%28n%29+equivariant+graph+neural+networks&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:23 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:23 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Revisiting+over-smoothing+and+over-squashing+using+ollivier-ricci+curvature&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:23 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:23 [INFO] HTTP Request: GET https://api.crossref.org/works/10.1109%2Ftpami.2026.3684569?mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:23 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:23 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Bridging+biomolecular+modalities+for+knowledge+transfer+in+bio-language+models&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:23 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:23 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Deeprnatwist%3A+Language+model+guided+rna+torsion+angle+prediction+with+attention-inception+network&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:23 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:23 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Deep+learning+models+for+predicting+rna+degradation+via+dual+crowdsourcing&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:23 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:23 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Geometric+deep+learning%3A+Grids%2C+groups%2C+graphs%2C+geodesics%2C+and+gauges&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:23 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/ARXIV:arXiv:2410.11443?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 404 Not Found"
+15:45:23 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:23 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=GLora%3A+A+benchmark+to+evaluate+the+ability+to+learn+long-range+dependencies+in+graphs&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:23 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:23 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3ALong+range+graph+benchmark&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:23 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Are+highdegree+representations+really+unnecessary+in+equivariant+graph+neural+networks%3F+arXiv+preprint&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:23 [INFO] HTTP Request: HEAD https://doi.org/10.52202/079017-0826 "HTTP/1.1 302 Found"
+15:45:24 [INFO] HTTP Request: HEAD https://linkinghub.elsevier.com/retrieve/pii/0022283673900119 "HTTP/1.1 200 "
+15:45:24 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Directional+message+passing+for+molecular+graphs&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:24 [WARNING] crossref: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:24 [INFO] HTTP Request: HEAD http://www.proceedings.com/079017-0826.html "HTTP/1.1 301 Moved Permanently"
+15:45:24 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/ARXIV:arXiv:2207.09453?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 404 Not Found"
+15:45:24 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AEnvironment+and+exposure+to+solvent+of+protein+atoms+Lysozyme+and+insulin&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:24 [INFO] HTTP Request: HEAD https://www.proceedings.com/079017-0826.html "HTTP/1.1 200 OK"
+15:45:24 [INFO] HTTP Request: GET https://api.crossref.org/works/10.52202%2F079017-0826?mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:24 [INFO] HTTP Request: GET https://api.crossref.org/works/10.1109%2Fbigdata55660.2022.10020519?mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:24 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Optimization-induced+graph+implicit+nonlinear+diffusion&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:24 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Euclidean+neural+networks&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:24 [INFO] HTTP Request: HEAD https://doi.org/10.1109/bigdata55660.2022.10020519 "HTTP/1.1 302 Found"
+15:45:24 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Nodeformer%3A+A+scalable+graph+structure+learning+transformer+for+node+classification&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:24 [INFO] HTTP Request: HEAD https://doi.org/10.52202/079017-0826 "HTTP/1.1 302 Found"
+15:45:24 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Accelerating+bayesian+optimization+for+biological+sequence+design+with+denoising+autoencoders&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:24 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Evaluating+and+learning+from+rna+pseudotorsional+space%3A+quantitative+validation+of+a+reduced+representation+for+rna+structure&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:24 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Simple+and+deep+graph+convolutional+networks&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:25 [INFO] HTTP Request: HEAD https://doi.org/10.52202/068431-1986 "HTTP/1.1 302 Found"
+15:45:25 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AOptimization+induced+graph+implicit+nonlinear+diffusion&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:25 [INFO] HTTP Request: GET https://api.crossref.org/works/10.52202%2F068431-0830?mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:25 [INFO] HTTP Request: GET https://api.crossref.org/works/10.1016%2Fj.bbrc.2020.08.116?mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:25 [INFO] HTTP Request: HEAD https://doi.org/10.1016/j.jmb.2007.06.058 "HTTP/1.1 302 Found"
+15:45:25 [INFO] HTTP Request: HEAD http://www.proceedings.com/079017-0826.html "HTTP/1.1 301 Moved Permanently"
+15:45:25 [INFO] HTTP Request: GET https://api.crossref.org/works/10.1016%2Fj.fmre.2023.06.001?mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:25 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AAre+highdegree+representations+really+unnecessary+in+equivariant+graph+neural+networks+arXiv+preprint&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:25 [INFO] HTTP Request: HEAD http://www.proceedings.com/068431-1986.html "HTTP/1.1 301 Moved Permanently"
+15:45:25 [INFO] HTTP Request: HEAD https://doi.org/10.52202/068431-0830 "HTTP/1.1 302 Found"
+15:45:25 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=SE%283%29-hyena+operator+for+scalable+equivariant+learning&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:25 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Fast+graph+representation+learning+with+PyTorch+Geometric&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:25 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Spherical+message+passing+for+3d+molecular+graphs&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:25 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2206.14418 "HTTP/1.1 302 Found"
+15:45:25 [INFO] HTTP Request: HEAD https://ieeexplore.ieee.org/document/10020519/ "HTTP/1.1 418 Unknown Code"
+15:45:25 [INFO] Dead DOI detected: 10.1109/bigdata55660.2022.10020519 returned HTTP 418
+15:45:25 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Optuna%3A+A+next-generation+hyperparameter+optimization+framework&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:25 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Geometric+deep+learning+of+rna+structure&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:25 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3ASimple+and+deep+graph+convolutional+networks&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:25 [INFO] HTTP Request: HEAD https://doi.org/10.1016/j.fmre.2023.06.001 "HTTP/1.1 302 Found"
+15:45:25 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Crystal+structure+of+a+group+i+ribozyme+domain%3A+principles+of+rna+packing&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:25 [INFO] HTTP Request: GET https://api.crossref.org/works/10.1007%2F978-981-96-8180-8_32?mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:25 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Sgformer%3A+Simplifying+and+empowering+transformers+for+large-graph+representations&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:25 [INFO] HTTP Request: HEAD http://www.proceedings.com/068431-0830.html "HTTP/1.1 301 Moved Permanently"
+15:45:25 [INFO] HTTP Request: GET https://api.crossref.org/works/10.52202%2F068431-0667?mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:25 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AEuclidean+neural+networks&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:25 [INFO] HTTP Request: GET https://api.crossref.org/works/10.1109%2Fbigdata62323.2024.10825716?mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:25 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Rna+structural+dynamics+as+captured+by+molecular+simulations%3A+a+comprehensive+overview&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:25 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Unbiased+stochastic+proximal+solver+for+graph+neural+networks+with+equilibrium+states&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:25 [INFO] HTTP Request: HEAD https://linkinghub.elsevier.com/retrieve/pii/S0022283607008509 "HTTP/1.1 200 "
+15:45:25 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2206.14418 "HTTP/1.1 200 OK"
+15:45:25 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=The+limitless+future+of+rna+therapeutics&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:25 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=On+the+expressive+power+of+geometric+graph+neural+networks&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:25 [INFO] HTTP Request: HEAD https://www.proceedings.com/079017-0826.html "HTTP/1.1 200 OK"
+15:45:25 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Shape-aware+graph+spectral+learning&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:25 [INFO] HTTP Request: GET https://api.crossref.org/works/10.1007%2Fs11704-025-41426-w?mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:25 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Rna-torsionbert%3A+leveraging+language+models+for+rna+3d+torsion+angles+prediction&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:25 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Beyond+sequence%3A+Impact+of+geometric+context+for+RNA+property+prediction&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:25 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Equivariant+message+passing+for+the+prediction+of+tensorial+properties+and+molecular+spectra&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:25 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Enhancing+graph+transformers+with+hierarchical+distance+structural+encoding&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:25 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AAccelerating+bayesian+optimization+for+biological+sequence+design+with+denoising+autoencoders&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:25 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/ARXIV:arXiv:2503.21681?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 404 Not Found"
+15:45:25 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2007.02133 "HTTP/1.1 302 Found"
+15:45:25 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=A+euclidean+transformer+for+fast+and+stable+machine+learned+force+fields&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:25 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Highly+accurate+protein+structure+prediction+with+alphafold&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:25 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Biolangfusion%3A+Multimodal+fusion+of+dna%2C+mrna%2C+and+protein+language+models&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:25 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AFast+graph+representation+learning+with+PyTorch+Geometric&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:25 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3ASE+3+hyena+operator+for+scalable+equivariant+learning&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:25 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Multiscale+graph+neural+networks+with+implicit+layers&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:25 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Recipe+for+a+General%2C+Powerful%2C+Scalable+Graph+Transformer&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:25 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2007.02133 "HTTP/1.1 200 OK"
+15:45:25 [INFO] HTTP Request: HEAD https://doi.org/10.1007/978-981-16-6054-2_5 "HTTP/1.1 302 Found"
+15:45:25 [INFO] HTTP Request: GET https://api.crossref.org/works/10.1038%2Fnrd4278?mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:25 [INFO] HTTP Request: HEAD https://www.proceedings.com/068431-1986.html "HTTP/1.1 200 OK"
+15:45:25 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3ACrystal+structure+of+a+group+i+ribozyme+domain+principles+of+rna+packing&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:25 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2207.09453 "HTTP/1.1 302 Found"
+15:45:25 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Ribonanza%3A+deep+learning+of+rna+structure+through+dual+crowdsourcing&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:25 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AEvaluating+and+learning+from+rna+pseudotorsional+space+quantitative+validation+of+a+reduced+representation+for+rna+structure&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:25 [INFO] HTTP Request: HEAD https://doi.org/10.1038/s41467-024-50620-6 "HTTP/1.1 302 Found"
+15:45:25 [INFO] HTTP Request: HEAD https://doi.org/10.52202/079017-1821 "HTTP/1.1 302 Found"
+15:45:25 [INFO] HTTP Request: GET https://api.crossref.org/works/10.52202%2F075280-2070?mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:25 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2203.12742 "HTTP/1.1 302 Found"
+15:45:25 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Geometric+hyena+networks+for+large-scale+equivariant+learning&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:25 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Hyperhelm%3A+Hyperbolic+hierarchy+encoding+for+mrna+language+modeling&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:25 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=On+the+bottleneck+of+graph+neural+networks+and+its+practical+implications&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:25 [INFO] HTTP Request: GET https://api.crossref.org/works/10.5194%2Fessd-2020-174-rc1?mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:25 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=HELM%3A+Hierarchical+encoding+for+mRNA+language+modeling&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:25 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=HARMONY%3A+A+multi-representation+framework+for+RNA+property+prediction&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:25 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Schnet%3A+A+continuous-filter+convolutional+neural+network+for+modeling+quantum+interactions&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:25 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Ewald-based+long-range+message+passing+for+molecular+graphs&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:25 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Gemnet%3A+Universal+directional+graph+neural+networks+for+molecules&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:25 [INFO] HTTP Request: HEAD https://linkinghub.elsevier.com/retrieve/pii/S2667325823001796 "HTTP/1.1 200 "
+15:45:25 [INFO] HTTP Request: HEAD https://doi.org/10.3389/fbioe.2021.628137 "HTTP/1.1 302 Found"
+15:45:25 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2207.09453 "HTTP/1.1 200 OK"
+15:45:25 [INFO] HTTP Request: GET https://api.crossref.org/works/10.1038%2Fs41598-018-31289-6?mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:25 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AAre+High+Degree+Representations+Really+Unnecessary+in+Equivariant+Graph+Neural+Networks&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:25 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AGeometric+deep+learning+of+rna+structure&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:25 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2203.12742 "HTTP/1.1 200 OK"
+15:45:25 [INFO] HTTP Request: GET https://api.crossref.org/works/10.3389%2Ffrai.2020.580607?mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:25 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Transformers+meet+directed+graphs&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:25 [INFO] HTTP Request: HEAD https://link.springer.com/10.1007/978-981-16-6054-2_5 "HTTP/1.1 301 Moved Permanently"
+15:45:25 [INFO] HTTP Request: GET https://api.crossref.org/works/10.1093%2Fbenz%2F9780199773787.article.b00187341?mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:25 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=E+%28n%29+equivariant+graph+neural+networks&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:25 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Scalable+and+effective+implicit+graph+neural+networks+on+large+graphs&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:25 [INFO] HTTP Request: HEAD https://www.proceedings.com/068431-0830.html "HTTP/1.1 200 OK"
+15:45:25 [INFO] HTTP Request: HEAD https://doi.org/10.1101/2024.02.24.581671 "HTTP/1.1 302 Found"
+15:45:25 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=On+the+generalization+of+equivariance+and+convolution+in+neural+networks+to+the+action+of+compact+groups&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:26 [INFO] HTTP Request: GET https://api.crossref.org/works/10.1109%2Ftpami.2026.3684569?mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:26 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Bridging+biomolecular+modalities+for+knowledge+transfer+in+bio-language+models&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:26 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2407.01049 "HTTP/1.1 302 Found"
+15:45:26 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AEfficient+and+Scalable+Implicit+Graph+Neural+Networks+with+Virtual+Equilibrium&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:26 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Do+transformers+really+perform+badly+for+graph+representation%3F&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:26 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3ASpherical+message+passing+for+3d+molecular+graphs&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:26 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Revisiting+over-smoothing+and+over-squashing+using+ollivier-ricci+curvature&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:26 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.1903.02428 "HTTP/1.1 302 Found"
+15:45:26 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Deep+learning+models+for+predicting+rna+degradation+via+dual+crowdsourcing&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:26 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=A+comprehensive+benchmark+for+rna+3d+structure-function+modeling&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:26 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:26 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Geometric+deep+learning%3A+Grids%2C+groups%2C+graphs%2C+geodesics%2C+and+gauges&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:26 [INFO] HTTP Request: HEAD http://www.proceedings.com/079017-1821.html "HTTP/1.1 301 Moved Permanently"
+15:45:26 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AUnbiased+stochastic+proximal+solver+for+graph+neural+networks+with+equilibrium+states&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:26 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3ARna+structural+dynamics+as+captured+by+molecular+simulations+a+comprehensive+overview&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:26 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AOptuna+A+next+generation+hyperparameter+optimization+framework&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:26 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2407.01049 "HTTP/1.1 200 OK"
+15:45:26 [INFO] HTTP Request: HEAD https://doi.org/10.1038/s41598-018-31289-6 "HTTP/1.1 302 Found"
+15:45:26 [INFO] HTTP Request: HEAD https://arxiv.org/abs/1903.02428 "HTTP/1.1 200 OK"
+15:45:26 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3ASgformer+Simplifying+and+empowering+transformers+for+large+graph+representations&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:26 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=GLora%3A+A+benchmark+to+evaluate+the+ability+to+learn+long-range+dependencies+in+graphs&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:26 [INFO] HTTP Request: HEAD https://doi.org/10.1126/science.273.5282.1678 "HTTP/1.1 302 Found"
+15:45:26 [INFO] HTTP Request: HEAD https://doi.org/10.1038/nrd4278 "HTTP/1.1 302 Found"
+15:45:26 [INFO] HTTP Request: HEAD https://link.springer.com/chapter/10.1007/978-981-16-6054-2_5 "HTTP/1.1 303 See Other"
+15:45:26 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Deeprnatwist%3A+Language+model+guided+rna+torsion+angle+prediction+with+attention-inception+network&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:26 [INFO] HTTP Request: HEAD https://www.science.org/doi/10.1126/science.273.5282.1678 "HTTP/1.1 403 Forbidden"
+15:45:26 [INFO] Dead DOI detected: 10.1126/science.273.5282.1678 returned HTTP 403
+15:45:26 [INFO] HTTP Request: HEAD https://www.nature.com/articles/s41467-024-50620-6 "HTTP/1.1 200 OK"
+15:45:26 [INFO] HTTP Request: HEAD http://biorxiv.org/lookup/doi/10.1101/2024.02.24.581671 "HTTP/1.1 302 Found"
+15:45:26 [INFO] HTTP Request: HEAD https://doi.org/10.1126/science.abe5650 "HTTP/1.1 302 Found"
+15:45:26 [INFO] HTTP Request: HEAD https://idp.springer.com/authorize?response_type=cookie&client_id=springerlink&redirect_uri=https%3A%2F%2Flink.springer.com%2Fchapter%2F10.1007%2F978-981-16-6054-2_5 "HTTP/1.1 302 Found"
+15:45:26 [INFO] HTTP Request: HEAD https://doi.org/10.1101/2024.10.24.619978 "HTTP/1.1 302 Found"
+15:45:26 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AEquivariant+message+passing+for+the+prediction+of+tensorial+properties+and+molecular+spectra&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:26 [INFO] HTTP Request: HEAD https://www.frontiersin.org/articles/10.3389/fbioe.2021.628137/full "HTTP/1.1 301 Moved Permanently"
+15:45:26 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AShape+aware+graph+spectral+learning&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:26 [INFO] HTTP Request: HEAD https://www.biorxiv.org/lookup/doi/10.1101/2024.02.24.581671 "HTTP/1.1 403 Forbidden"
+15:45:26 [INFO] Dead DOI detected: 10.1101/2024.02.24.581671 returned HTTP 403
+15:45:26 [INFO] HTTP Request: HEAD https://www.science.org/doi/10.1126/science.abe5650 "HTTP/1.1 403 Forbidden"
+15:45:26 [INFO] Dead DOI detected: 10.1126/science.abe5650 returned HTTP 403
+15:45:26 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2306.10759 "HTTP/1.1 302 Found"
+15:45:26 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3ARna+torsionbert+leveraging+language+models+for+rna+3d+torsion+angles+prediction&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:26 [INFO] HTTP Request: HEAD https://doi.org/10.1021/acs.chemrev.7b00427 "HTTP/1.1 302 Found"
+15:45:26 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2306.10759 "HTTP/1.1 200 OK"
+15:45:26 [INFO] HTTP Request: HEAD https://pubs.acs.org/doi/10.1021/acs.chemrev.7b00427 "HTTP/1.1 403 Forbidden"
+15:45:26 [INFO] Dead DOI detected: 10.1021/acs.chemrev.7b00427 returned HTTP 403
+15:45:26 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2102.03150 "HTTP/1.1 302 Found"
+15:45:26 [INFO] HTTP Request: HEAD https://www.nature.com/articles/s41598-018-31289-6 "HTTP/1.1 200 OK"
+15:45:26 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Directional+message+passing+for+molecular+graphs&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:26 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2102.03150 "HTTP/1.1 200 OK"
+15:45:26 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3ABeyond+sequence+Impact+of+geometric+context+for+RNA+property+prediction&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:26 [INFO] HTTP Request: GET https://api.crossref.org/works/10.4230%2Foasics.dx.2024.30?mailto=diyanapv%40gmail.com "HTTP/1.1 429 Too Many Requests"
+15:45:26 [WARNING] crossref: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:26 [INFO] HTTP Request: HEAD https://www.proceedings.com/079017-1821.html "HTTP/1.1 200 OK"
+15:45:26 [INFO] HTTP Request: HEAD http://biorxiv.org/lookup/doi/10.1101/2024.10.24.619978 "HTTP/1.1 302 Found"
+15:45:26 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AHighly+accurate+protein+structure+prediction+with+alphafold&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:26 [INFO] HTTP Request: HEAD https://doi.org/10.1145/3627673.3679604 "HTTP/1.1 302 Found"
+15:45:26 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AMultiscale+graph+neural+networks+with+implicit+layers&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:26 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3ARecipe+for+a+General+Powerful+Scalable+Graph+Transformer&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:26 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2410.11933 "HTTP/1.1 302 Found"
+15:45:26 [INFO] HTTP Request: HEAD https://www.biorxiv.org/lookup/doi/10.1101/2024.10.24.619978 "HTTP/1.1 403 Forbidden"
+15:45:26 [INFO] Dead DOI detected: 10.1101/2024.10.24.619978 returned HTTP 403
+15:45:26 [INFO] HTTP Request: HEAD https://dl.acm.org/doi/10.1145/3627673.3679604 "HTTP/1.1 403 Forbidden"
+15:45:26 [INFO] Dead DOI detected: 10.1145/3627673.3679604 returned HTTP 403
+15:45:26 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2205.12454 "HTTP/1.1 302 Found"
+15:45:26 [INFO] HTTP Request: HEAD https://www.nature.com/articles/nrd4278 "HTTP/1.1 200 OK"
+15:45:26 [INFO] HTTP Request: HEAD https://link.springer.com/chapter/10.1007/978-981-16-6054-2_5 "HTTP/1.1 200 OK"
+15:45:26 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3ANodeformer+A+scalable+graph+structure+learning+transformer+for+node+classification&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:26 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2410.11933 "HTTP/1.1 200 OK"
+15:45:26 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2210.08353 "HTTP/1.1 302 Found"
+15:45:26 [INFO] HTTP Request: HEAD https://doi.org/10.1093/bioinformatics/btaf004 "HTTP/1.1 302 Found"
+15:45:26 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2205.12454 "HTTP/1.1 200 OK"
+15:45:26 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AGeometric+hyena+networks+for+large+scale+equivariant+learning&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:26 [INFO] HTTP Request: HEAD https://academic.oup.com/bioinformatics/article/doi/10.1093/bioinformatics/btaf004/7945663 "HTTP/1.1 403 Forbidden"
+15:45:26 [INFO] Dead DOI detected: 10.1093/bioinformatics/btaf004 returned HTTP 403
+15:45:26 [INFO] HTTP Request: HEAD https://doi.org/10.1038/s41586-021-03819-2 "HTTP/1.1 302 Found"
+15:45:26 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2210.08353 "HTTP/1.1 200 OK"
+15:45:26 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AOn+the+expressive+power+of+geometric+graph+neural+networks&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:26 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Fast+graph+representation+learning+with+PyTorch+Geometric&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:45:26 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2505.22560 "HTTP/1.1 302 Found"
+15:45:27 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AHyperhelm+Hyperbolic+hierarchy+encoding+for+mrna+language+modeling&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:27 [INFO] HTTP Request: HEAD https://www.nature.com/articles/s41586-021-03819-2 "HTTP/1.1 200 OK"
+15:45:27 [INFO] HTTP Request: HEAD https://www.frontiersin.org/journals/bioengineering-and-biotechnology/articles/10.3389/fbioe.2021.628137/full "HTTP/1.1 200 OK"
+15:45:27 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2505.22560 "HTTP/1.1 200 OK"
+15:45:27 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=A+comprehensive+benchmark+for+rna+3d+structure-function+modeling&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:27 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AHELM+Hierarchical+encoding+for+mRNA+language+modeling&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:27 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AHARMONY+A+multi+representation+framework+for+RNA+property+prediction&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:27 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AOn+the+bottleneck+of+graph+neural+networks+and+its+practical+implications&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:27 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3ASchnet+A+continuous+filter+convolutional+neural+network+for+modeling+quantum+interactions&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:27 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2410.12459 "HTTP/1.1 302 Found"
+15:45:27 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2410.12459 "HTTP/1.1 200 OK"
+15:45:27 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/ARXIV:arXiv:2506.02052?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 404 Not Found"
+15:45:27 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2006.05205 "HTTP/1.1 302 Found"
+15:45:27 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.1706.08566 "HTTP/1.1 302 Found"
+15:45:27 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AGemnet+Universal+directional+graph+neural+networks+for+molecules&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:27 [INFO] HTTP Request: GET https://api.crossref.org/works/10.4230%2Foasics.dx.2024.30?mailto=diyanapv%40gmail.com "HTTP/1.1 404 Not Found"
+15:45:27 [INFO] HTTP Request: HEAD https://arxiv.org/abs/1706.08566 "HTTP/1.1 200 OK"
+15:45:27 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2006.05205 "HTTP/1.1 200 OK"
+15:45:27 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Protap%3A+A+benchmark+for+protein+modeling+on+realistic+downstream+applications&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:27 [INFO] HTTP Request: HEAD https://doi.org/10.4230/oasics.dx.2024.30 "HTTP/1.1 302 Found"
+15:45:27 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3ARNA+structure+determination+From+2D+to+3D&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:27 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AEwald+based+long+range+message+passing+for+molecular+graphs&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:27 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2106.08903 "HTTP/1.1 302 Found"
+15:45:27 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2106.08903 "HTTP/1.1 200 OK"
+15:45:27 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2303.04791 "HTTP/1.1 302 Found"
+15:45:27 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2303.04791 "HTTP/1.1 200 OK"
+15:45:28 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3ABiolangfusion+Multimodal+fusion+of+dna+mrna+and+protein+language+models&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:28 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3ATransformers+meet+directed+graphs&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:28 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AScalable+and+effective+implicit+graph+neural+networks+on+large+graphs&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:28 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2506.08936 "HTTP/1.1 302 Found"
+15:45:28 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2506.08936 "HTTP/1.1 200 OK"
+15:45:28 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2302.00049 "HTTP/1.1 302 Found"
+15:45:28 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2302.00049 "HTTP/1.1 200 OK"
+15:45:28 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AMACE+Higher+Order+Equivariant+Message+Passing+Neural+Networks+for+Fast+and+Accurate+Force+Fields&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:28 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AE+n+equivariant+graph+neural+networks&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:28 [INFO] HTTP Request: HEAD https://drops.dagstuhl.de/entities/document/10.4230/OASIcs.DX.2024.30 "HTTP/1.1 200 OK"
+15:45:28 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AOn+the+generalization+of+equivariance+and+convolution+in+neural+networks+to+the+action+of+compact+groups&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:28 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/ARXIV:arXiv:2502.06914?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 404 Not Found"
+15:45:28 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3ABridging+biomolecular+modalities+for+knowledge+transfer+in+bio+language+models&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:28 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.1802.03690 "HTTP/1.1 302 Found"
+15:45:28 [INFO] HTTP Request: HEAD https://arxiv.org/abs/1802.03690 "HTTP/1.1 200 OK"
+15:45:28 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Unizyme%3A+A+unified+protein+cleavage+site+predictor+enhanced+with+enzyme+active-site+knowledge&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:28 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2102.09844 "HTTP/1.1 302 Found"
+15:45:28 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2102.09844 "HTTP/1.1 200 OK"
+15:45:28 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3ARevisiting+over+smoothing+and+over+squashing+using+ollivier+ricci+curvature&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:28 [INFO] HTTP Request: GET https://api.crossref.org/works/10.1101%2F2024.10.15.618385?mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:28 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2211.15779 "HTTP/1.1 302 Found"
+15:45:28 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2211.15779 "HTTP/1.1 200 OK"
+15:45:28 [INFO] HTTP Request: HEAD https://doi.org/10.1101/2024.10.15.618385 "HTTP/1.1 302 Found"
+15:45:29 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3ADo+transformers+really+perform+badly+for+graph+representation&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:29 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3ADeep+learning+models+for+predicting+rna+degradation+via+dual+crowdsourcing&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:29 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AGeometric+deep+learning+Grids+groups+graphs+geodesics+and+gauges&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:29 [INFO] HTTP Request: HEAD http://biorxiv.org/lookup/doi/10.1101/2024.10.15.618385 "HTTP/1.1 302 Found"
+15:45:29 [INFO] HTTP Request: HEAD https://www.biorxiv.org/lookup/doi/10.1101/2024.10.15.618385 "HTTP/1.1 403 Forbidden"
+15:45:29 [INFO] Dead DOI detected: 10.1101/2024.10.15.618385 returned HTTP 403
+15:45:29 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AGLora+A+benchmark+to+evaluate+the+ability+to+learn+long+range+dependencies+in+graphs&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:29 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2104.13478 "HTTP/1.1 302 Found"
+15:45:29 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2104.13478 "HTTP/1.1 200 OK"
+15:45:29 [INFO] HTTP Request: HEAD https://doi.org/10.1038/s42256-022-00571-8 "HTTP/1.1 302 Found"
+15:45:29 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3ARibonanza+deep+learning+of+rna+structure+through+dual+crowdsourcing&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:29 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3ARole+of+solvent+accessibility+for+aggregation+prone+patches+in+protein+folding&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:29 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AA+euclidean+transformer+for+fast+and+stable+machine+learned+force+fields&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:29 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/ARXIV:arXiv:2312.07511?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 404 Not Found"
+15:45:29 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3ADirectional+message+passing+for+molecular+graphs&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:29 [INFO] Existence check progress: 17/86
+15:45:29 [INFO] HTTP Request: HEAD https://www.nature.com/articles/s42256-022-00571-8 "HTTP/1.1 200 OK"
+15:45:29 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AEnhancing+graph+transformers+with+hierarchical+distance+structural+encoding&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:29 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3ADeeprnatwist+Language+model+guided+rna+torsion+angle+prediction+with+attention+inception+network&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:29 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2003.03123 "HTTP/1.1 302 Found"
+15:45:29 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2003.03123 "HTTP/1.1 200 OK"
+15:45:29 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AmRNA+based+therapeutics+developing+a+new+class+of+drugs&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:30 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Yoshua+Bengio%2C+and+Michael+Bronstein.+A+hitchhiker%27s+guide+to+geometric+gnns+for+3d+atomic+systems&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:30 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AThe+limitless+future+of+rna+therapeutics&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:30 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AA+comprehensive+benchmark+for+rna+3d+structure+function+modeling&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:30 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2503.21681 "HTTP/1.1 302 Found"
+15:45:30 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AProtap+A+benchmark+for+protein+modeling+on+realistic+downstream+applications&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:30 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2503.21681 "HTTP/1.1 200 OK"
+15:45:30 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/ARXIV:arXiv:2009.01411?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 429 "
+15:45:30 [WARNING] semantic_scholar: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:30 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AUnizyme+A+unified+protein+cleavage+site+predictor+enhanced+with+enzyme+active+site+knowledge&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:30 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2502.06914 "HTTP/1.1 302 Found"
+15:45:30 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3ABridging+biomolecular+modalities+for+knowledge+transfer+in+bio+language+models&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:30 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2502.06914 "HTTP/1.1 200 OK"
+15:45:30 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AYoshua+Bengio+and+Michael+Bronstein+A+hitchhiker+s+guide+to+geometric+gnns+for+3d+atomic+systems&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:30 [INFO] HTTP Request: GET https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=Protap++A+benchmark+for+protein+modeling+on+realistic+downstream+applications%5BTitle%5D&retmode=json&retmax=5 "HTTP/1.1 200 OK"
+15:45:30 [INFO] HTTP Request: GET https://export.arxiv.org/api/query?search_query=ti%3A%22Yoshua+Bengio+and+Michael+Bronstein+A+hitchhiker+s+guide+to+geometric+gnns+for+3d+atomic+systems%22&start=0&max_results=5 "HTTP/1.1 429 Unknown Error"
+15:45:30 [WARNING] arxiv: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:45:31 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/ARXIV:arXiv:1802.08219?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 404 Not Found"
+15:45:31 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Tensor+field+networks%3A+Rotation-and+translation-equivariant+neural+networks+for+3d+point+clouds&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:32 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3ATensor+field+networks+Rotation+and+translation+equivariant+neural+networks+for+3d+point+clouds&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:32 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.1802.08219 "HTTP/1.1 302 Found"
+15:45:32 [INFO] HTTP Request: HEAD https://arxiv.org/abs/1802.08219 "HTTP/1.1 200 OK"
+15:45:32 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/ARXIV:arXiv:2207.01586?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 404 Not Found"
+15:45:33 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=d%3A+End-to-end+deep+learning+method+for+accurate+de+novo+rna+3d+structure+prediction&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:33 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/ARXIV:arXiv:2311.01276?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 404 Not Found"
+15:45:33 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3Ad+End+to+end+deep+learning+method+for+accurate+de+novo+rna+3d+structure+prediction&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:33 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Neural+atoms%3A+Propagating+long-range+interaction+in+molecular+graphs+through+efficient+communication+channel&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:34 [INFO] HTTP Request: GET https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=d++End+to+end+deep+learning+method+for+accurate+de+novo+rna+3d+structure+prediction%5BTitle%5D&retmode=json&retmax=5 "HTTP/1.1 200 OK"
+15:45:34 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3ANeural+atoms+Propagating+long+range+interaction+in+molecular+graphs+through+efficient+communication+channel&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:34 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2311.01276 "HTTP/1.1 302 Found"
+15:45:34 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2311.01276 "HTTP/1.1 200 OK"
+15:45:34 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Implicit+graph+neural+networks+A+monotone+operator+viewpoint&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:45:35 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Representing+long+range+context+for+graph+neural+networks+with+global+attention&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:45:36 [INFO] HTTP Request: GET https://export.arxiv.org/api/query?search_query=ti%3A%22Yoshua+Bengio+and+Michael+Bronstein+A+hitchhiker+s+guide+to+geometric+gnns+for+3d+atomic+systems%22&start=0&max_results=5 "HTTP/1.1 429 Unknown Error"
+15:45:36 [WARNING] arxiv: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:45:37 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Implicit+graph+neural+networks&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:45:37 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Se+3+transformers+3d+roto+translation+equivariant+attention+networks&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:45:39 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=The+protein+data+bank&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:45:39 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/DOI:10.1016/j.bbrc.2020.08.116?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 200 OK"
+15:45:39 [INFO] HTTP Request: HEAD https://doi.org/10.1016/j.bbrc.2020.08.116 "HTTP/1.1 302 Found"
+15:45:39 [INFO] HTTP Request: HEAD https://linkinghub.elsevier.com/retrieve/pii/S0006291X20317216 "HTTP/1.1 200 "
+15:45:40 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3ARNA+dependent+RNA+polymerase+Structure+mechanism+and+drug+discovery+for+COVID+19&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:40 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/DOI:10.1007/978-981-96-8180-8_32?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 200 OK"
+15:45:40 [INFO] HTTP Request: HEAD https://doi.org/10.1007/978-981-96-8180-8_32 "HTTP/1.1 302 Found"
+15:45:41 [INFO] HTTP Request: HEAD https://link.springer.com/10.1007/978-981-96-8180-8_32 "HTTP/1.1 301 Moved Permanently"
+15:45:41 [INFO] HTTP Request: HEAD https://link.springer.com/chapter/10.1007/978-981-96-8180-8_32 "HTTP/1.1 200 OK"
+15:45:41 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/DOI:10.52202/068431-0667?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 200 OK"
+15:45:41 [INFO] HTTP Request: HEAD https://doi.org/10.52202/068431-0667 "HTTP/1.1 302 Found"
+15:45:41 [INFO] HTTP Request: HEAD http://www.proceedings.com/068431-0667.html "HTTP/1.1 301 Moved Permanently"
+15:45:41 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AEfficient+and+Diverse+De+Novo+Protein+Backbone+Design+with+SE+3+Equivariant+Diffusion&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:42 [INFO] HTTP Request: HEAD https://www.proceedings.com/068431-0667.html "HTTP/1.1 200 OK"
+15:45:42 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/DOI:10.1109/bigdata62323.2024.10825716?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 200 OK"
+15:45:42 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AEquivariant+Graph+Hierarchy+Based+Neural+Networks&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:42 [INFO] HTTP Request: HEAD https://doi.org/10.1109/BigData62323.2024.10825716 "HTTP/1.1 302 Found"
+15:45:42 [INFO] HTTP Request: GET https://export.arxiv.org/api/query?search_query=ti%3A%22Yoshua+Bengio+and+Michael+Bronstein+A+hitchhiker+s+guide+to+geometric+gnns+for+3d+atomic+systems%22&start=0&max_results=5 "HTTP/1.1 429 Unknown Error"
+15:45:43 [INFO] HTTP Request: HEAD https://ieeexplore.ieee.org/document/10825716/ "HTTP/1.1 418 Unknown Code"
+15:45:43 [INFO] Dead DOI detected: 10.1109/BigData62323.2024.10825716 returned HTTP 418
+15:45:43 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3ASE+3+Equivariant+Neural+Network+for+3D+Graphs&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:44 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Optimization+induced+graph+implicit+nonlinear+diffusion&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:45:44 [INFO] Existence check progress: 34/86
+15:45:44 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/DOI:10.1007/s11704-025-41426-w?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 200 OK"
+15:45:44 [INFO] HTTP Request: HEAD https://doi.org/10.1007/s11704-025-41426-w "HTTP/1.1 302 Found"
+15:45:44 [INFO] HTTP Request: HEAD https://link.springer.com/10.1007/s11704-025-41426-w "HTTP/1.1 301 Moved Permanently"
+15:45:45 [INFO] HTTP Request: HEAD https://link.springer.com/article/10.1007/s11704-025-41426-w "HTTP/1.1 200 OK"
+15:45:45 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AA+survey+of+geometric+graph+neural+networks+data+structures+models+and+applications&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:46 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Simple+and+deep+graph+convolutional+networks&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:45:46 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/DOI:10.52202/075280-2070?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 200 OK"
+15:45:46 [INFO] HTTP Request: HEAD https://doi.org/10.52202/075280-2070 "HTTP/1.1 302 Found"
+15:45:46 [INFO] HTTP Request: HEAD http://www.proceedings.com/075280-2070.html "HTTP/1.1 301 Moved Permanently"
+15:45:47 [INFO] HTTP Request: HEAD https://www.proceedings.com/075280-2070.html "HTTP/1.1 200 OK"
+15:45:47 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3ATransformers+over+Directed+Acyclic+Graphs&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:47 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/DOI:10.5194/essd-2020-174-rc1?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 200 OK"
+15:45:47 [INFO] HTTP Request: HEAD https://doi.org/10.5194/essd-2020-174-rc1 "HTTP/1.1 302 Found"
+15:45:47 [INFO] HTTP Request: HEAD https://essd.copernicus.org/preprints/essd-2020-174/essd-2020-174-RC1.pdf "HTTP/1.1 200 OK"
+15:45:48 [WARNING] arxiv: ReadTimeout (attempt 1/3), retrying in 1.0s
+15:45:49 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Euclidean+neural+networks&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:45:49 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Accelerating+bayesian+optimization+for+biological+sequence+design+with+denoising+autoencoders&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:45:50 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/DOI:10.3389/frai.2020.580607?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 200 OK"
+15:45:50 [INFO] HTTP Request: HEAD https://doi.org/10.3389/frai.2020.580607 "HTTP/1.1 302 Found"
+15:45:51 [INFO] HTTP Request: HEAD https://www.frontiersin.org/articles/10.3389/frai.2020.580607/full "HTTP/1.1 301 Moved Permanently"
+15:45:51 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/DOI:10.1093/benz/9780199773787.article.b00187341?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 404 Not Found"
+15:45:51 [INFO] HTTP Request: HEAD https://www.frontiersin.org/journals/artificial-intelligence/articles/10.3389/frai.2020.580607/full "HTTP/1.1 200 OK"
+15:45:51 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AUssing+Stefan+or+Stephan+Peter+Johannes+Hjort&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:51 [INFO] HTTP Request: HEAD https://doi.org/10.1093/benz/9780199773787.article.b00187341 "HTTP/1.1 302 Found"
+15:45:52 [INFO] HTTP Request: HEAD http://www.oxfordartonline.com/benezit/view/10.1093/benz/9780199773787.001.0001/acref-9780199773787-e-00187341 "HTTP/1.1 301 Moved Permanently"
+15:45:52 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AGraph+Neural+Networks+for+Maximum+Constraint+Satisfaction&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:52 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/DOI:10.1109/tpami.2026.3684569?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 404 Not Found"
+15:45:52 [INFO] HTTP Request: HEAD https://www.oxfordartonline.com/benezit/view/10.1093/benz/9780199773787.001.0001/acref-9780199773787-e-00187341 "HTTP/1.1 302 "
+15:45:52 [INFO] HTTP Request: HEAD https://oup2-idp.sams-sigma.com/authorize?scope=license_lite+openid+offline_access+profile+email+profile_extended&response_type=code&ip_address=217.255.94.219&redirect_uri=https%3A%2F%2Fwww.oxfordartonline.com%2Foidc_callback&state=G0yt4eewztvZEkqg8xKEEZrYM0-F45TXSvfznBUkO9Yredirect%3D%2Fbenezit%2Fview%2F10.1093%2Fbenz%2F9780199773787.001.0001%2Facref-9780199773787-e-00187341&auth_token=eyJlbmMiOiJBMTI4R0NNIiwiYWxnIjoiUlNBLU9BRVAtMjU2In0.Q8oACfp44Qa8QeIX9B3275iIkw_fBLLbF57--gAS9GzZROtSbt-2Ko2TGGkZrx6kHEvRds2nrz0QOShvBx1SJsEIOvjEWBUYEq_12_w2KM6Z4KoRBNf_S3QdevWDe0LU61IOgL-IFQpVPEXeIuKH9TUQV_v8mMz_xpekWgBffDJpIy5-YWeFvOlBRuIFI3nAIW9ceICyX4In05CnG-FgOn52C3JLJr5hU-oUXfOdH3Wu1_uAoloXhaxYhOsw2bv5dSPb8rlbIRTMhAIof2UPfOH4YAD70jAgVzl0cV30U390r54KvR9c45ZdPhMqpE3yyxPoOEu4b2nc-177zJRLwA.8Ypmo8JfPYxuxFVu.-obOcX3Lm7mLbDYTnfHbOa0k2Ia9UGQgilcQiNmRcudzsO9zVi6T1Y_GPxaonywcywoWp_GCvipfMrsN7DeIUzICMUoJyV7NLM7iNQuNLzCO5GpNYGFNFdepzenEcj65Qm4QWCRYH4U19mBruM3DzBucHAk-p0EMqfkBFeDbiXplJ48BYA4L-DKitIughzmfrnyGMWanVw.dFcj38PTwmL6KNTGkCD_Aw&prompt=none&nonce=7ZnncsX8ijxr9GsRRAEWGurQxXuoakFFgxTPkLRdc44&client_id=OAO "HTTP/1.1 302 Found"
+15:45:52 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AFast+and+Distributed+Equivariant+Graph+Neural+Networks+by+Virtual+Node+Learning&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:52 [INFO] HTTP Request: HEAD https://www.oxfordartonline.com/oidc_callback?error=login_required&state=G0yt4eewztvZEkqg8xKEEZrYM0-F45TXSvfznBUkO9Yredirect%3D%2Fbenezit%2Fview%2F10.1093%2Fbenz%2F9780199773787.001.0001%2Facref-9780199773787-e-00187341 "HTTP/1.1 302 "
+15:45:52 [INFO] HTTP Request: HEAD https://doi.org/10.1109/tpami.2026.3684569 "HTTP/1.1 302 Found"
+15:45:52 [INFO] HTTP Request: HEAD https://www.oxfordartonline.com/benezit/view/10.1093/benz/9780199773787.001.0001/acref-9780199773787-e-00187341 "HTTP/1.1 301 "
+15:45:53 [INFO] HTTP Request: HEAD https://ieeexplore.ieee.org/document/11482500/ "HTTP/1.1 418 Unknown Code"
+15:45:53 [INFO] Dead DOI detected: 10.1109/tpami.2026.3684569 returned HTTP 418
+15:45:53 [INFO] HTTP Request: HEAD https://www.oxfordartonline.com/benezit/display/10.1093/benz/9780199773787.001.0001/acref-9780199773787-e-00187341 "HTTP/1.1 200 "
+15:45:53 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Spherical+message+passing+for+3d+molecular+graphs&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:45:54 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3ASpherical+message+passing+for+3d+molecular+graphs&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:54 [WARNING] arxiv: ReadTimeout (attempt 1/3), retrying in 1.0s
+15:45:54 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Unbiased+stochastic+proximal+solver+for+graph+neural+networks+with+equilibrium+states&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:45:55 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AUnbiased+stochastic+proximal+solver+for+graph+neural+networks+with+equilibrium+states&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:55 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=SE+3+hyena+operator+for+scalable+equivariant+learning&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:45:56 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/ARXIV:arXiv:2110.02905?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 404 Not Found"
+15:45:57 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Geometric+and+physical+quantities+improve+e+%283%29+equivariant+message+passing&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:57 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Crystal+structure+of+a+group+i+ribozyme+domain+principles+of+rna+packing&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:45:58 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AGeometric+and+physical+quantities+improve+e+3+equivariant+message+passing&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:45:58 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2110.02905 "HTTP/1.1 302 Found"
+15:45:58 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2110.02905 "HTTP/1.1 200 OK"
+15:45:59 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Geometric+deep+learning+of+rna+structure&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:45:59 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Sgformer+Simplifying+and+empowering+transformers+for+large+graph+representations&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:46:00 [WARNING] arxiv: ReadTimeout (attempt 1/3), retrying in 1.0s
+15:46:00 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Rna+structural+dynamics+as+captured+by+molecular+simulations+a+comprehensive+overview&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:46:01 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Equivariant+message+passing+for+the+prediction+of+tensorial+properties+and+molecular+spectra&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:46:03 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Shape+aware+graph+spectral+learning&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:46:03 [INFO] Existence check progress: 51/86
+15:46:03 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Beyond+sequence+Impact+of+geometric+context+for+RNA+property+prediction&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:46:04 [INFO] HTTP Request: GET https://export.arxiv.org/api/query?search_query=ti%3A%22Protap+A+benchmark+for+protein+modeling+on+realistic+downstream+applications%22&start=0&max_results=5 "HTTP/1.1 429 Unknown Error"
+15:46:04 [WARNING] arxiv: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:46:04 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Recipe+for+a+General+Powerful+Scalable+Graph+Transformer&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:46:05 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Rna+torsionbert+leveraging+language+models+for+rna+3d+torsion+angles+prediction&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:46:07 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Multiscale+graph+neural+networks+with+implicit+layers&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:46:07 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Hyperhelm+Hyperbolic+hierarchy+encoding+for+mrna+language+modeling&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:46:07 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arXiv.2509.24655 "HTTP/1.1 302 Found"
+15:46:08 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2509.24655 "HTTP/1.1 200 OK"
+15:46:08 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AHyperhelm+Hyperbolic+hierarchy+encoding+for+mrna+language+modeling&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:46:09 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Highly+accurate+protein+structure+prediction+with+alphafold&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:46:09 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Geometric+hyena+networks+for+large+scale+equivariant+learning&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:46:10 [WARNING] arxiv: ReadTimeout (attempt 2/3), retrying in 2.0s
+15:46:11 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=HARMONY+A+multi+representation+framework+for+RNA+property+prediction&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:46:11 [INFO] HTTP Request: GET https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=HARMONY++A+multi+representation+framework+for+RNA+property+prediction%5BTitle%5D&retmode=json&retmax=5 "HTTP/1.1 200 OK"
+15:46:12 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=HELM+Hierarchical+encoding+for+mRNA+language+modeling&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:46:13 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Schnet+A+continuous+filter+convolutional+neural+network+for+modeling+quantum+interactions&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:46:13 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=On+the+bottleneck+of+graph+neural+networks+and+its+practical+implications&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:46:14 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Gemnet+Universal+directional+graph+neural+networks+for+molecules&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:46:15 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Ewald+based+long+range+message+passing+for+molecular+graphs&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:46:16 [WARNING] arxiv: ReadTimeout (attempt 2/3), retrying in 2.0s
+15:46:16 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Scalable+and+effective+implicit+graph+neural+networks+on+large+graphs&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:46:17 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AScalable+and+effective+implicit+graph+neural+networks+on+large+graphs&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:46:17 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Biolangfusion+Multimodal+fusion+of+dna+mrna+and+protein+language+models&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:46:19 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Transformers+meet+directed+graphs&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:46:20 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Optuna+A+next+generation+hyperparameter+optimization+framework&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:46:20 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=On+the+generalization+of+equivariance+and+convolution+in+neural+networks+to+the+action+of+compact+groups&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:46:20 [INFO] Existence check progress: 68/86
+15:46:22 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=E+n+equivariant+graph+neural+networks&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:46:22 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Revisiting+over+smoothing+and+over+squashing+using+ollivier+ricci+curvature&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:46:23 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Do+transformers+really+perform+badly+for+graph+representation&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:46:25 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=GLora+A+benchmark+to+evaluate+the+ability+to+learn+long+range+dependencies+in+graphs&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:46:25 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3AGLora+A+benchmark+to+evaluate+the+ability+to+learn+long+range+dependencies+in+graphs&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:46:25 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Geometric+deep+learning+Grids+groups+graphs+geodesics+and+gauges&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:46:26 [WARNING] arxiv: ReadTimeout (attempt 1/3), retrying in 1.0s
+15:46:26 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Deep+learning+models+for+predicting+rna+degradation+via+dual+crowdsourcing&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:46:27 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Directional+message+passing+for+molecular+graphs&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:46:28 [INFO] HTTP Request: GET https://export.arxiv.org/api/query?search_query=ti%3A%22HARMONY+A+multi+representation+framework+for+RNA+property+prediction%22&start=0&max_results=5 "HTTP/1.1 429 Unknown Error"
+15:46:28 [WARNING] arxiv: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:46:29 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=A+comprehensive+benchmark+for+rna+3d+structure+function+modeling&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:46:29 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Unizyme+A+unified+protein+cleavage+site+predictor+enhanced+with+enzyme+active+site+knowledge&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:46:30 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/ARXIV:arXiv:2009.01411?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 404 Not Found"
+15:46:31 [INFO] HTTP Request: GET https://api.crossref.org/works?query.bibliographic=Learning+from+protein+structure+with+geometric+vector+perceptrons&rows=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:46:32 [INFO] HTTP Request: GET https://export.arxiv.org/api/query?search_query=au%3Acohen+AND+au%3Aduval&start=0&max_results=10 "HTTP/1.1 429 Unknown Error"
+15:46:32 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Tensor+field+networks+Rotation+and+translation+equivariant+neural+networks+for+3d+point+clouds&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:46:32 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3ALearning+from+protein+structure+with+geometric+vector+perceptrons&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:46:32 [INFO] HTTP Request: HEAD https://doi.org/10.48550/arxiv.2009.01411 "HTTP/1.1 302 Found"
+15:46:32 [INFO] HTTP Request: HEAD https://arxiv.org/abs/2009.01411 "HTTP/1.1 200 OK"
+15:46:32 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Neural+atoms+Propagating+long+range+interaction+in+molecular+graphs+through+efficient+communication+channel&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 429 "
+15:46:32 [WARNING] semantic_scholar: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:46:33 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Fast+and+Distributed+Equivariant+Graph+Neural+Networks+by+Virtual+Node+Learning&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:46:34 [INFO] HTTP Request: GET https://export.arxiv.org/api/query?search_query=ti%3A%22HARMONY+A+multi+representation+framework+for+RNA+property+prediction%22&start=0&max_results=5 "HTTP/1.1 429 Unknown Error"
+15:46:34 [INFO] HTTP Request: GET https://api.openreview.net/notes/search?term=Yoshua+Bengio%2C+and+Michael+Bronstein.+A+hitchhiker%27s+guide+to+geometric+gnns+for+3d+atomic+systems&limit=10 "HTTP/1.1 200 OK"
+15:46:34 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Geometric+and+physical+quantities+improve+e+3+equivariant+message+passing&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:46:35 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Learning+from+protein+structure+with+geometric+vector+perceptrons&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:46:36 [WARNING] arxiv: ReadTimeout (attempt 1/3), retrying in 1.0s
+15:46:36 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Neural+atoms+Propagating+long+range+interaction+in+molecular+graphs+through+efficient+communication+channel&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:46:45 [WARNING] arxiv: ReadTimeout (attempt 1/3), retrying in 1.0s
+15:46:51 [WARNING] arxiv: ReadTimeout (attempt 1/3), retrying in 1.0s
+15:46:54 [WARNING] arxiv: ReadTimeout (attempt 2/3), retrying in 2.0s
+15:47:01 [WARNING] arxiv: ReadTimeout (attempt 2/3), retrying in 2.0s
+15:47:07 [WARNING] arxiv: ReadTimeout (attempt 2/3), retrying in 2.0s
+15:47:14 [INFO] HTTP Request: GET https://api.openreview.net/notes/search?term=Protap%3A+A+benchmark+for+protein+modeling+on+realistic+downstream+applications&limit=10 "HTTP/1.1 200 OK"
+15:47:21 [INFO] HTTP Request: GET https://api.openreview.net/notes/search?term=d%3A+End-to-end+deep+learning+method+for+accurate+de+novo+rna+3d+structure+prediction&limit=10 "HTTP/1.1 200 OK"
+15:47:21 [INFO] HTTP Request: GET https://api.openalex.org/works?filter=title.search%3Ad+End+to+end+deep+learning+method+for+accurate+de+novo+rna+3d+structure+prediction&per_page=5&mailto=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:47:21 [INFO] Existence check progress: 85/86
+15:47:26 [INFO] HTTP Request: GET https://api.openreview.net/notes/search?term=HARMONY%3A+A+multi-representation+framework+for+RNA+property+prediction&limit=10 "HTTP/1.1 200 OK"
+15:47:26 [INFO] Existence check complete: 83/86 references found
+15:47:26 [INFO] STAGE L2_existence seconds=125.640 refs=86
+15:47:27 [INFO] HTTP Request: GET https://api.unpaywall.org/v2/10.1101/2024.10.24.619978?email=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:47:27 [INFO] HTTP Request: GET https://www.biorxiv.org/content/biorxiv/early/2024/10/29/2024.10.24.619978.full.pdf "HTTP/1.1 403 Forbidden"
+15:47:27 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/DOI:10.1101/2024.10.24.619978?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 404 Not Found"
+15:47:28 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=DeepRNA+Twist+Language+Model+guided+RNA+Torsion+Angle+Prediction+with+Attention+Inception+Network&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 429 "
+15:47:28 [WARNING] semantic_scholar: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:47:30 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=DeepRNA+Twist+Language+Model+guided+RNA+Torsion+Angle+Prediction+with+Attention+Inception+Network&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:47:45 [WARNING] arxiv: ReadTimeout (attempt 1/3), retrying in 1.0s
+15:47:56 [WARNING] get_full_text: ref_id=1 exceeded 30s fetch budget; returning abstract_only.
+15:47:57 [INFO] HTTP Request: GET https://api.unpaywall.org/v2/10.1093/bioinformatics/btac386?email=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:47:57 [INFO] HTTP Request: GET https://doi.org/10.1093/bioinformatics/btac386 "HTTP/1.1 302 Found"
+15:47:57 [INFO] HTTP Request: GET https://academic.oup.com/bioinformatics/article/38/14/3668/6604270 "HTTP/1.1 403 Forbidden"
+15:47:58 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/DOI:10.1093/bioinformatics/btac386?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 200 OK"
+15:47:58 [INFO] HTTP Request: GET https://doi.org/10.1093/bioinformatics/btac386 "HTTP/1.1 302 Found"
+15:47:58 [INFO] HTTP Request: GET https://academic.oup.com/bioinformatics/article/38/14/3668/6604270 "HTTP/1.1 403 Forbidden"
+15:48:13 [WARNING] arxiv: ReadTimeout (attempt 1/3), retrying in 1.0s
+15:48:26 [WARNING] get_full_text: ref_id=2 exceeded 30s fetch budget; returning abstract_only.
+15:48:26 [INFO] HTTP Request: GET http://arxiv.org/abs/1907.10902 "HTTP/1.1 301 Moved Permanently"
+15:48:26 [INFO] HTTP Request: GET https://arxiv.org/abs/1907.10902 "HTTP/1.1 200 OK"
+15:48:26 [INFO] HTTP Request: GET https://arxiv.org/pdf/1907.10902 "HTTP/1.1 200 OK"
+15:48:29 [DEBUG] Building index from IDs objects
+15:48:32 [INFO] Loading dense model: all-MiniLM-L6-v2
+15:48:32 [INFO] Use pytorch device_name: cpu
+15:48:32 [INFO] Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+15:48:32 [INFO] HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/modules.json "HTTP/1.1 307 Temporary Redirect"
+15:48:32 [INFO] HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/c9745ed1d9f207416be6d2e6f8de32d1f16199bf/modules.json "HTTP/1.1 200 OK"
+15:48:32 [INFO] HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/config_sentence_transformers.json "HTTP/1.1 307 Temporary Redirect"
+15:48:32 [INFO] HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/c9745ed1d9f207416be6d2e6f8de32d1f16199bf/config_sentence_transformers.json "HTTP/1.1 200 OK"
+15:48:33 [INFO] HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/config_sentence_transformers.json "HTTP/1.1 307 Temporary Redirect"
+15:48:33 [INFO] HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/c9745ed1d9f207416be6d2e6f8de32d1f16199bf/config_sentence_transformers.json "HTTP/1.1 200 OK"
+15:48:33 [INFO] HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/README.md "HTTP/1.1 307 Temporary Redirect"
+15:48:33 [INFO] HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/c9745ed1d9f207416be6d2e6f8de32d1f16199bf/README.md "HTTP/1.1 200 OK"
+15:48:33 [INFO] HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/modules.json "HTTP/1.1 307 Temporary Redirect"
+15:48:33 [INFO] HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/c9745ed1d9f207416be6d2e6f8de32d1f16199bf/modules.json "HTTP/1.1 200 OK"
+15:48:33 [INFO] HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/sentence_bert_config.json "HTTP/1.1 307 Temporary Redirect"
+15:48:33 [INFO] HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/c9745ed1d9f207416be6d2e6f8de32d1f16199bf/sentence_bert_config.json "HTTP/1.1 200 OK"
+15:48:33 [INFO] HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/adapter_config.json "HTTP/1.1 404 Not Found"
+15:48:33 [INFO] HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+15:48:33 [INFO] HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/c9745ed1d9f207416be6d2e6f8de32d1f16199bf/config.json "HTTP/1.1 200 OK"
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|██████████| 103/103 [00:00<00:00, 3824.45it/s]
+[1mBertModel LOAD REPORT[0m from: sentence-transformers/all-MiniLM-L6-v2
+Key                     | Status     |  | 
+------------------------+------------+--+-
+embeddings.position_ids | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+15:48:34 [INFO] HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+15:48:34 [INFO] HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/c9745ed1d9f207416be6d2e6f8de32d1f16199bf/config.json "HTTP/1.1 200 OK"
+15:48:34 [INFO] HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/tokenizer_config.json "HTTP/1.1 307 Temporary Redirect"
+15:48:34 [INFO] HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/c9745ed1d9f207416be6d2e6f8de32d1f16199bf/tokenizer_config.json "HTTP/1.1 200 OK"
+15:48:34 [INFO] HTTP Request: GET https://huggingface.co/api/models/sentence-transformers/all-MiniLM-L6-v2/tree/main/additional_chat_templates?recursive=false&expand=false "HTTP/1.1 404 Not Found"
+15:48:34 [INFO] HTTP Request: GET https://huggingface.co/api/models/sentence-transformers/all-MiniLM-L6-v2/tree/main?recursive=true&expand=false "HTTP/1.1 200 OK"
+15:48:34 [INFO] HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/1_Pooling/config.json "HTTP/1.1 307 Temporary Redirect"
+15:48:34 [INFO] HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/c9745ed1d9f207416be6d2e6f8de32d1f16199bf/1_Pooling%2Fconfig.json "HTTP/1.1 200 OK"
+15:48:35 [INFO] HTTP Request: GET https://huggingface.co/api/models/sentence-transformers/all-MiniLM-L6-v2 "HTTP/1.1 200 OK"
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 80.18it/s]
+15:48:36 [INFO] Loading CrossEncoder reranker: cross-encoder/ms-marco-MiniLM-L-12-v2
+15:48:36 [INFO] HTTP Request: HEAD https://huggingface.co/cross-encoder/ms-marco-MiniLM-L-12-v2/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+15:48:36 [INFO] HTTP Request: HEAD https://huggingface.co/cross-encoder/ms-marco-MiniLM-L12-v2/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+15:48:36 [INFO] HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/cross-encoder/ms-marco-MiniLM-L12-v2/7b0235231ca2674cb8ca8f022859a6eba2b1c968/config.json "HTTP/1.1 200 OK"
+Loading weights:   0%|          | 0/201 [00:00<?, ?it/s]Loading weights: 100%|██████████| 201/201 [00:00<00:00, 2931.23it/s]
+[1mBertForSequenceClassification LOAD REPORT[0m from: cross-encoder/ms-marco-MiniLM-L-12-v2
+Key                          | Status     |  | 
+-----------------------------+------------+--+-
+bert.embeddings.position_ids | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+15:48:36 [INFO] HTTP Request: HEAD https://huggingface.co/cross-encoder/ms-marco-MiniLM-L-12-v2/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+15:48:37 [INFO] HTTP Request: HEAD https://huggingface.co/cross-encoder/ms-marco-MiniLM-L12-v2/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+15:48:37 [INFO] HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/cross-encoder/ms-marco-MiniLM-L12-v2/7b0235231ca2674cb8ca8f022859a6eba2b1c968/config.json "HTTP/1.1 200 OK"
+15:48:37 [INFO] HTTP Request: HEAD https://huggingface.co/cross-encoder/ms-marco-MiniLM-L-12-v2/resolve/main/tokenizer_config.json "HTTP/1.1 307 Temporary Redirect"
+15:48:37 [INFO] HTTP Request: HEAD https://huggingface.co/cross-encoder/ms-marco-MiniLM-L12-v2/resolve/main/tokenizer_config.json "HTTP/1.1 307 Temporary Redirect"
+15:48:37 [INFO] HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/cross-encoder/ms-marco-MiniLM-L12-v2/7b0235231ca2674cb8ca8f022859a6eba2b1c968/tokenizer_config.json "HTTP/1.1 200 OK"
+15:48:37 [INFO] HTTP Request: GET https://huggingface.co/api/models/cross-encoder/ms-marco-MiniLM-L-12-v2/tree/main/additional_chat_templates?recursive=false&expand=false "HTTP/1.1 307 Temporary Redirect"
+15:48:37 [INFO] HTTP Request: GET https://huggingface.co/api/models/cross-encoder/ms-marco-MiniLM-L12-v2/tree/main/additional_chat_templates?recursive=false&expand=false "HTTP/1.1 404 Not Found"
+15:48:38 [INFO] HTTP Request: GET https://huggingface.co/api/models/cross-encoder/ms-marco-MiniLM-L-12-v2/tree/main?recursive=true&expand=false "HTTP/1.1 307 Temporary Redirect"
+15:48:38 [INFO] HTTP Request: GET https://huggingface.co/api/models/cross-encoder/ms-marco-MiniLM-L12-v2/tree/main?recursive=true&expand=false "HTTP/1.1 200 OK"
+15:48:38 [INFO] HTTP Request: HEAD https://huggingface.co/cross-encoder/ms-marco-MiniLM-L-12-v2/resolve/main/README.md "HTTP/1.1 307 Temporary Redirect"
+15:48:38 [INFO] HTTP Request: HEAD https://huggingface.co/cross-encoder/ms-marco-MiniLM-L12-v2/resolve/main/README.md "HTTP/1.1 307 Temporary Redirect"
+15:48:38 [INFO] HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/cross-encoder/ms-marco-MiniLM-L12-v2/7b0235231ca2674cb8ca8f022859a6eba2b1c968/README.md "HTTP/1.1 200 OK"
+15:48:38 [INFO] Use pytorch device: cpu
+15:48:38 [INFO] HTTP Request: GET https://huggingface.co/api/models/cross-encoder/ms-marco-MiniLM-L-12-v2 "HTTP/1.1 307 Temporary Redirect"
+15:48:39 [INFO] HTTP Request: GET https://huggingface.co/api/models/cross-encoder/ms-marco-MiniLM-L12-v2 "HTTP/1.1 200 OK"
+15:48:46 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+15:48:46 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 109.50it/s]
+15:48:54 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+15:48:54 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 75.42it/s]
+15:49:10 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+15:49:10 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 93.04it/s]
+15:49:17 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+15:49:17 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 99.47it/s]
+15:49:27 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+15:49:27 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 144.12it/s]
+15:49:37 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+15:49:37 [INFO] HTTP Request: GET http://arxiv.org/abs/2006.05205 "HTTP/1.1 301 Moved Permanently"
+15:49:37 [INFO] HTTP Request: GET https://arxiv.org/abs/2006.05205 "HTTP/1.1 200 OK"
+15:49:37 [INFO] HTTP Request: GET https://arxiv.org/pdf/2006.05205 "HTTP/1.1 200 OK"
+15:49:39 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 76.53it/s]
+15:49:48 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+15:49:48 [INFO] HTTP Request: GET https://api.unpaywall.org/v2/10.1038/s42256-021-00418-8?email=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:49:49 [INFO] HTTP Request: GET https://arxiv.org/pdf/2107.12375 "HTTP/1.1 200 OK"
+15:49:55 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 65.11it/s]
+15:50:04 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+15:50:05 [INFO] HTTP Request: GET https://api.unpaywall.org/v2/10.1109/BigData62323.2024.10825716?email=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:50:05 [INFO] HTTP Request: GET https://export.arxiv.org/api/query?search_query=ti%3A%22SE+3+Equivariant+Neural+Network+for+3D+Graphs%22&start=0&max_results=5 "HTTP/1.1 429 Unknown Error"
+15:50:05 [WARNING] arxiv: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:50:08 [INFO] HTTP Request: GET https://export.arxiv.org/api/query?search_query=ti%3A%22SE+3+Equivariant+Neural+Network+for+3D+Graphs%22&start=0&max_results=5 "HTTP/1.1 429 Unknown Error"
+15:50:08 [WARNING] arxiv: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:50:11 [INFO] HTTP Request: GET https://export.arxiv.org/api/query?search_query=ti%3A%22SE+3+Equivariant+Neural+Network+for+3D+Graphs%22&start=0&max_results=5 "HTTP/1.1 429 Unknown Error"
+15:50:11 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 47.04it/s]
+15:50:29 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+15:50:29 [INFO] HTTP Request: GET https://api.unpaywall.org/v2/10.1126/science.1065659?email=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:50:30 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/DOI:10.1126/science.1065659?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 200 OK"
+15:50:45 [WARNING] arxiv: ReadTimeout (attempt 1/3), retrying in 1.0s
+15:50:46 [INFO] HTTP Request: GET https://export.arxiv.org/api/query?search_query=ti%3A%22Protein+Structure+Prediction+and+Structural+Genomics%22&start=0&max_results=5 "HTTP/1.1 429 Unknown Error"
+15:50:46 [WARNING] arxiv: HTTP 429 (attempt 2/3), retrying in 2.0s
+15:50:59 [WARNING] get_full_text: ref_id=7 exceeded 30s fetch budget; returning abstract_only.
+15:50:59 [INFO] HTTP Request: GET https://www.osti.gov/biblio/2000320 "HTTP/1.1 200 "
+15:51:00 [INFO] HTTP Request: GET https://www.osti.gov/servlets/purl/2000320 "HTTP/1.1 200 "
+15:51:06 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 66.84it/s]
+15:51:24 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+15:51:24 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 59.73it/s]
+15:51:37 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+15:51:37 [INFO] HTTP Request: GET https://api.unpaywall.org/v2/10.52202/068431-0830?email=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:51:38 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/DOI:10.52202/068431-0830?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 404 Not Found"
+15:51:39 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=MACE+Higher+Order+Equivariant+Message+Passing+Neural+Networks+for+Fast+and+Accurate+Force+Fields&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 429 "
+15:51:39 [WARNING] semantic_scholar: HTTP 429 (attempt 1/3), retrying in 1.0s
+15:51:41 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=MACE+Higher+Order+Equivariant+Message+Passing+Neural+Networks+for+Fast+and+Accurate+Force+Fields&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:51:41 [INFO] HTTP Request: GET http://arxiv.org/pdf/2206.07697 "HTTP/1.1 301 Moved Permanently"
+15:51:41 [INFO] HTTP Request: GET https://arxiv.org/pdf/2206.07697 "HTTP/1.1 200 OK"
+15:51:44 [INFO] HTTP Request: GET https://api.unpaywall.org/v2/10.1093/nar/28.1.235?email=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:51:45 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/DOI:10.1093/nar/28.1.235?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 200 OK"
+15:51:45 [INFO] HTTP Request: GET https://www.ncbi.nlm.nih.gov/pmc/articles/PMC102472 "HTTP/1.1 301 Moved Permanently"
+15:51:45 [INFO] HTTP Request: GET https://pmc.ncbi.nlm.nih.gov/articles/PMC102472 "HTTP/1.1 301 Moved Permanently"
+15:51:45 [INFO] HTTP Request: GET https://pmc.ncbi.nlm.nih.gov/articles/PMC102472/ "HTTP/1.1 200 OK"
+15:51:46 [INFO] HTTP Request: GET https://pmc.ncbi.nlm.nih.gov/articles/PMC102472/pdf/gkd090.pdf "HTTP/1.1 200 OK"
+15:51:59 [INFO] HTTP Request: GET https://export.arxiv.org/api/query?search_query=ti%3A%22The+Protein+Data+Bank%22&start=0&max_results=5 "HTTP/1.1 200 OK"
+15:52:05 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+15:52:05 [INFO] HTTP Request: GET https://doi.org/10.1093/bioinformatics/btaf004 "HTTP/1.1 302 Found"
+15:52:06 [INFO] HTTP Request: GET https://academic.oup.com/bioinformatics/article/doi/10.1093/bioinformatics/btaf004/7945663 "HTTP/1.1 403 Forbidden"
+15:52:06 [INFO] HTTP Request: GET https://api.unpaywall.org/v2/10.1093/bioinformatics/btaf004?email=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:52:06 [INFO] HTTP Request: GET https://academic.oup.com/bioinformatics/advance-article-pdf/doi/10.1093/bioinformatics/btaf004/61381586/btaf004.pdf "HTTP/1.1 403 Forbidden"
+15:52:07 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/DOI:10.1093/bioinformatics/btaf004?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 200 OK"
+15:52:07 [INFO] HTTP Request: GET https://doi.org/10.1093/bioinformatics/btaf004 "HTTP/1.1 302 Found"
+15:52:07 [INFO] HTTP Request: GET https://academic.oup.com/bioinformatics/article/doi/10.1093/bioinformatics/btaf004/7945663 "HTTP/1.1 403 Forbidden"
+15:52:18 [INFO] HTTP Request: GET https://export.arxiv.org/api/query?search_query=ti%3A%22RNA+TorsionBERT+leveraging+language+models+for+RNA+3D+torsion+angles+prediction%22&start=0&max_results=5 "HTTP/1.1 200 OK"
+15:52:18 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 75.94it/s]
+15:52:25 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+15:52:25 [INFO] HTTP Request: GET http://arxiv.org/abs/2110.02905 "HTTP/1.1 301 Moved Permanently"
+15:52:25 [INFO] HTTP Request: GET https://arxiv.org/abs/2110.02905 "HTTP/1.1 200 OK"
+15:52:25 [INFO] HTTP Request: GET https://arxiv.org/pdf/2110.02905 "HTTP/1.1 200 OK"
+15:52:28 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 86.01it/s]
+15:52:37 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+15:52:37 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 81.20it/s]
+15:52:51 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+15:52:51 [INFO] HTTP Request: GET http://arxiv.org/abs/2104.13478 "HTTP/1.1 301 Moved Permanently"
+15:52:51 [INFO] HTTP Request: GET https://arxiv.org/abs/2104.13478 "HTTP/1.1 200 OK"
+15:52:51 [INFO] HTTP Request: GET https://arxiv.org/pdf/2104.13478 "HTTP/1.1 200 OK"
+15:53:04 [INFO] HTTP Request: GET https://api.unpaywall.org/v2/10.1126/science.273.5282.1678?email=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:53:04 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/DOI:10.1126/science.273.5282.1678?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 200 OK"
+15:53:05 [INFO] HTTP Request: GET https://export.arxiv.org/api/query?search_query=ti%3A%22Crystal+Structure+of+a+Group+I+Ribozyme+Domain+Principles+of+RNA+Packing%22&start=0&max_results=5 "HTTP/1.1 200 OK"
+15:53:17 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+15:53:17 [INFO] HTTP Request: GET https://api.unpaywall.org/v2/10.52202/079017-0826?email=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:53:17 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/DOI:10.52202/079017-0826?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 404 Not Found"
+15:53:19 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Are+High+Degree+Representations+Really+Unnecessary+in+Equivariant+Graph+Neural+Networks&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:53:19 [INFO] HTTP Request: GET https://export.arxiv.org/api/query?search_query=ti%3A%22Are+High+Degree+Representations+Really+Unnecessary+in+Equivariant+Graph+Neural+Networks%22&start=0&max_results=5 "HTTP/1.1 200 OK"
+15:53:20 [INFO] HTTP Request: GET https://export.arxiv.org/pdf/2410.11443 "HTTP/1.1 200 OK"
+15:53:23 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 92.72it/s]
+15:53:30 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+15:53:30 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 54.44it/s]
+15:53:54 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+15:53:54 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 74.69it/s]
+15:54:04 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+15:54:04 [INFO] HTTP Request: GET http://arxiv.org/abs/2007.02133 "HTTP/1.1 301 Moved Permanently"
+15:54:04 [INFO] HTTP Request: GET https://arxiv.org/abs/2007.02133 "HTTP/1.1 200 OK"
+15:54:04 [INFO] HTTP Request: GET https://arxiv.org/pdf/2007.02133 "HTTP/1.1 200 OK"
+15:54:07 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 68.72it/s]
+15:54:16 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+15:54:17 [INFO] HTTP Request: GET https://api.unpaywall.org/v2/10.1109/bigdata55660.2022.10020519?email=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:54:18 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/DOI:10.1109/bigdata55660.2022.10020519?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 200 OK"
+15:54:18 [INFO] HTTP Request: GET https://export.arxiv.org/api/query?search_query=ti%3A%22Efficient+and+Scalable+Implicit+Graph+Neural+Networks+with+Virtual+Equilibrium%22&start=0&max_results=5 "HTTP/1.1 200 OK"
+15:54:18 [INFO] HTTP Request: GET http://arxiv.org/abs/2206.14418 "HTTP/1.1 301 Moved Permanently"
+15:54:18 [INFO] HTTP Request: GET https://arxiv.org/abs/2206.14418 "HTTP/1.1 200 OK"
+15:54:18 [INFO] HTTP Request: GET https://arxiv.org/pdf/2206.14418 "HTTP/1.1 200 OK"
+15:54:21 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 57.75it/s]
+15:54:31 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+15:54:31 [INFO] HTTP Request: GET https://api.unpaywall.org/v2/10.3389/fbioe.2021.628137?email=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:54:32 [INFO] HTTP Request: GET https://www.frontiersin.org/articles/10.3389/fbioe.2021.628137/pdf "HTTP/1.1 301 Moved Permanently"
+15:54:32 [INFO] HTTP Request: GET https://www.frontiersin.org/journals/bioengineering-and-biotechnology/articles/10.3389/fbioe.2021.628137/pdf "HTTP/1.1 200 OK"
+15:54:39 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 98.86it/s]
+15:54:51 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+15:54:52 [INFO] HTTP Request: GET https://api.unpaywall.org/v2/10.1016/j.fmre.2023.06.001?email=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:54:52 [INFO] HTTP Request: GET https://pmc.ncbi.nlm.nih.gov/articles/PMC11197651/pdf/main.pdf "HTTP/1.1 200 OK"
+15:54:52 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/DOI:10.1016/j.fmre.2023.06.001?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 200 OK"
+15:54:52 [INFO] HTTP Request: GET https://doi.org/10.1016/j.fmre.2023.06.001 "HTTP/1.1 302 Found"
+15:54:53 [INFO] HTTP Request: GET https://linkinghub.elsevier.com/retrieve/pii/S2667325823001796 "HTTP/1.1 200 "
+15:55:08 [WARNING] arxiv: ReadTimeout (attempt 1/3), retrying in 1.0s
+15:55:21 [WARNING] get_full_text: ref_id=22 exceeded 30s fetch budget; returning abstract_only.
+15:55:22 [INFO] HTTP Request: GET https://api.unpaywall.org/v2/10.52202/068431-1622?email=diyanapv%40gmail.com "HTTP/1.1 200 OK"
+15:55:22 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/DOI:10.52202/068431-1622?fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue "HTTP/1.1 404 Not Found"
+15:55:24 [INFO] HTTP Request: GET https://api.semanticscholar.org/graph/v1/paper/search?query=Long+Range+Graph+Benchmark&fields=title%2Cauthors%2Cyear%2Cvenue%2Cabstract%2CexternalIds%2CopenAccessPdf%2CpublicationVenue&limit=5 "HTTP/1.1 200 OK"
+15:55:24 [INFO] HTTP Request: GET http://arxiv.org/pdf/2206.08164 "HTTP/1.1 301 Moved Permanently"
+15:55:24 [INFO] HTTP Request: GET https://arxiv.org/pdf/2206.08164 "HTTP/1.1 200 OK"
+15:55:29 [DEBUG] Building index from IDs objects
+BM25S Retrieve:   0%|          | 0/1 [00:00<?, ?it/s]                                                     Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 107.07it/s]

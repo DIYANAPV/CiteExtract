@@ -119,6 +119,246 @@
     "total_cost_usd": 4.1919,
     "total_latency_seconds": 1149.1
   },
+  "gpt-5-min__title_only": {
+    "n": 741,
+    "accuracy": 0.8137651821862348,
+    "macro_f1": 0.7700786056049215,
+    "valid": {
+      "precision": 0.9114173228346457,
+      "recall": 0.8327338129496403,
+      "f1": 0.8703007518796992,
+      "support": 556
+    },
+    "misrep": {
+      "precision": 0.6008583690987125,
+      "recall": 0.7567567567567568,
+      "f1": 0.6698564593301437,
+      "support": 185
+    },
+    "errors": 0,
+    "total_cost_usd": 1.8718,
+    "total_latency_seconds": 2357.9
+  },
+  "gpt-5-min__title_abstract": {
+    "n": 741,
+    "accuracy": 0.8137651821862348,
+    "macro_f1": 0.7733201510932983,
+    "valid": {
+      "precision": 0.9196787148594378,
+      "recall": 0.8237410071942446,
+      "f1": 0.8690702087286527,
+      "support": 556
+    },
+    "misrep": {
+      "precision": 0.5967078189300411,
+      "recall": 0.7837837837837838,
+      "f1": 0.677570093457944,
+      "support": 185
+    },
+    "errors": 0,
+    "total_cost_usd": 2.112,
+    "total_latency_seconds": 2451.9
+  },
+  "gpt-5-min__title_abstract_passages": {
+    "n": 741,
+    "accuracy": 0.863697705802969,
+    "macro_f1": 0.8197145438121048,
+    "valid": {
+      "precision": 0.9128856624319419,
+      "recall": 0.9046762589928058,
+      "f1": 0.908762420957543,
+      "support": 556
+    },
+    "misrep": {
+      "precision": 0.7210526315789474,
+      "recall": 0.7405405405405405,
+      "f1": 0.7306666666666667,
+      "support": 185
+    },
+    "errors": 0,
+    "total_cost_usd": 2.675,
+    "total_latency_seconds": 2492.5
+  },
+  "gpt-5-med__title_only": {
+    "n": 741,
+    "accuracy": 0.6963562753036437,
+    "macro_f1": 0.6658181417303896,
+    "valid": {
+      "precision": 0.9046454767726161,
+      "recall": 0.6654676258992805,
+      "f1": 0.766839378238342,
+      "support": 556
+    },
+    "misrep": {
+      "precision": 0.4397590361445783,
+      "recall": 0.7891891891891892,
+      "f1": 0.5647969052224371,
+      "support": 185
+    },
+    "errors": 0,
+    "total_cost_usd": 8.012,
+    "total_latency_seconds": 10560.6
+  },
+  "gpt-5-med__title_abstract": {
+    "n": 741,
+    "accuracy": 0.7260458839406208,
+    "macro_f1": 0.6933378455792562,
+    "valid": {
+      "precision": 0.9133489461358314,
+      "recall": 0.7014388489208633,
+      "f1": 0.7934893184130214,
+      "support": 556
+    },
+    "misrep": {
+      "precision": 0.4713375796178344,
+      "recall": 0.8,
+      "f1": 0.5931863727454909,
+      "support": 185
+    },
+    "errors": 0,
+    "total_cost_usd": 7.2776,
+    "total_latency_seconds": 8389.7
+  },
+  "gpt-5-med__title_abstract_passages": {
+    "n": 741,
+    "accuracy": 0.8286099865047234,
+    "macro_f1": 0.7756584922797457,
+    "valid": {
+      "precision": 0.8935779816513761,
+      "recall": 0.8758992805755396,
+      "f1": 0.8846503178928247,
+      "support": 556
+    },
+    "misrep": {
+      "precision": 0.6479591836734694,
+      "recall": 0.6864864864864865,
+      "f1": 0.6666666666666667,
+      "support": 185
+    },
+    "errors": 0,
+    "total_cost_usd": 8.7102,
+    "total_latency_seconds": 9448.8
+  },
+  "gpt-5.5-min__title_only": {
+    "n": 741,
+    "accuracy": 0.6923076923076923,
+    "macro_f1": 0.6689059952339145,
+    "valid": {
+      "precision": 0.9293193717277487,
+      "recall": 0.6384892086330936,
+      "f1": 0.7569296375266524,
+      "support": 556
+    },
+    "misrep": {
+      "precision": 0.4401114206128134,
+      "recall": 0.8540540540540541,
+      "f1": 0.5808823529411764,
+      "support": 185
+    },
+    "errors": 0,
+    "total_cost_usd": 10.5651,
+    "total_latency_seconds": 6125.3
+  },
+  "gpt-5.5-min__title_abstract": {
+    "n": 741,
+    "accuracy": 0.7152496626180836,
+    "macro_f1": 0.6854718495585368,
+    "valid": {
+      "precision": 0.9176755447941889,
+      "recall": 0.6816546762589928,
+      "f1": 0.782249742002064,
+      "support": 556
+    },
+    "misrep": {
+      "precision": 0.4603658536585366,
+      "recall": 0.8162162162162162,
+      "f1": 0.5886939571150097,
+      "support": 185
+    },
+    "errors": 0,
+    "total_cost_usd": 10.4388,
+    "total_latency_seconds": 4787.5
+  },
+  "gpt-5.5-min__title_abstract_passages": {
+    "n": 741,
+    "accuracy": 0.8609986504723347,
+    "macro_f1": 0.8161445347786811,
+    "valid": {
+      "precision": 0.911070780399274,
+      "recall": 0.9028776978417267,
+      "f1": 0.9069557362240289,
+      "support": 556
+    },
+    "misrep": {
+      "precision": 0.7157894736842105,
+      "recall": 0.7351351351351352,
+      "f1": 0.7253333333333333,
+      "support": 185
+    },
+    "errors": 0,
+    "total_cost_usd": 11.7227,
+    "total_latency_seconds": 5493.9
+  },
+  "gpt-5.5-med__title_only": {
+    "n": 741,
+    "accuracy": 0.7098515519568152,
+    "macro_f1": 0.6812405836769728,
+    "valid": {
+      "precision": 0.918918918918919,
+      "recall": 0.6726618705035972,
+      "f1": 0.7767393561786086,
+      "support": 556
+    },
+    "misrep": {
+      "precision": 0.4550898203592814,
+      "recall": 0.8216216216216217,
+      "f1": 0.5857418111753372,
+      "support": 185
+    },
+    "errors": 0,
+    "total_cost_usd": 13.7259,
+    "total_latency_seconds": 7482.6
+  },
+  "gpt-5.5-med__title_abstract": {
+    "n": 741,
+    "accuracy": 0.7300944669365722,
+    "macro_f1": 0.6993378128347454,
+    "valid": {
+      "precision": 0.9218009478672986,
+      "recall": 0.6996402877697842,
+      "f1": 0.7955010224948875,
+      "support": 556
+    },
+    "misrep": {
+      "precision": 0.47648902821316613,
+      "recall": 0.8216216216216217,
+      "f1": 0.6031746031746031,
+      "support": 185
+    },
+    "errors": 0,
+    "total_cost_usd": 13.1122,
+    "total_latency_seconds": 7875.6
+  },
+  "gpt-5.5-med__title_abstract_passages": {
+    "n": 741,
+    "accuracy": 0.8596491228070176,
+    "macro_f1": 0.8120170166263367,
+    "valid": {
+      "precision": 0.9050179211469535,
+      "recall": 0.908273381294964,
+      "f1": 0.9066427289048474,
+      "support": 556
+    },
+    "misrep": {
+      "precision": 0.7213114754098361,
+      "recall": 0.7135135135135136,
+      "f1": 0.717391304347826,
+      "support": 185
+    },
+    "errors": 0,
+    "total_cost_usd": 14.1236,
+    "total_latency_seconds": 6637.9
+  },
   "Qwen3-8B__title_only": {
     "n": 741,
     "accuracy": 0.7611336032388664,

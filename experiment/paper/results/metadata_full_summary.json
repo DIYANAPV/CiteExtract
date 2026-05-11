@@ -1,13 +1,13 @@
 {
-  "our_system__production": {
+  "our_system__production_gpt5mini": {
     "n": 302,
-    "accuracy": 0.9635761589403974,
-    "fab_precision": 0.9605263157894737,
+    "accuracy": 0.9701986754966887,
+    "fab_precision": 0.9733333333333334,
     "fab_recall": 0.9668874172185431,
-    "fab_f1": 0.9636963696369637,
+    "fab_f1": 0.9700996677740864,
     "errors": 0,
-    "total_cost_usd": 0.0817,
-    "total_latency_seconds": 1197.0,
+    "total_cost_usd": 0.5237,
+    "total_latency_seconds": 2262.6,
     "avg_searches_per_ref": 0.0
   }
 }

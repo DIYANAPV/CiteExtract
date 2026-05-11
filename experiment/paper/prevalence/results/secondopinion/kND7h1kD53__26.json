@@ -1,0 +1,19 @@
+{
+  "paper_id": "kND7h1kD53",
+  "ref_id": "26",
+  "citing_sentence": "Unlike existing methods which either use nonlocal attention using spherical harmonics [26] in Euclidean-space neighborhoods or using high-degree steerable representations within a single geometric space [17,6], DualEquiNet jointly constructs complementary representations in both Euclidean (EU) and spherical harmonics (SH) spaces: the EU space captures local geometric interactions crucial for atomiclevel detail, while the SH space encodes rotation-equivariant features well-suited for long-range structural dependencies.",
+  "cited_title": "A Euclidean transformer for fast and stable machine learned force fields",
+  "cited_doi": "10.1038/s41467-024-50620-6",
+  "primary_verdict": "CONTRADICTS",
+  "primary_explanation": "The citing sentence attributes to [26] the use of \"nonlocal attention using spherical harmonics in Euclidean-space neighborhoods.\" The cited paper instead emphasizes a Euclidean self-attention mechanism that replaces SO(3) convolutions (i.e., it is proposing an alternative to spherical-harmonic / SO(3)-convolution approaches), so it does not support the described category. The paper presents Euclidean self-attention / SO3KRATES rather than a spherical-harmonics nonlocal-attention method, making the citation inappropriate for that specific claim.",
+  "secondopinion_verdict": "NOT_SUPPORTED",
+  "secondopinion_reasoning": "The citing sentence claims that the cited paper [17] uses high-degree steerable representations within a single geometric space. However, the cited paper primarily discusses the SO3KRATES method, which employs a Euclidean self-attention mechanism and avoids expensive SO(3) convolutions by using a filter on the relative orientation of atomic neighborhoods. It does not focus on high-degree steerable representations within a single geometric space as described in the citing sentence.",
+  "secondopinion_confidence": "high",
+  "agrees": true,
+  "cited_text_chars": 59997,
+  "citing_context_chars": 4100,
+  "cited_text_source": "unpaywall",
+  "model": "gpt-4o",
+  "cost_usd": 0.035693,
+  "error": null
+}

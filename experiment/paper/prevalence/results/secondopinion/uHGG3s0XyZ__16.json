@@ -1,0 +1,19 @@
+{
+  "paper_id": "uHGG3s0XyZ",
+  "ref_id": "16",
+  "citing_sentence": "The former methods predict the disparity update and iteratively approximate the GT value in a GRU framework [27,24,16,48,5,10].",
+  "cited_title": "Uncertainty Guided Adaptive Warping for Robust and Efficient Stereo Matching",
+  "cited_doi": "10.1109/iccv51070.2023.00307",
+  "primary_verdict": "CONTRADICTS",
+  "primary_explanation": "The cited paper proposes an uncertainty-guided adaptive warping approach (a warping-based stereo method) rather than a GRU-based iterative disparity-update method. The retrieved passages describe the authors' warping approach and list other iterative/RAFT-style methods separately, but do not present this paper as a GRU-based iterative update method. Therefore it is not an appropriate source to back the specific claim that it uses a GRU framework to iteratively predict disparity updates.",
+  "secondopinion_verdict": "SUPPORTED",
+  "secondopinion_reasoning": "The cited paper discusses the use of a GRU framework for iterative refinement in stereo matching, specifically mentioning the use of Gate Recurrent Unit (GRU) in their Adaptive Recurrent Module (ARM) for refining disparities. This aligns with the citing sentence's claim that the methods predict disparity updates and iteratively approximate the ground truth value in a GRU framework. The cited paper states, 'The disparities are then refined with correlation using Gate Recurrent Unit (GRU).' This supports the claim made in the citing sentence.",
+  "secondopinion_confidence": "high",
+  "agrees": false,
+  "cited_text_chars": 25930,
+  "citing_context_chars": 4100,
+  "cited_text_source": "s2_fallback",
+  "model": "gpt-4o",
+  "cost_usd": 0.019365,
+  "error": null
+}

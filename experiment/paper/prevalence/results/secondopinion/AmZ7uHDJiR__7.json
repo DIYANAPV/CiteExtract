@@ -1,0 +1,19 @@
+{
+  "paper_id": "AmZ7uHDJiR",
+  "ref_id": "7",
+  "citing_sentence": "Most SLAM systems [38,34,7,58,60,56,49,20,27,16] assume an autonomous agent navigating an environment with distant, static illumination, e.g., a self-driving car in the streets, and they optimize a Photometric Bundle Adjustment loss where they minimize an error between the captured image and the re-rendered image using estimated 3D scene and camera poses.",
+  "cited_title": "Neural Topological SLAM for Visual Navigation",
+  "cited_doi": "10.1109/cvpr42600.2020.01289",
+  "primary_verdict": "CONTRADICTS",
+  "primary_explanation": "The cited paper (Neural Topological SLAM, NTS) describes a topological SLAM approach that builds a graph of panoramic images and relative poses for navigation, not a metric photometric bundle-adjustment system that minimizes image vs. re-rendered image photometric error. Thus it does not support the claim that 'most SLAM systems' optimize a photometric BA loss; in fact NTS exemplifies a different (topological) SLAM paradigm and is not evidence for the photometric BA assertion.",
+  "secondopinion_verdict": "NOT_SUPPORTED",
+  "secondopinion_reasoning": "The cited paper does not discuss SLAM systems assuming distant, static illumination or optimizing a Photometric Bundle Adjustment loss. Instead, it focuses on a topological representation for navigation using a graph-based approach with nodes represented by panoramic images and functions for geometric and semantic predictions. There is no mention of minimizing errors between captured and re-rendered images using estimated 3D scenes and camera poses.",
+  "secondopinion_confidence": "high",
+  "agrees": true,
+  "cited_text_chars": 34286,
+  "citing_context_chars": 4000,
+  "cited_text_source": "unpaywall",
+  "model": "gpt-4o",
+  "cost_usd": 0.022705,
+  "error": null
+}

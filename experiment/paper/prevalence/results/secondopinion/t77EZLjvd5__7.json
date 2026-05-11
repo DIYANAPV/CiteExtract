@@ -1,0 +1,19 @@
+{
+  "paper_id": "t77EZLjvd5",
+  "ref_id": "7",
+  "citing_sentence": "The attack budgets, including PDG attack and CW acctack [36,7], are set of ϵ a = 1/255 in default.",
+  "cited_title": "Towards Evaluating the Robustness of Neural Networks",
+  "cited_doi": "10.1109/sp.2017.49",
+  "primary_verdict": "CONTRADICTS",
+  "primary_explanation": "The Carlini & Wagner (\"Towards Evaluating the Robustness of Neural Networks\") attacks are formulated as optimization problems that use a confidence parameter κ and do not rely on a default L_infty epsilon budget of 1/255. The paper discusses setting κ (they set κ=0) rather than using an epsilon bound as the default, so using this paper as support for an ϵ=1/255 default is incorrect.",
+  "secondopinion_verdict": "NOT_SUPPORTED",
+  "secondopinion_reasoning": "The cited paper does not mention specific attack budgets or the use of ϵ = 1/255 for PDG or CW attacks. The paper discusses various adversarial attacks and their effectiveness but does not specify the attack budgets or parameters like ϵ = 1/255. The citing sentence's claim about the attack budgets is not supported by the content of the cited paper.",
+  "secondopinion_confidence": "high",
+  "agrees": true,
+  "cited_text_chars": 63890,
+  "citing_context_chars": 4000,
+  "cited_text_source": "unpaywall",
+  "model": "gpt-4o",
+  "cost_usd": 0.041107,
+  "error": null
+}

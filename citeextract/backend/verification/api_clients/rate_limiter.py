@@ -85,6 +85,11 @@ async def fetch_with_retry(
                         delay = max(delay, float(retry_after))
                     except ValueError:
                         pass
+                # Cap retry sleep so a server's daily-quota Retry-After (often
+                # several hours) doesn't hang the whole pipeline. If the cap
+                # is hit the request will fail through and the other databases
+                # in the existence cascade will substitute.
+                delay = min(delay, 120.0)
                 log.warning(
                     f"{api_name}: HTTP {resp.status_code} (attempt {attempt + 1}/{max_retries + 1}), "
                     f"retrying in {delay:.1f}s"
