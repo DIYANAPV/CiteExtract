@@ -35,11 +35,9 @@ import logging
 import random
 from pathlib import Path
 
-# --- repo path setup ------------------------------------------------------
 _THIS_FILE = Path(__file__).resolve()
 _PREV_DIR = _THIS_FILE.parent
 
-# --- constants ------------------------------------------------------------
 DEFAULT_INSTANCES_CSV = _PREV_DIR / "results" / "all_instances.csv"
 DEFAULT_OUT_CSV = _PREV_DIR / "results" / "validation_sample.csv"
 DEFAULT_N_MISREP = 50

@@ -69,7 +69,6 @@ os.environ["CITEEXTRACT_SKIP_OPENALEX"] = "1"
 os.environ["CITEEXTRACT_SKIP_ARXIV"] = "1"
 os.environ["CITEEXTRACT_SKIP_OPENREVIEW"] = "1"
 
-# --- repo path setup ------------------------------------------------------
 # NOTE: do NOT add _REPO_ROOT to sys.path — that would make Python find
 # `citeextract/` as a namespace package and shadow the editable-installed
 # `citeextract` package whose actual code lives in `citeextract/backend/`
@@ -86,11 +85,9 @@ try:
 except Exception:
     pass
 
-# --- pipeline imports (existing modules, do not duplicate) -----------------
 from citeextract.models.comprehension import ComprehensionResult
 from citeextract.pipeline import run_unified_pipeline
 
-# --- constants ------------------------------------------------------------
 DEFAULT_MANIFEST = _PREV_DIR / "data" / "corpus_manifest.csv"
 DEFAULT_RESULTS_DIR = _PREV_DIR / "results"
 DEFAULT_PER_PAPER_DIR = DEFAULT_RESULTS_DIR / "per_paper"

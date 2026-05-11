@@ -46,11 +46,9 @@ from typing import Iterable, Optional
 
 import numpy as np
 
-# --- repo path setup ------------------------------------------------------
 _THIS_FILE = Path(__file__).resolve()
 _PREV_DIR = _THIS_FILE.parent
 
-# --- constants ------------------------------------------------------------
 DEFAULT_PER_PAPER_DIR = _PREV_DIR / "results" / "per_paper"
 DEFAULT_OUT_DIR = _PREV_DIR / "results"
 DEFAULT_INSTANCES_CSV = DEFAULT_OUT_DIR / "all_instances.csv"

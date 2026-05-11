@@ -33,7 +33,6 @@ import json
 import logging
 from pathlib import Path
 
-# --- repo path setup ------------------------------------------------------
 _THIS_FILE = Path(__file__).resolve()
 _PREV_DIR = _THIS_FILE.parent
 
@@ -192,7 +191,6 @@ def main() -> int:
         log.warning("no cases matched the filter")
         return 0
 
-    # --- markdown export ---
     args.md.parent.mkdir(parents=True, exist_ok=True)
     md_parts: list[str] = []
     md_parts.append(f"# Misrep review — {len(cases)} cases\n")
@@ -210,7 +208,6 @@ def main() -> int:
     args.md.write_text("\n".join(md_parts), encoding="utf-8")
     log.info("wrote %s", args.md)
 
-    # --- csv export ---
     fields = [
         "paper_id", "ref_id", "verdict", "cited_title", "cited_doi", "cited_year",
         "citing_sentence", "explanation", "evidence_quote",

@@ -34,7 +34,6 @@ _RESULTS = _PAPER_ROOT / "results"
 BOOTSTRAP_N = 10_000
 BOOTSTRAP_SEED = 20260510
 
-# Metadata cells. Tuple is (cell_id, csv_filename, display_label).
 METADATA_CELLS: list[tuple[str, str, str]] = [
     ("llama_3_1_8B",                "metadata_Llama-3.1-8B-Instruct_llm_only.csv",      "Llama-3.1-8B"),
     ("qwen3_8B",                    "metadata_Qwen3-8B_llm_only.csv",                   "Qwen3-8B"),
@@ -57,7 +56,6 @@ METADATA_CELLS: list[tuple[str, str, str]] = [
 
 CITEEXTRACT_REFS = ["citeextract+gpt-4o-mini", "citeextract+gpt-5.5(med)"]
 
-# Semantic cells: (model, condition) maps to a CSV filename pattern.
 SEMANTIC_MODELS = [
     ("Llama-3.1-8B-Instruct", "Llama-3.1-8B"),
     ("Qwen3-8B",              "Qwen3-8B"),
@@ -214,7 +212,6 @@ def main() -> None:
 
     out: dict = {"metadata": {}, "semantic": {}, "metadata_pairwise": [], "semantic_targeted": []}
 
-    # Metadata: per-cell accuracy + CI
     for cid, c in md.items():
         out["metadata"][cid] = {"label": c["label"], "n": c["n"],
                                  "accuracy_pct": round(c["accuracy"]*100, 2),
@@ -245,7 +242,6 @@ def main() -> None:
         _annotate_holm(family, family_label)
         out["metadata_pairwise"].extend(family)
 
-    # Pipeline-vs-pipeline (3 unique unordered pairs)
     pipeline_ids = ["citeextract+gpt-4o-mini", "citeextract+gpt-5-mini", "citeextract+gpt-5.5(med)"]
     pipeline_family: list[dict] = []
     for i in range(len(pipeline_ids)):
@@ -255,7 +251,6 @@ def main() -> None:
     _annotate_holm(pipeline_family, "metadata_pipeline_pipeline")
     out["metadata_pairwise"].extend(pipeline_family)
 
-    # Semantic: per-cell accuracy + CI
     for (mid, cid), c in sm.items():
         if c["n"] == 0:
             continue
@@ -314,7 +309,6 @@ def main() -> None:
     # are NOT against the production cell. Each is a "scale doesn't matter"
     # narrative beat. Tested as its own small family.
     SEM_NARRATIVE_PAIRS = [
-        # (a_id, a_lab, b_id, b_lab, claim)
         (("gpt-4o-mini", "title_abstract_passages"), ("gpt-4o", "title_abstract_passages"),
          "GPT-4o vs GPT-4o-mini in +passages (scale-with-retrieval)"),
         (("gpt-4o", "title_abstract_passages"), ("gpt-5-min", "title_abstract_passages"),
@@ -356,7 +350,6 @@ def main() -> None:
         f"Stars-Holm column applies the same thresholds to the Holm-adjusted p-value._\n"
     )
 
-    # Alignment audit
     audit_rows: list[dict] = []
     for tests in (out["metadata_pairwise"], out["semantic_targeted"]):
         for t in tests:
@@ -382,7 +375,6 @@ def main() -> None:
         lo, hi = c["ci95"]
         md_lines.append(f"| {c['label']} | {c['accuracy']*100:.2f} [{lo*100:.2f}, {hi*100:.2f}] | {c['n']} |")
 
-    # Group metadata pairwise by family
     md_lines.append("\n## Metadata pairwise McNemar")
     by_family: dict[str, list[dict]] = {}
     for mc in out["metadata_pairwise"]:
@@ -407,7 +399,6 @@ def main() -> None:
         lo, hi = s["ci95_pct"]
         md_lines.append(f"| {s['label']} | {s['accuracy_pct']:.2f} [{lo:.2f}, {hi:.2f}] | {s['n']} |")
 
-    # Group semantic targeted by family
     md_lines.append("\n## Semantic targeted pairs")
     sem_by_family: dict[str, list[dict]] = {}
     for mc in out["semantic_targeted"]:

@@ -35,14 +35,12 @@ from typing import Iterable
 
 import requests
 
-# --- repo path setup ------------------------------------------------------
 _THIS_FILE = Path(__file__).resolve()
 _PREV_DIR = _THIS_FILE.parent
 _REPO_ROOT = _PREV_DIR.parent.parent.parent  # repo root (4 levels up from this file)
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
-# --- constants ------------------------------------------------------------
 OPENREVIEW_API = "https://api2.openreview.net"
 NEURIPS_2025_VENUEID = "NeurIPS.cc/2025/Conference"
 ACCEPTED_VENUE_PREFIX = "NeurIPS 2025 "  # accepted notes carry venue like "NeurIPS 2025 poster" / "spotlight" / "oral"

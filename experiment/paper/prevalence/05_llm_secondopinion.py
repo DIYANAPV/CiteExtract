@@ -47,7 +47,6 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Optional
 
-# --- repo path setup ------------------------------------------------------
 _THIS_FILE = Path(__file__).resolve()
 _PREV_DIR = _THIS_FILE.parent
 _REPO_ROOT = _PREV_DIR.parent.parent.parent
@@ -73,7 +72,6 @@ from citeextract.verification.api_clients.fulltext import get_full_text
 from citeextract.verification.cache import APICache
 from citeextract.verification.existence import check_existence
 
-# --- constants ------------------------------------------------------------
 DEFAULT_PER_PAPER_DIR = _PREV_DIR / "results" / "per_paper"
 DEFAULT_PAPERS_DIR = _PREV_DIR / "data" / "papers"
 DEFAULT_OUT_DIR = _PREV_DIR / "results" / "secondopinion"

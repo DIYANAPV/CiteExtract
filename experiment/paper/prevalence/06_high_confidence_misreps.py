@@ -32,7 +32,6 @@ from typing import Optional
 
 import fitz  # pymupdf
 
-# --- repo path setup ------------------------------------------------------
 _THIS_FILE = Path(__file__).resolve()
 _PREV_DIR = _THIS_FILE.parent
 
@@ -157,7 +156,6 @@ def main() -> int:
             skipped_disagree.append({"paper_id": paper_id, "ref_id": ref_id, "so_verdict": so_verdict})
             continue
 
-        # Alignment check: pull PDF bibliography line and compare to our cited_title
         if paper_id not in pdf_cache:
             pdf_cache[paper_id] = _flat_pdf(args.papers_dir / f"{paper_id}.pdf")
         flat = pdf_cache[paper_id]
@@ -206,7 +204,6 @@ def main() -> int:
         len(high_conf), len(skipped_alignment), len(skipped_disagree),
     )
 
-    # --- Markdown report ---
     args.md.parent.mkdir(parents=True, exist_ok=True)
     lines: list[str] = []
     lines.append(f"# High-confidence citation misrepresentations\n")
@@ -274,7 +271,6 @@ def main() -> int:
     args.md.write_text("\n".join(lines), encoding="utf-8")
     log.info("wrote %s", args.md)
 
-    # --- CSV companion ---
     if high_conf:
         fields = list(high_conf[0].keys())
         # all_citing_sentences is a list — flatten to "; "-joined string
