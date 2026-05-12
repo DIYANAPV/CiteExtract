@@ -60,8 +60,8 @@ Three pipeline layers run in one pass: existence cascade across CrossRef → Sem
 Set in `.env`:
 
 ```bash
-OPENAI_API_KEY=sk-...           # required for --agentic
-S2_API_KEY=...                  # optional (10× rate limit)
+OPENAI_API_KEY=your-openai-key  # required for --agentic
+S2_API_KEY=your-s2-key          # optional
 CROSSREF_MAILTO=you@uni.edu     # optional polite-pool
 OPENALEX_MAILTO=you@uni.edu     # optional polite-pool
 ```
