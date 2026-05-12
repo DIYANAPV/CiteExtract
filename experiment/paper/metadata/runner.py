@@ -57,7 +57,10 @@ logging.basicConfig(
 log = logging.getLogger("metadata_table")
 
 DATA_PATH = _PAPER_ROOT / "data" / "benchmark_metadata.jsonl"
-RESULTS_DIR = _PAPER_ROOT / "results"
+RESULTS_DIR = _PAPER_ROOT / "results" / "metadata"
+CSV_DIR = RESULTS_DIR / "csv"
+PARTIAL_DIR = RESULTS_DIR / "partial"
+SUMMARIES_DIR = RESULTS_DIR / "summaries"
 
 DEFAULT_MODELS = ("gpt-4o-mini", "gpt-4o")
 DEFAULT_CELLS: list[tuple[str, str]] = [
@@ -170,11 +173,11 @@ def stratified_smoke_sample(records: list[dict], n: int = 10, seed: int = 42) ->
 
 
 def _csv_path(model: str, condition: str) -> Path:
-    return RESULTS_DIR / f"metadata_{model}_{condition}.csv"
+    return CSV_DIR / f"metadata_{model}_{condition}.csv"
 
 
 def _partial_path(model: str, condition: str) -> Path:
-    return RESULTS_DIR / f"metadata_partial_{model}_{condition}.jsonl"
+    return PARTIAL_DIR / f"metadata_partial_{model}_{condition}.jsonl"
 
 
 def load_completed_ids(p: Path) -> set[int]:
@@ -555,7 +558,7 @@ async def main_async() -> int:
     log.info(f"all cells done in {el:.1f}s")
     print_mini_table(summaries)
 
-    side = RESULTS_DIR / ("metadata_smoke_summary.json" if args.smoke else "metadata_full_summary.json")
+    side = SUMMARIES_DIR / ("metadata_smoke_summary.json" if args.smoke else "metadata_full_summary.json")
     side.parent.mkdir(parents=True, exist_ok=True)
     side.write_text(json.dumps(summaries, indent=2, default=str), encoding="utf-8")
     log.info(f"summary: {side}")

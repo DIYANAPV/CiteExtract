@@ -12,7 +12,9 @@ _REPO_ROOT = _PAPER_ROOT.parent.parent
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
-RESULTS_DIR = _PAPER_ROOT / "results"
+RESULTS_DIR = _PAPER_ROOT / "results" / "metadata"
+CSV_DIR = RESULTS_DIR / "csv"
+TABLES_DIR = RESULTS_DIR / "tables"
 
 CELLS: list[tuple[str, str, str]] = [
     ("gpt-4o-mini",           "llm_only",        "gpt-4o-mini"),
@@ -36,7 +38,7 @@ CELLS: list[tuple[str, str, str]] = [
 
 
 def _csv_path(model: str, condition: str) -> Path:
-    return RESULTS_DIR / f"metadata_{model}_{condition}.csv"
+    return CSV_DIR / f"metadata_{model}_{condition}.csv"
 
 
 def _read(path: Path) -> list[dict]:
@@ -164,9 +166,9 @@ def main() -> None:
         metrics[(model, condition)] = cell_metrics(rows)
 
     suffix = "_smoke" if args.smoke else ""
-    tex_path = RESULTS_DIR / f"tab_metadata_results{suffix}.tex"
-    detailed_tex_path = RESULTS_DIR / f"tab_metadata_results_detailed{suffix}.tex"
-    json_path = RESULTS_DIR / f"tab_metadata_results_full{suffix}.json"
+    tex_path = TABLES_DIR / f"tab_metadata_results{suffix}.tex"
+    detailed_tex_path = TABLES_DIR / f"tab_metadata_results_detailed{suffix}.tex"
+    json_path = TABLES_DIR / f"tab_metadata_results_full{suffix}.json"
 
     tex = render_latex(metrics)
     tex_detailed = render_latex_detailed(metrics)

@@ -39,7 +39,10 @@ logging.basicConfig(
 log = logging.getLogger("semantic_table")
 
 DATA_PATH = _PAPER_ROOT / "data" / "benchmark_semantic.jsonl"
-RESULTS_DIR = _PAPER_ROOT / "results"
+RESULTS_DIR = _PAPER_ROOT / "results" / "semantic"
+CSV_DIR = RESULTS_DIR / "csv"
+PARTIAL_DIR = RESULTS_DIR / "partial"
+SUMMARIES_DIR = RESULTS_DIR / "summaries"
 
 DEFAULT_MODELS = (
     "gpt-4o-mini", "gpt-4o",
@@ -123,11 +126,11 @@ def stratified_smoke_sample(records: list[dict], n: int = 10, seed: int = 42) ->
 
 
 def _csv_path(model: str, condition: str) -> Path:
-    return RESULTS_DIR / f"semantic_{model.replace('/', '_')}_{condition}.csv"
+    return CSV_DIR / f"semantic_{model.replace('/', '_')}_{condition}.csv"
 
 
 def _partial_path(model: str, condition: str) -> Path:
-    return RESULTS_DIR / f"semantic_partial_{model.replace('/', '_')}_{condition}.jsonl"
+    return PARTIAL_DIR / f"semantic_partial_{model.replace('/', '_')}_{condition}.jsonl"
 
 
 def load_completed_ids(partial_path: Path) -> set[int]:
@@ -393,7 +396,7 @@ async def main_async() -> int:
     log.info(f"all cells done in {time.perf_counter() - grand_t0:.1f}s")
     print_mini_table(summaries, tuple(args.models))
 
-    side = RESULTS_DIR / ("smoke_summary.json" if args.smoke else "full_summary.json")
+    side = SUMMARIES_DIR / ("semantic_smoke_summary.json" if args.smoke else "semantic_full_summary.json")
     side.parent.mkdir(parents=True, exist_ok=True)
     side.write_text(json.dumps(
         {f"{m}__{c}": s for (m, c), s in summaries.items()},

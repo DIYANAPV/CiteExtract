@@ -13,8 +13,8 @@ discordant pairs are < 25) for the targeted pairs:
   - semantic: gpt-4o vs gpt-4o-mini in the +passages condition (model-scale-with-retrieval)
 
 Outputs:
-  - results/significance.json (all numbers)
-  - results/significance_summary.md (readable for the paper)
+  - results/significance/significance.json (all numbers)
+  - results/significance/significance_summary.md (readable for the paper)
 """
 
 from __future__ import annotations
@@ -30,6 +30,9 @@ from scipy.stats import binomtest, chi2
 _THIS = Path(__file__).resolve()
 _PAPER_ROOT = _THIS.parent.parent
 _RESULTS = _PAPER_ROOT / "results"
+_METADATA_CSV_DIR = _RESULTS / "metadata" / "csv"
+_SEMANTIC_CSV_DIR = _RESULTS / "semantic" / "csv"
+_SIGNIFICANCE_DIR = _RESULTS / "significance"
 
 BOOTSTRAP_N = 10_000
 BOOTSTRAP_SEED = 20260510
@@ -154,7 +157,7 @@ def _annotate_holm(tests: list[dict], family: str) -> None:
 def _load_metadata() -> dict[str, dict]:
     cells: dict[str, dict] = {}
     for cid, fname, label in METADATA_CELLS:
-        csv_path = _RESULTS / fname
+        csv_path = _METADATA_CSV_DIR / fname
         ids, correct = _load_correct_vector(csv_path)
         acc = float(correct.mean())
         ci = bootstrap_ci(correct)
@@ -171,7 +174,7 @@ def _load_semantic() -> dict[tuple[str, str], dict]:
     for model_id, model_label in SEMANTIC_MODELS:
         for cond_id, cond_label in SEMANTIC_CONDITIONS:
             safe = model_id.replace("/", "_")
-            csv_path = _RESULTS / f"semantic_{safe}_{cond_id}.csv"
+            csv_path = _SEMANTIC_CSV_DIR / f"semantic_{safe}_{cond_id}.csv"
             if not csv_path.exists():
                 cells[(model_id, cond_id)] = {"label": f"{model_label} × {cond_label}", "n": 0,
                                                "accuracy": None, "ci95": None,
@@ -335,7 +338,7 @@ def main() -> None:
     _annotate_holm(sem_narrative, "semantic_narrative_pairs")
     out["semantic_targeted"].extend(sem_narrative)
 
-    json_path = _RESULTS / "significance.json"
+    json_path = _SIGNIFICANCE_DIR / "significance.json"
     json_path.write_text(json.dumps(out, indent=2), encoding="utf-8")
     print(f"wrote {json_path}")
 
@@ -428,7 +431,7 @@ def main() -> None:
         "resamples of the test set with replacement._\n"
     )
 
-    md_path = _RESULTS / "significance_summary.md"
+    md_path = _SIGNIFICANCE_DIR / "significance_summary.md"
     md_path.write_text("\n".join(md_lines), encoding="utf-8")
     print(f"wrote {md_path}")
 

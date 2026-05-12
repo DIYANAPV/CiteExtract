@@ -14,7 +14,9 @@ if str(_REPO_ROOT) not in sys.path:
 
 from experiment.paper.semantic.prompt_builder import CONDITIONS
 
-RESULTS_DIR = _PAPER_ROOT / "results"
+RESULTS_DIR = _PAPER_ROOT / "results" / "semantic"
+CSV_DIR = RESULTS_DIR / "csv"
+TABLES_DIR = RESULTS_DIR / "tables"
 DEFAULT_MODELS = (
     "gpt-4o-mini",
     "gpt-4o",
@@ -37,7 +39,7 @@ PRODUCTION_CELL = ("gpt-4o-mini", "title_abstract_passages")
 
 def _csv_path(model: str, condition: str, suffix: str = "") -> Path:
     safe = model.replace("/", "_")
-    return RESULTS_DIR / f"semantic_{safe}_{condition}{suffix}.csv"
+    return CSV_DIR / f"semantic_{safe}_{condition}{suffix}.csv"
 
 
 def _read_rows(path: Path) -> list[dict]:
@@ -180,9 +182,9 @@ def main() -> None:
             metrics[(m, c)] = cell_metrics(rows)
 
     suffix = "_smoke" if args.smoke else ""
-    tex_path = RESULTS_DIR / f"tab_semantic_results{suffix}.tex"
-    detailed_tex_path = RESULTS_DIR / f"tab_semantic_results_detailed{suffix}.tex"
-    json_path = RESULTS_DIR / f"tab_semantic_results_full{suffix}.json"
+    tex_path = TABLES_DIR / f"tab_semantic_results{suffix}.tex"
+    detailed_tex_path = TABLES_DIR / f"tab_semantic_results_detailed{suffix}.tex"
+    json_path = TABLES_DIR / f"tab_semantic_results_full{suffix}.json"
 
     tex = render_latex(metrics, models=tuple(args.models))
     tex_detailed = render_latex_detailed(metrics, models=tuple(args.models))

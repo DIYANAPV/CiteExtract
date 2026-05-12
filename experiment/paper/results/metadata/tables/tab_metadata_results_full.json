@@ -223,5 +223,35 @@
     "total_cost_usd": 0.0817,
     "total_latency_seconds": 1197.0,
     "avg_searches_per_ref": 0.0
+  },
+  "our_system__production_gpt5mini": {
+    "n": 302,
+    "accuracy": 0.9701986754966887,
+    "macro_f1": 0.9701983487385284,
+    "fab_precision": 0.9733333333333334,
+    "fab_recall": 0.9668874172185431,
+    "fab_f1": 0.9700996677740864,
+    "valid_precision": 0.9671052631578947,
+    "valid_recall": 0.9735099337748344,
+    "valid_f1": 0.9702970297029704,
+    "errors": 0,
+    "total_cost_usd": 0.5237,
+    "total_latency_seconds": 2262.6,
+    "avg_searches_per_ref": 0.0
+  },
+  "our_system__production_gpt55med": {
+    "n": 302,
+    "accuracy": 0.9801324503311258,
+    "macro_f1": 0.9801315789473684,
+    "fab_precision": 0.9865771812080537,
+    "fab_recall": 0.9735099337748344,
+    "fab_f1": 0.98,
+    "valid_precision": 0.9738562091503268,
+    "valid_recall": 0.9867549668874173,
+    "valid_f1": 0.9802631578947368,
+    "errors": 0,
+    "total_cost_usd": 6.5031,
+    "total_latency_seconds": 8216.4,
+    "avg_searches_per_ref": 0.0
   }
 }
