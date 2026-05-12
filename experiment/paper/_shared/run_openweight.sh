@@ -5,8 +5,8 @@
 # conditions) for ONE HuggingFace model. Pass the model id as $1.
 #
 # Examples:
-#   sbatch experiment/paper/openweight/run.sh Qwen/Qwen3-8B
-#   sbatch experiment/paper/openweight/run.sh meta-llama/Llama-3.1-8B-Instruct
+#   sbatch experiment/paper/_shared/run_openweight.sh Qwen/Qwen3-8B
+#   sbatch experiment/paper/_shared/run_openweight.sh meta-llama/Llama-3.1-8B-Instruct
 #
 # Output / errors are merged into:
 #   experiment/paper/results/openweight_<jobid>_ow-bench.log
@@ -43,9 +43,9 @@ python -c "import sentencepiece" 2>/dev/null || pip install --quiet sentencepiec
 mkdir -p experiment/paper/results
 
 # Semantic task: 3 conditions × 741 instances
-python -m experiment.paper.openweight.runner --model "$MODEL" --task semantic --full
+python -m experiment.paper.semantic.runner_openweight --model "$MODEL" --full
 
 # Metadata task: 1 condition × 302 instances
-python -m experiment.paper.openweight.runner --model "$MODEL" --task metadata --full
+python -m experiment.paper.metadata.runner_openweight --model "$MODEL" --full
 
 echo "=== done at $(date) ==="
