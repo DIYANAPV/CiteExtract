@@ -4,9 +4,10 @@
 # Submits a one-GPU job that runs the full sweep (3 semantic + 1 metadata
 # conditions) for ONE HuggingFace model. Pass the model id as $1.
 #
-# Examples:
-#   sbatch experiment/paper/_shared/run_openweight.sh Qwen/Qwen3-8B
-#   sbatch experiment/paper/_shared/run_openweight.sh meta-llama/Llama-3.1-8B-Instruct
+# Examples (set REPO_ROOT to the repo's checkout path before sbatch):
+#   export REPO_ROOT=/path/to/checkcitation
+#   sbatch --export=ALL experiment/paper/_shared/run_openweight.sh Qwen/Qwen3-8B
+#   sbatch --export=ALL experiment/paper/_shared/run_openweight.sh meta-llama/Llama-3.1-8B-Instruct
 #
 # Output / errors are merged into:
 #   experiment/paper/results/openweight_<jobid>_ow-bench.log
@@ -29,11 +30,16 @@ set -eu
 
 MODEL="${1:-Qwen/Qwen3-8B}"
 
+if [[ -z "${REPO_ROOT:-}" ]]; then
+    echo "error: REPO_ROOT is not set. Run: export REPO_ROOT=/path/to/checkcitation" >&2
+    exit 2
+fi
+
 echo "=== job $SLURM_JOB_ID: full open-weight benchmark for $MODEL ==="
 echo "node: $(hostname)  start: $(date)"
 nvidia-smi | head -10 || true
 
-cd /nfs/home/muhammedd/Projects/phd/CHECKCITATION
+cd "$REPO_ROOT"
 source ~/vllm-env/bin/activate
 
 # Make sure runtime deps are present (no-ops if already installed).
