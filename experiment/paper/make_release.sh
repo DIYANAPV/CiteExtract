@@ -25,28 +25,6 @@ rsync -a \
     --exclude='results/semantic/partial/' \
     "$PAPER_DIR/" "$STAGING/"
 
-cat >"$STAGING/RELEASE_NOTES.md" <<'EOF'
-# Notes for reviewers
-
-This is a trimmed copy of `experiment/paper/`. The following items have been
-omitted to keep the archive small; everything is reproducible from what is
-included:
-
-- **Cited-paper PDFs** (~160 MB, 20 NeurIPS 2025 papers). The corpus manifest
-  at `prevalence/data/corpus_manifest.csv` lists the 20 paper IDs and
-  OpenReview URLs. Re-fetch with:
-
-  ```bash
-  python -m experiment.paper.prevalence.00_fetch_neurips
-  ```
-
-- **Resume checkpoints** (`results/{task}/partial/*.jsonl`). Runners write
-  these for resumability; the CSVs in `results/{task}/csv/` are derived from
-  them and are included.
-
-- **Run logs** (`*.log`). Debug traces only; not used in the analysis.
-EOF
-
 cd "$(dirname "$STAGING")"
 zip -rq "$ZIP" "$(basename "$STAGING")"
 
