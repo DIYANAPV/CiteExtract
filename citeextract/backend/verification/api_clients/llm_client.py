@@ -57,11 +57,6 @@ def is_reasoning_model(model: str) -> bool:
 
 
 def effective_max_completion_tokens(model: str, configured: int) -> int:
-    """Reasoning models spend tokens on hidden reasoning before producing
-    output. The configured `max_tokens` (sized for non-reasoning JSON output)
-    is too tight when the model is gpt-5-* / o1-* / etc., causing empty
-    completions that fail JSON parsing. Floor at 8k for reasoning models.
-    """
     if is_reasoning_model(model):
         return max(configured, _REASONING_MIN_COMPLETION_TOKENS)
     return configured

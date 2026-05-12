@@ -95,15 +95,12 @@ class APICache:
 
     @staticmethod
     async def _apply_pragmas(db: aiosqlite.Connection) -> None:
-        # Best-practice pragmas for an async-accessed SQLite cache.
-        # Wrapped per-pragma so a read-only FS or FUSE mount can degrade
-        # gracefully (warning, not crash) instead of disabling the cache.
         pragmas = [
-            ("journal_mode", "WAL"),       # readers don't block writers
-            ("synchronous", "NORMAL"),     # safe with WAL; faster than FULL
-            ("temp_store", "MEMORY"),      # temp tables in RAM
-            ("cache_size", "-16000"),      # 16 MB page cache
-            ("mmap_size", "67108864"),     # 64 MB mmap (capped at file size)
+            ("journal_mode", "WAL"),
+            ("synchronous", "NORMAL"),
+            ("temp_store", "MEMORY"),
+            ("cache_size", "-16000"),
+            ("mmap_size", "67108864"),
         ]
         for name, value in pragmas:
             try:

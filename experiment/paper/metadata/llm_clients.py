@@ -203,8 +203,6 @@ class OpenAIResponsesBenchClient(LLMClient):
 
         timeout = httpx.Timeout(connect=15.0, read=self.timeout_s, write=15.0, pool=15.0)
 
-        # web_search tool rejects reasoning.effort='minimal' on gpt-5/gpt-5.5;
-        # bump to 'low' for the search path only.
         effort = self.reasoning_effort
         if effort == "minimal":
             effort = "low"

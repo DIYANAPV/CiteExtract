@@ -226,7 +226,7 @@ def annotate_citation_confidence(
                 final, conf = grobid, "high"
 
         c.ref_id = final
-        c.link_confidence = conf  # type: ignore[assignment]
+        c.link_confidence = conf
 
         if conf == "medium":
             med += 1

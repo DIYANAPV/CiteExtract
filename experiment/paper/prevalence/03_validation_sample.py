@@ -1,31 +1,4 @@
-"""
-03_validation_sample.py
-=======================
-
-Sample N citation instances from ``results/all_instances.csv`` for hand
-annotation and write them to ``results/validation_sample.csv`` in a format
-ready for two annotators to fill in.
-
-Sampling
---------
-Stratified random:
-* 50 instances where the system labelled the citation as misrepresenting
-  the cited source (NOT_SUPPORTED / CONTRADICTS)
-* 50 instances where the system labelled the citation as faithful
-  (SUPPORTED / SUPPORTS)
-
-Only in-scope instances are eligible (``paper_found=True`` AND
-``full_text_available=True``).
-
-Annotators read the cited source and fill ``annotator_1``, ``annotator_2``,
-``final_label``, ``notes``. The validation script then computes precision
-and recall of the system relative to the human consensus.
-
-Usage
------
-    python 03_validation_sample.py
-    python 03_validation_sample.py --n-misrep 30 --n-supported 30
-"""
+"""Sample N citation instances from ``results/all_instances.csv`` for hand"""
 
 from __future__ import annotations
 
@@ -111,7 +84,7 @@ def main() -> int:
     sampled_supported = rng.sample(supported_pool, n_s)
 
     sampled = sampled_misrep + sampled_supported
-    rng.shuffle(sampled)  # blind annotators to the system label position
+    rng.shuffle(sampled)
     log.info("sampled %d total instances (%d misrep + %d supported)",
              len(sampled), n_m, n_s)
 

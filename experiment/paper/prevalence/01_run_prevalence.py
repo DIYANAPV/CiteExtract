@@ -1,47 +1,4 @@
-"""
-01_run_prevalence.py
-====================
-
-Run the CheckCitation pipeline on each paper in ``data/corpus_manifest.csv``
-and write per-paper JSONL checkpoints with all citation-level semantic
-verification results.
-
-Each paper's results land at ``results/per_paper/{paper_id}.jsonl``. If that
-file already exists the paper is skipped, so the script is fully resumable.
-
-The script does **not** reimplement the pipeline — it imports
-``run_unified_pipeline`` in ``mode="agentic"`` (the UI's verification path),
-which fetches and chunks references in parallel and runs a single LLM
-verifier pass per citing sentence. We consume only the ``comp_report``
-half of the output (per-citation semantic verdicts + retrieved evidence).
-The accompanying ``paper_report`` (metadata verdicts) is discarded.
-
-Usage
------
-    python 01_run_prevalence.py                          # all 20 papers
-    python 01_run_prevalence.py --paper-id kND7h1kD53    # just one paper (debug)
-    python 01_run_prevalence.py --limit 5                # first 5 only (dry run)
-    python 01_run_prevalence.py --force                  # re-run, overwrite
-
-Outputs
--------
-    results/per_paper/{paper_id}.jsonl   — one line per (ref, citing sentence)
-    results/run_summary.json             — cumulative per-paper status
-
-Notes
------
-* No web search is invoked. Existence resolution uses only the configured
-  scholarly databases (Crossref, Semantic Scholar, OpenAlex, arXiv).
-* Full-text retrieval uses the existing open-access waterfall
-  (Semantic Scholar OA → Unpaywall → arXiv → abstract-only).
-* GROBID must be running for best full-text coverage. If it is not, citations
-  will be retrievable as abstract-only at best, which is recorded in
-  ``full_text_source`` and excluded from the prevalence analysis downstream.
-* The pipeline's report cache is on by default, so a re-run on a paper that
-  already produced a JSONL is essentially free for the LLM. The JSONL
-  existence check provides a second, faster skip path that avoids even
-  parsing the PDF again.
-"""
+"""Run the CheckCitation pipeline on each paper in ``data/corpus_manifest.csv``"""
 
 from __future__ import annotations
 
@@ -56,24 +13,11 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Optional
 
-# Disable rate-limited / quota-bound databases for the prevalence run BEFORE
-# any pipeline imports. Same env-var-gate pattern across all four:
-# - SERPAPI_KEY="" → agentic verifier skips Google Scholar fallback
-# - CITEEXTRACT_SKIP_OPENALEX=1 → existence check skips OpenAlex
-# - CITEEXTRACT_SKIP_ARXIV=1 → existence check skips arXiv
-# - CITEEXTRACT_SKIP_OPENREVIEW=1 → existence check skips OpenReview
-# Crossref, Semantic Scholar, and PubMed still substitute. Daily quotas are
-# preserved for normal use.
 os.environ["SERPAPI_KEY"] = ""
 os.environ["CITEEXTRACT_SKIP_OPENALEX"] = "1"
 os.environ["CITEEXTRACT_SKIP_ARXIV"] = "1"
 os.environ["CITEEXTRACT_SKIP_OPENREVIEW"] = "1"
 
-# NOTE: do NOT add _REPO_ROOT to sys.path — that would make Python find
-# `citeextract/` as a namespace package and shadow the editable-installed
-# `citeextract` package whose actual code lives in `citeextract/backend/`
-# (per pyproject `tool.setuptools.package-dir = {citeextract = "backend"}`).
-# This script must be run with the repo's venv Python so the package resolves.
 _THIS_FILE = Path(__file__).resolve()
 _PREV_DIR = _THIS_FILE.parent
 _REPO_ROOT = _PREV_DIR.parent.parent.parent
@@ -103,10 +47,9 @@ log = logging.getLogger("run_prevalence")
 
 @dataclass
 class CitationRecord:
-    """One row per (citing sentence, cited reference) pair, ready for analysis."""
 
-    paper_id: str             # NeurIPS paper (the *citing* paper)
-    paper_decision: str       # NeurIPS 2025 poster / spotlight / oral
+    paper_id: str
+    paper_decision: str
     ref_id: str
     citing_sentence: str
     context_before: str
@@ -114,23 +57,19 @@ class CitationRecord:
     cited_title: Optional[str]
     cited_doi: Optional[str]
     cited_year: Optional[int]
-    cited_source: Optional[str]   # which DB matched the cited paper
-    paper_found: bool             # cited paper resolved to a real record
-    full_text_available: bool     # full text (not abstract) was retrieved
+    cited_source: Optional[str]
+    paper_found: bool
+    full_text_available: bool
     full_text_source: Optional[str]
-    # Semantic axis (from comp_report.results[i].claim_verdict)
-    verdict: Optional[str]        # SUPPORTED / NOT_SUPPORTED / SUPPORTS / CONTRADICTS / NEUTRAL / null
+    verdict: Optional[str]
     explanation: Optional[str]
     evidence_quote: Optional[str]
     top_passage_text: Optional[str]
     top_passage_score: Optional[float]
-    # Metadata axis (from paper_report.verdicts[i]) — kept since the agentic
-    # mode computes them anyway. Useful for stratification by metadata health
-    # and for cross-checking the GPT Zero / GhostCite-style numbers.
-    metadata_verdict: Optional[str]            # VALID / FABRICATED / UNVERIFIABLE
+    metadata_verdict: Optional[str]
     metadata_flags: Optional[list[str]]
     metadata_explanation: Optional[str]
-    top_level_verdict: Optional[str]           # FABRICATED / VALID / UNVERIFIABLE (from CitationVerdict.verdict)
+    top_level_verdict: Optional[str]
     top_level_flags: Optional[list[str]]
     retraction_status: Optional[bool]
 
@@ -149,7 +88,7 @@ def comp_result_to_record(
     md = r.paper_metadata or {}
     cv = r.claim_verdict
     top = r.top_passages[0] if r.top_passages else None
-    pv = verdict_map.get(r.ref_id)  # CitationVerdict for the metadata axis
+    pv = verdict_map.get(r.ref_id)
     retr = None
     if pv is not None and getattr(pv, "existence", None) is not None:
         retr = getattr(pv.existence, "retraction_status", None)
@@ -191,7 +130,6 @@ def atomic_write_jsonl(path: Path, records: list[CitationRecord]) -> None:
 
 
 def extract_cost(paper_report) -> float:
-    """Pull the LLM cost from a PaperReport (agentic mode populates summary.total_cost_usd)."""
     if paper_report is None:
         return 0.0
     summary = getattr(paper_report, "summary", None)
@@ -221,12 +159,6 @@ async def process_paper(
 
     t0 = time.time()
     try:
-        # mode="agentic" is what the UI uses — it fetches and chunks references
-        # in parallel (max_concurrent_agents from config, typically 15) and runs
-        # the LLM verifier in one pass per citing sentence. The comp_report we
-        # consume below is populated from the agentic data path.
-        # We discard the resulting paper_report (which contains metadata
-        # verdicts we are not using); only comp_report.results matters here.
         paper_report, comp_report, _parsed = await run_unified_pipeline(
             file_path=str(pdf_abs),
             mode="agentic",
@@ -329,7 +261,7 @@ async def main_async(args: argparse.Namespace) -> int:
         log.info("[%d/%d] paper_id=%s", i, len(manifest), row["paper_id"])
         summary = await process_paper(row, args.per_paper_dir, force=args.force)
         summaries.append(summary)
-        write_summary(args.summary, summaries)  # cumulative, crash-resilient
+        write_summary(args.summary, summaries)
 
     log.info("done — summary at %s", args.summary)
     return 0

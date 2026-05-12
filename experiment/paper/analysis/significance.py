@@ -1,21 +1,4 @@
-"""Statistical significance + bootstrap CIs for the metadata and semantic
-benchmark tables.
-
-For every cell (system × condition) we:
-  - load the per-instance CSV
-  - convert each row to correct/incorrect (predicted_verdict == gold_label)
-  - compute accuracy and a percentile bootstrap 95% CI (10k resamples)
-
-Then we run McNemar's test (with continuity correction; exact binomial when
-discordant pairs are < 25) for the targeted pairs:
-  - metadata: every system vs CiteExtract+gpt-4o-mini AND vs CiteExtract+gpt-5.5(med)
-  - semantic: title-only vs +passages within each model (retrieval effect)
-  - semantic: gpt-4o vs gpt-4o-mini in the +passages condition (model-scale-with-retrieval)
-
-Outputs:
-  - results/significance/significance.json (all numbers)
-  - results/significance/significance_summary.md (readable for the paper)
-"""
+"""Statistical significance + bootstrap CIs for the metadata and semantic"""
 
 from __future__ import annotations
 
@@ -77,7 +60,6 @@ SEMANTIC_CONDITIONS = [
 
 
 def _load_correct_vector(csv_path: Path) -> tuple[np.ndarray, np.ndarray]:
-    """Returns (instance_ids, correct) for a per-instance CSV."""
     if not csv_path.exists():
         raise FileNotFoundError(csv_path)
     ids: list[int] = []
@@ -100,17 +82,13 @@ def bootstrap_ci(correct: np.ndarray, n_boot: int = BOOTSTRAP_N, seed: int = BOO
 
 
 def mcnemar(a: np.ndarray, b: np.ndarray) -> dict:
-    """McNemar's test on paired correctness vectors. Continuity-corrected
-    chi-square when discordant pairs (b+c) >= 25; exact binomial otherwise."""
     assert a.shape == b.shape, f"shape mismatch {a.shape} vs {b.shape}"
-    # b: a correct, b wrong; c: a wrong, b correct
     b_count = int(((a == 1) & (b == 0)).sum())
     c_count = int(((a == 0) & (b == 1)).sum())
     n_disc = b_count + c_count
     if n_disc == 0:
         return {"b": b_count, "c": c_count, "n_discordant": 0, "p_value": 1.0, "method": "exact"}
     if n_disc < 25:
-        # exact two-sided binomial test on min(b, c) successes out of n_disc trials, p=0.5
         res = binomtest(min(b_count, c_count), n=n_disc, p=0.5, alternative="two-sided")
         return {"b": b_count, "c": c_count, "n_discordant": n_disc, "p_value": float(res.pvalue), "method": "exact"}
     chi2_stat = (abs(b_count - c_count) - 1) ** 2 / n_disc
@@ -126,8 +104,6 @@ def stars(p: float) -> str:
 
 
 def holm_correct(p_values: list[float]) -> list[float]:
-    """Holm-Bonferroni step-down correction. Returns adjusted p-values in
-    the original input order. Adjusted values are clipped to <= 1.0."""
     n = len(p_values)
     if n == 0:
         return []
@@ -142,7 +118,6 @@ def holm_correct(p_values: list[float]) -> list[float]:
 
 
 def _annotate_holm(tests: list[dict], family: str) -> None:
-    """Add `p_holm` and `stars_holm` fields in-place; tag with `family`."""
     if not tests:
         return
     p_raw = [t["p_value"] for t in tests]
@@ -193,9 +168,6 @@ def _load_semantic() -> dict[tuple[str, str], dict]:
 
 
 def _aligned(a: dict, b: dict) -> tuple[np.ndarray, np.ndarray, dict]:
-    """Inner-join two cells on instance_id and return (a_correct, b_correct,
-    alignment_info). alignment_info exposes n_a, n_b, n_pair, and whether any
-    instances were dropped from either side."""
     common = np.intersect1d(a["ids"], b["ids"])
     a_idx = np.searchsorted(a["ids"], common)
     b_idx = np.searchsorted(b["ids"], common)
@@ -220,16 +192,11 @@ def main() -> None:
                                  "accuracy_pct": round(c["accuracy"]*100, 2),
                                  "ci95_pct": [round(c["ci95"][0]*100, 2), round(c["ci95"][1]*100, 2)]}
 
-    # Metadata: per-reference families. Each reference (gpt-4o-mini variant,
-    # gpt-5.5 med variant) gets its own family of pairwise comparisons against
-    # all non-pipeline systems. Pipeline-vs-pipeline tests live in their own
-    # family so the multiple-comparisons correction is applied within rather
-    # than across logically distinct comparison sets.
     metadata_baselines = [cid for cid in md if cid not in {"citeextract+gpt-4o-mini", "citeextract+gpt-5-mini", "citeextract+gpt-5.5(med)"}]
 
     def _pair_md(other_cid: str, ref_cid: str) -> dict:
         ra, rb, info = _aligned(md[other_cid], md[ref_cid])
-        mc = mcnemar(rb, ra)  # b = ref right, other wrong
+        mc = mcnemar(rb, ra)
         mc.update({
             "system": other_cid, "system_label": md[other_cid]["label"],
             "reference": ref_cid, "reference_label": md[ref_cid]["label"],
@@ -250,7 +217,7 @@ def main() -> None:
     for i in range(len(pipeline_ids)):
         for j in range(i + 1, len(pipeline_ids)):
             a_id, b_id = pipeline_ids[i], pipeline_ids[j]
-            pipeline_family.append(_pair_md(a_id, b_id))  # ref = b_id
+            pipeline_family.append(_pair_md(a_id, b_id))
     _annotate_holm(pipeline_family, "metadata_pipeline_pipeline")
     out["metadata_pairwise"].extend(pipeline_family)
 
@@ -263,7 +230,6 @@ def main() -> None:
             "ci95_pct": [round(c["ci95"][0]*100, 2), round(c["ci95"][1]*100, 2)],
         }
 
-    # Semantic family A: within each model, title_only vs +passages (retrieval effect)
     sem_retrieval: list[dict] = []
     for mid, mlab in SEMANTIC_MODELS:
         a = sm.get((mid, "title_only"))
@@ -271,7 +237,7 @@ def main() -> None:
         if not a or not b or a["n"] == 0 or b["n"] == 0:
             continue
         ra, rb, info = _aligned(a, b)
-        mc = mcnemar(rb, ra)  # b = +passages right, title-only wrong
+        mc = mcnemar(rb, ra)
         mc.update({"name": f"{mlab}: title-only vs +passages",
                    "model": mlab,
                    "diff_pct": round((b["accuracy"] - a["accuracy"]) * 100, 2),
@@ -283,9 +249,6 @@ def main() -> None:
     _annotate_holm(sem_retrieval, "semantic_retrieval_effect")
     out["semantic_targeted"].extend(sem_retrieval)
 
-    # Semantic family B: cross-model in the +passages condition. Production
-    # cell (gpt-4o-mini × passages, the bolded cell in Table 2) is the ref.
-    # Tests every other model's +passages row against it.
     PROD_SEMANTIC = ("gpt-4o-mini", "title_abstract_passages")
     prod = sm.get(PROD_SEMANTIC)
     sem_prod_vs_others: list[dict] = []
@@ -297,7 +260,7 @@ def main() -> None:
             if not other or other["n"] == 0:
                 continue
             ra, rb, info = _aligned(prod, other)
-            mc = mcnemar(rb, ra)  # b = other right, prod wrong  (ref=other)
+            mc = mcnemar(rb, ra)
             mc.update({"name": f"{mlab} vs GPT-4o-mini in +passages",
                        "diff_pct": round((other["accuracy"] - prod["accuracy"]) * 100, 2),
                        "acc_a_pct": round(prod["accuracy"] * 100, 2),
@@ -308,9 +271,6 @@ def main() -> None:
     _annotate_holm(sem_prod_vs_others, "semantic_prod_vs_others_in_passages")
     out["semantic_targeted"].extend(sem_prod_vs_others)
 
-    # Semantic family C: rhetorically-load-bearing cross-model pairs that
-    # are NOT against the production cell. Each is a "scale doesn't matter"
-    # narrative beat. Tested as its own small family.
     SEM_NARRATIVE_PAIRS = [
         (("gpt-4o-mini", "title_abstract_passages"), ("gpt-4o", "title_abstract_passages"),
          "GPT-4o vs GPT-4o-mini in +passages (scale-with-retrieval)"),

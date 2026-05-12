@@ -30,10 +30,6 @@ def stage(name: str, **meta):
 
 @contextmanager
 def collect_stages():
-    """Activate a per-run accumulator. Use as a context manager around the
-    top-level pipeline call. Returns a dict that gets populated as `stage()`
-    contexts exit.
-    """
     bucket: dict[str, float] = {}
     token = _collector.set(bucket)
     try:

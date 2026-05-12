@@ -252,10 +252,6 @@ class TestGrobidDedupRemap:
 
 
 class TestVenueWipingHeuristic:
-    """The venue-wiping heuristic in _clean_grobid_reference wipes venue
-    when SequenceMatcher(venue, title).ratio() > 0.80 OR one is contained
-    in the other. Locks in the current behaviour so future refactors
-    cannot silently regress it."""
 
     def test_wipe_when_venue_equals_title(self):
         from citeextract.parsers.grobid_parser import _clean_grobid_reference
@@ -290,9 +286,6 @@ class TestVenueWipingHeuristic:
         assert ref["venue"] == "NeurIPS"
 
     def test_keep_when_venue_shares_words_but_distinct(self):
-        # A title and a venue that share a few words must NOT wipe — they're
-        # not similar enough by SequenceMatcher and neither is a substring of
-        # the other.
         from citeextract.parsers.grobid_parser import _clean_grobid_reference
         ref = _clean_grobid_reference({
             "title": "Online learning for reinforcement learning agents",
@@ -306,7 +299,5 @@ class TestVenueWipingHeuristic:
             "title": "Attention is all you need",
             "venue": "",
         })
-        # venue stays empty when nothing to compare; the heuristic only
-        # triggers when both fields are non-empty.
         assert ref.get("venue") == ""
 

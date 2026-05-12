@@ -1,18 +1,4 @@
 #!/usr/bin/env bash
-# Build a trimmed, anonymous-supplementary archive of experiment/paper/ for
-# paper submission. Non-destructive: the working tree is unchanged.
-#
-# Excludes (reproducible from what is included, or not anonymity-safe):
-#   - prevalence/data/papers/*.pdf       (re-fetch via 00_fetch_neurips.py)
-#   - results/{metadata,semantic}/partial/  (resume checkpoints; CSVs derive from them)
-#   - *.log                              (debug traces)
-#   - _trash/                            (locally-discarded items)
-#   - __pycache__/, *.pyc, .DS_Store
-#   - this script itself
-#
-# Usage:
-#   bash experiment/paper/make_release.sh                   # default staging dir
-#   bash experiment/paper/make_release.sh /path/to/output   # custom staging dir
 set -euo pipefail
 
 PAPER_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -40,7 +26,6 @@ rsync -a \
     "$PAPER_DIR/" "$STAGING/"
 
 cat >"$STAGING/RELEASE_NOTES.md" <<'EOF'
-# Notes for reviewers
 
 This is a trimmed copy of `experiment/paper/`. The following items have been
 omitted to keep the archive small; everything is reproducible from what is

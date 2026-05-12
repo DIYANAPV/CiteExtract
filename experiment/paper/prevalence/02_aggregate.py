@@ -1,36 +1,4 @@
-"""
-02_aggregate.py
-===============
-
-Aggregate the per-paper JSONL checkpoints from ``results/per_paper/`` into a
-single dataset and compute the prevalence numbers ready to drop into the
-paper.
-
-Outputs
--------
-    results/all_instances.csv          — full long-form table, one row per (paper, ref, citing sentence)
-    results/prevalence_summary.json    — headline + stratifications + bootstrap CIs
-
-Headline number
----------------
-The prevalence of semantic misrepresentation, computed only over citations
-where the cited paper was bibliographically resolved AND its full text was
-retrievable. Citations without full text are excluded from the numerator
-*and* the denominator (they are reported separately as coverage).
-
-Misrepresentation = LLM verdict in {NOT_SUPPORTED, CONTRADICTS}.
-Verdicts of NEUTRAL or null are reported separately and *not* counted as
-misrepresentation in the headline rate.
-
-Bootstrap is over citations (not over papers) — 10,000 resamples,
-percentile-method 95% CI. We also report the per-paper rate distribution as
-a sanity check that no single paper dominates.
-
-Usage
------
-    python 02_aggregate.py
-    python 02_aggregate.py --per-paper-dir results/per_paper --out-dir results
-"""
+"""Aggregate the per-paper JSONL checkpoints from ``results/per_paper/`` into a"""
 
 from __future__ import annotations
 
@@ -138,7 +106,6 @@ def write_instances_csv(rows: Iterable[CitationRow], path: Path) -> None:
 
 
 def is_in_scope(r: CitationRow) -> bool:
-    """The denominator definition: bibliographically valid AND full text retrieved."""
     return r.paper_found and r.full_text_available and r.verdict is not None
 
 
@@ -147,10 +114,6 @@ def is_misrep(r: CitationRow) -> bool:
 
 
 def bootstrap_ci(values: list[int], resamples: int, seed: int) -> tuple[float, float, float]:
-    """Bootstrap percentile 95% CI for a binary indicator's mean.
-
-    Returns (point, lo, hi) as percentages (0–100).
-    """
     if not values:
         return 0.0, 0.0, 0.0
     arr = np.array(values, dtype=np.uint8)

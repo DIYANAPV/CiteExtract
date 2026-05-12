@@ -16,11 +16,6 @@ _NS = {"atom": "http://www.w3.org/2005/Atom"}
 
 
 def _arxiv_disabled() -> bool:
-    """True when the caller has explicitly disabled arXiv via env var.
-
-    Used to skip arXiv when the daily quota is exhausted. Same pattern as
-    the SERPAPI_KEY and CITEEXTRACT_SKIP_OPENALEX gates.
-    """
     return os.environ.get("CITEEXTRACT_SKIP_ARXIV") == "1"
 
 

@@ -24,6 +24,13 @@ venv/
 # Trash
 trash/
 *.pre_recovery
+experiment/paper/_trash/
+
+# Logs (debug traces, not reproducible/load-bearing for results)
+*.log
+
+# Local API cache (regenerated on first run)
+data/cache/
 
 # OS
 .DS_Store

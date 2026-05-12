@@ -78,7 +78,7 @@ def detect_citation_format(raw_text: str, source_format: str = "") -> Optional[s
         "mla": _score_mla(text),
     }
 
-    best_format = max(scores, key=scores.get)  # type: ignore[arg-type]
+    best_format = max(scores, key=scores.get)
     best_score = scores[best_format]
 
     if best_score < _MIN_CONFIDENCE:

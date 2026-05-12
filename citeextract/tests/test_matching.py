@@ -48,7 +48,7 @@ class TestNormalizeTitle:
 
     def test_empty(self):
         assert normalize_title("") == ""
-        assert normalize_title(None) == ""  # type: ignore
+        assert normalize_title(None) == ""
 
 
 class TestTitleSimilarity:

@@ -1,36 +1,4 @@
-"""
-05_llm_secondopinion.py
-=======================
-
-For every MISREP case (CONTRADICTS) from the prevalence run, send a stronger
-LLM (gpt-4o by default) the FULL citing-section context + the FULL cited
-paper, and ask whether the citing sentence is actually misrepresenting its
-source.
-
-This is the calibration step for the prevalence claim: if the second-opinion
-LLM agrees with our primary system on most cases, the 4.24% headline holds
-up; disagreements are the cases that go to human review.
-
-Inputs
-------
-* `results/per_paper/*.jsonl` — read MISREP rows
-* `data/papers/{paper_id}.pdf` — the citing NeurIPS paper
-* The pipeline's SQLite cache — full text of cited papers (already populated
-  by the primary run; we just look it up)
-
-Outputs
--------
-* `results/secondopinion/{paper_id}__{ref_id}.json` — per-case checkpoint (resumable)
-* `results/misrep_secondopinion.csv` — aggregated, one row per case
-* `results/misrep_secondopinion.md` — human-readable, one section per case
-
-Usage
------
-    python 05_llm_secondopinion.py                 # all 49 cases, gpt-4o
-    python 05_llm_secondopinion.py --limit 5       # first 5
-    python 05_llm_secondopinion.py --model gpt-5   # use gpt-5 instead
-    python 05_llm_secondopinion.py --force         # re-run cases with existing checkpoints
-"""
+"""For every MISREP case (CONTRADICTS) from the prevalence run, send a stronger"""
 
 from __future__ import annotations
 
@@ -53,8 +21,6 @@ _REPO_ROOT = _PREV_DIR.parent.parent.parent
 
 try:
     from dotenv import load_dotenv
-    # The .env is canonically at citeextract/.env (the package root), not the
-    # repo root. Try both for safety.
     for _candidate in (_REPO_ROOT / "citeextract" / ".env", _REPO_ROOT / ".env"):
         if _candidate.exists():
             load_dotenv(_candidate, override=False)
@@ -62,7 +28,7 @@ try:
 except Exception:
     pass
 
-import fitz  # pymupdf
+import fitz
 import httpx
 from openai import AsyncOpenAI
 
@@ -79,8 +45,8 @@ DEFAULT_CSV = _PREV_DIR / "results" / "misrep_secondopinion.csv"
 DEFAULT_MD = _PREV_DIR / "results" / "misrep_secondopinion.md"
 
 DEFAULT_MODEL = "gpt-4o"
-CITING_WINDOW_CHARS = 4000      # chars around citing sentence for citing-paper context
-MAX_CITED_CHARS = 350_000       # ~80–100K tokens; safe for gpt-4o's 128K context
+CITING_WINDOW_CHARS = 4000
+MAX_CITED_CHARS = 350_000
 TEMPERATURE = 0.0
 
 MISREP_VERDICTS = {"NOT_SUPPORTED", "CONTRADICTS"}
@@ -100,15 +66,15 @@ class SecondOpinionResult:
     citing_sentence: str
     cited_title: Optional[str]
     cited_doi: Optional[str]
-    primary_verdict: str            # the original CheckCitation verdict
-    primary_explanation: str        # original system explanation
-    secondopinion_verdict: str      # SUPPORTED / NOT_SUPPORTED / PARTIAL / UNCLEAR
+    primary_verdict: str
+    primary_explanation: str
+    secondopinion_verdict: str
     secondopinion_reasoning: str
-    secondopinion_confidence: str   # high / medium / low
-    agrees: bool                    # True if SO is also NOT_SUPPORTED-shaped
+    secondopinion_confidence: str
+    agrees: bool
     cited_text_chars: int
     citing_context_chars: int
-    cited_text_source: str          # full_text / abstract_only / not_found
+    cited_text_source: str
     model: str
     cost_usd: float
     error: Optional[str]
@@ -130,7 +96,6 @@ def load_misrep_cases(per_paper_dir: Path) -> list[dict]:
 
 
 def extract_citing_context(pdf_path: Path, citing_sentence: str, window: int) -> str:
-    """Extract a window of citing-paper text around the citing sentence."""
     if not pdf_path.exists():
         return ""
     doc = fitz.open(str(pdf_path))
@@ -142,7 +107,6 @@ def extract_citing_context(pdf_path: Path, citing_sentence: str, window: int) ->
     haystack = re.sub(r"\s+", " ", full_text)
     idx = haystack.find(needle)
     if idx == -1:
-        # Fallback: split off a representative middle chunk
         mid = len(haystack) // 2
         return haystack[max(0, mid - window // 2): mid + window // 2]
     start = max(0, idx - window // 2)
@@ -157,7 +121,6 @@ async def fetch_cited_full_text(
     client: httpx.AsyncClient,
     cache: APICache,
 ) -> tuple[str, str]:
-    """Get the cited paper's full text via the pipeline cache. Returns (text, source)."""
     if not cited_title and not cited_doi:
         return "", "not_found"
     ref = Reference(
@@ -232,7 +195,6 @@ CITED PAPER (full text, possibly truncated):
 =====
 """
 
-# Rough OpenAI pricing (USD per 1M tokens) — adjust if model pricing changes.
 PRICING = {
     "gpt-4o":         {"in": 2.50,  "out": 10.00},
     "gpt-4o-mini":    {"in": 0.15,  "out": 0.60},
@@ -251,7 +213,6 @@ async def call_llm(
     model: str,
     prompt: str,
 ) -> tuple[dict, float, dict]:
-    """Call the LLM with structured-output JSON. Returns (parsed, cost, usage_dict)."""
     resp = await openai_client.chat.completions.create(
         model=model,
         messages=[{"role": "user", "content": prompt}],
@@ -324,7 +285,7 @@ async def process_case(
     except Exception as exc:
         verdict, reasoning, confidence, cost, err = "UNCLEAR", str(exc), "low", 0.0, repr(exc)
 
-    agrees = verdict in ("NOT_SUPPORTED", "PARTIAL")  # second-opinion confirms our flag
+    agrees = verdict in ("NOT_SUPPORTED", "PARTIAL")
 
     return SecondOpinionResult(
         paper_id=paper_id, ref_id=ref_id,

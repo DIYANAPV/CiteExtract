@@ -150,7 +150,6 @@ class TestBiomedicalSignal:
 
     def test_word_boundary_not_substring(self):
         from citeextract.verification.existence import _has_biomedical_signal
-        # "general", "generation" contain "gene" as substring — must NOT match.
         assert _has_biomedical_signal(
             "General-purpose pretraining for natural language generation", "ACL"
         ) is False
@@ -162,8 +161,6 @@ class TestBiomedicalSignal:
 
 
 class TestCascadeOrder:
-    """Cluster-2 reorder: for a no-DOI ref, CrossRef-title runs BEFORE
-    OpenAlex, which runs BEFORE S2-title. PubMed is skipped on non-biomedical."""
 
     def test_no_doi_cascade_order(self, monkeypatch, tmp_path):
         from citeextract.verification import existence as ex
@@ -234,15 +231,12 @@ class TestCascadeOrder:
             return result
 
         result = _run(_test())
-        # No DOI / no arxiv_id → S2-by-id should NOT have run
         assert "s2_id" not in call_order
-        # crossref_title before openalex before s2_title
         assert "crossref_title" in call_order
         assert "openalex" in call_order
         assert "s2_title" in call_order
         assert call_order.index("crossref_title") < call_order.index("openalex")
         assert call_order.index("openalex") < call_order.index("s2_title")
-        # pubmed gated out on non-biomedical title
         assert "pubmed" not in call_order
         assert result.status == "NOT_FOUND"
 

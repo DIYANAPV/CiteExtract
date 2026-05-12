@@ -1,29 +1,4 @@
-"""
-04_misrep_review.py
-===================
-
-Export every MISREP-flagged case from the per-paper JSONLs as a
-human-readable Markdown file, one section per case. Lets you skim the
-system's verdicts, read the LLM reasoning, and decide whether each case
-is genuinely a misrepresentation or a system error.
-
-Filters
--------
-* verdict in {NOT_SUPPORTED, CONTRADICTS}
-* paper_found = True
-* full_text_available = True
-
-Output
-------
-    results/misrep_review.md   — Markdown, viewable in any editor / GitHub
-    results/misrep_review.csv  — Same content as a spreadsheet for offline note-taking
-
-Usage
------
-    python 04_misrep_review.py
-    python 04_misrep_review.py --include-neutral    # also include NEUTRAL verdicts
-    python 04_misrep_review.py --paper-id <id>      # only one paper
-"""
+"""Export every MISREP-flagged case from the per-paper JSONLs as a"""
 
 from __future__ import annotations
 
@@ -52,14 +27,12 @@ log = logging.getLogger("misrep_review")
 
 
 def _md_escape(s: str) -> str:
-    """Escape characters that would break Markdown rendering of a quoted block."""
     if s is None:
         return ""
     return s.replace("\r", "").strip()
 
 
 def _md_quote(s: str) -> str:
-    """Format multi-line text as a Markdown blockquote."""
     s = _md_escape(s)
     if not s:
         return "_(empty)_"

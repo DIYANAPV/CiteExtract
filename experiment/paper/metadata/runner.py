@@ -17,13 +17,8 @@ _REPO_ROOT = _PAPER_ROOT.parent.parent
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
-# `citeextract/config/` is a YAML data directory at the repo root that Python
-# would otherwise treat as a namespace package, shadowing `citeextract.config`
-# (a real module at `citeextract/backend/config.py`). The editable install's
-# finder maps `citeextract` -> `citeextract/backend` correctly, but it is
-# *appended* to sys.meta_path so PathFinder wins. Promote it to position 0.
 try:
-    import __editable___citeextract_0_1_0_finder as _ef  # type: ignore
+    import __editable___citeextract_0_1_0_finder as _ef
     if _ef._EditableFinder in sys.meta_path:
         sys.meta_path.remove(_ef._EditableFinder)
     sys.meta_path.insert(0, _ef._EditableFinder)
@@ -402,9 +397,6 @@ async def run_production_cell(
                     cache=cache,
                     metadata_agent_factory=_agent_factory,
                 )
-                # Recompute cost using this variant's pricing — CostTracker
-                # uses config.toml's global rates (gpt-4o-mini), so the
-                # pres.cost_usd would otherwise be wrong for gpt-5/5.5/-mini.
                 cost_recomputed = (
                     pres.prompt_tokens * in_rate / 1_000_000
                     + pres.completion_tokens * out_rate / 1_000_000

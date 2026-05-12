@@ -19,8 +19,6 @@ async def search_by_title(
     ref_year: Optional[int] = None,
     errors: Optional[list[str]] = None,
 ) -> Optional[dict]:
-    # Allow callers to fully skip OpenAlex (e.g. when daily quota is exhausted).
-    # Same pattern as the SERPAPI_KEY env-var gate. Empty/missing = enabled.
     if os.environ.get("CITEEXTRACT_SKIP_OPENALEX") == "1":
         return None
     if not title or len(title.strip()) < 5:

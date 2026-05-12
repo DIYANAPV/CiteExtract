@@ -1,24 +1,4 @@
-"""
-06_high_confidence_misreps.py
-=============================
-
-Filter misrep cases down to the *high-confidence* set — only those where:
-
-  1. Both LLMs agree (primary=CONTRADICTS/NOT_SUPPORTED AND
-     second-opinion=NOT_SUPPORTED/PARTIAL), and
-  2. The cited paper resolved by our metadata cascade actually matches the
-     bibliography entry [N] in the citing PDF (overlap ≥ 0.4 on long words
-     between our `cited_title` and the PDF bib line).
-
-These are the cases we are confident calling "real" misrepresentations. The
-output is a single Markdown file + companion CSV with full context for each
-case: citing paper, cited paper, citing sentence + surrounding text from the
-actual PDF, the PDF's bibliography entry, both LLMs' verdicts and reasoning.
-
-Usage
------
-    python 06_high_confidence_misreps.py
-"""
+"""Filter misrep cases down to the *high-confidence* set — only those where:"""
 
 from __future__ import annotations
 
@@ -30,7 +10,7 @@ import re
 from pathlib import Path
 from typing import Optional
 
-import fitz  # pymupdf
+import fitz
 
 _THIS_FILE = Path(__file__).resolve()
 _PREV_DIR = _THIS_FILE.parent
@@ -62,7 +42,6 @@ def _flat_pdf(pdf_path: Path) -> str:
 
 
 def _find_bib_entry(flat: str, ref_id: str) -> Optional[str]:
-    """Pull the bibliography line for [ref_id] from the PDF text."""
     ref_start = max(flat.rfind("References "), flat.rfind("REFERENCES "))
     if ref_start == -1:
         ref_start = int(len(flat) * 0.7)
@@ -95,7 +74,6 @@ def _title_overlap(a: Optional[str], b: Optional[str]) -> float:
 
 
 def _find_citing_window(flat: str, citing_sentence: str, around: int = 350) -> str:
-    """Pull a window of citing-paper text around the citing sentence."""
     if not citing_sentence:
         return ""
     needle = citing_sentence[:60].strip()
@@ -106,7 +84,6 @@ def _find_citing_window(flat: str, citing_sentence: str, around: int = 350) -> s
 
 
 def load_misrep_instances(per_paper_dir: Path) -> dict[tuple, list[dict]]:
-    """Map (paper_id, ref_id) -> list of misrep citation rows."""
     out: dict[tuple, list[dict]] = {}
     for path in sorted(per_paper_dir.glob("*.jsonl")):
         for line in path.open("r"):
@@ -170,8 +147,6 @@ def main() -> int:
             })
             continue
 
-        # Pull all instances (one ref can be cited multiple times — pick the first as canonical
-        # but keep a list of citing sentences for reference)
         ref_instances = instances.get((paper_id, ref_id), [])
         citing_sentences = [r["citing_sentence"] for r in ref_instances]
         canonical = ref_instances[0] if ref_instances else None
@@ -273,7 +248,6 @@ def main() -> int:
 
     if high_conf:
         fields = list(high_conf[0].keys())
-        # all_citing_sentences is a list — flatten to "; "-joined string
         with args.csv.open("w", newline="") as f:
             writer = csv.DictWriter(f, fieldnames=fields)
             writer.writeheader()

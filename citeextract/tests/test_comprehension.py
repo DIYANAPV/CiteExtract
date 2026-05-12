@@ -327,7 +327,7 @@ class TestRetrievalIndexParity:
         chunks = chunk_text(SAMPLE_PAPER_TEXT)
         index = build_retrieval_index(chunks, model_name=None)
         with pytest.raises(Exception):
-            index.chunks = []  # type: ignore[misc]
+            index.chunks = []
 
 
 class TestRerankPool:

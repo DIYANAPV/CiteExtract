@@ -1,6 +1,4 @@
-"""Shared HuggingFace runtime + parsing helpers for the open-weight benchmark
-runners in ``metadata/runner_openweight.py`` and ``semantic/runner_openweight.py``.
-"""
+"""Shared HuggingFace runtime + parsing helpers for the open-weight benchmark"""
 
 from __future__ import annotations
 
@@ -27,8 +25,6 @@ class CallResult:
 
 
 class TransformersClient:
-    """Greedy-decode HuggingFace causal-LM client. Qwen3 gets ``enable_thinking=False``
-    on the chat template (otherwise it emits ``<think>`` blocks the parser would have to strip)."""
 
     def __init__(self, model_id: str, dtype: str = "auto"):
         try:
@@ -145,8 +141,6 @@ PARSE_RETRY_SUFFIX = (
 def parse_two_class(
     raw: str, allowed: tuple[str, str], *, evidence_key: str,
 ) -> tuple[str, str, str, str | None]:
-    """Parse a two-label JSON verdict, tolerating ``<think>`` blocks, code fences,
-    and JSON embedded in prose. Returns ``(verdict, reasoning, evidence_or_confidence, error)``."""
     raw = (raw or "").strip()
     if not raw:
         return ("", "", "", "empty_response")
@@ -194,7 +188,6 @@ def parse_two_class(
 
 def stratified_sample(records: list[dict], n: int, seed: int,
                       label_key: str, label_values: tuple[str, str]) -> list[dict]:
-    """One pick per source, then fill toward a balanced label split."""
     rng = random.Random(seed)
     by_src: dict[str, list[dict]] = {}
     for r in records:
@@ -246,8 +239,6 @@ def append_partial(p: Path, row) -> None:
 
 def read_partial_as_rows(p: Path, kept_ids: set[int], row_cls,
                          metadata_defaults: bool = False):
-    """Replay a partial JSONL into typed rows. ``metadata_defaults=True`` backfills
-    search-related fields that older partials predate."""
     rows = []
     if not p.exists():
         return rows
@@ -277,7 +268,6 @@ def write_csv(p: Path, rows: Iterable, columns: list[str]) -> None:
 
 
 def update_summary(summary_path: Path, new_entries: dict) -> None:
-    """Merge ``new_entries`` into the JSON file at ``summary_path``."""
     summary_path.parent.mkdir(parents=True, exist_ok=True)
     if summary_path.exists():
         try:

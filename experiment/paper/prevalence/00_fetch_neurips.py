@@ -1,25 +1,4 @@
-"""
-00_fetch_neurips.py
-===================
-
-Sample N accepted NeurIPS 2025 papers from the OpenReview API v2 and download
-their PDFs into a local corpus folder for the prevalence study.
-
-Usage
------
-    python 00_fetch_neurips.py                    # default: N=20, seed=42
-    python 00_fetch_neurips.py --n 10 --seed 1    # smaller dry run
-    python 00_fetch_neurips.py --list-only        # list accepted, skip downloads
-
-Outputs
--------
-    data/papers/{paper_id}.pdf      — downloaded PDFs (atomic writes)
-    data/corpus_manifest.csv        — paper_id, title, decision, openreview_url, pdf_path
-
-The script is resumable: PDFs already on disk (>1 KiB) are not re-downloaded.
-The manifest is rewritten in full on every run; it indexes the corpus, it is
-not the source of truth.
-"""
+"""Sample N accepted NeurIPS 2025 papers from the OpenReview API v2 and download"""
 
 from __future__ import annotations
 
@@ -37,21 +16,21 @@ import requests
 
 _THIS_FILE = Path(__file__).resolve()
 _PREV_DIR = _THIS_FILE.parent
-_REPO_ROOT = _PREV_DIR.parent.parent.parent  # repo root (4 levels up from this file)
+_REPO_ROOT = _PREV_DIR.parent.parent.parent
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
 OPENREVIEW_API = "https://api2.openreview.net"
 NEURIPS_2025_VENUEID = "NeurIPS.cc/2025/Conference"
-ACCEPTED_VENUE_PREFIX = "NeurIPS 2025 "  # accepted notes carry venue like "NeurIPS 2025 poster" / "spotlight" / "oral"
+ACCEPTED_VENUE_PREFIX = "NeurIPS 2025 "
 
 DEFAULT_N = 20
 DEFAULT_SEED = 42
 DEFAULT_OUT_DIR = _PREV_DIR / "data" / "papers"
 DEFAULT_MANIFEST = _PREV_DIR / "data" / "corpus_manifest.csv"
-PAGE_SIZE = 1000  # OpenReview v2 max per page
-POLITE_DELAY_S = 1.0  # between PDF downloads
-PDF_429_BACKOFF_S = 8.0  # extra sleep on 429 before retrying
+PAGE_SIZE = 1000
+POLITE_DELAY_S = 1.0
+PDF_429_BACKOFF_S = 8.0
 PDF_MAX_RETRIES = 4
 
 logging.basicConfig(
@@ -64,15 +43,14 @@ log = logging.getLogger("fetch_neurips")
 
 @dataclass
 class PaperRecord:
-    paper_id: str        # OpenReview note id, used as filename
+    paper_id: str
     title: str
-    decision: str        # e.g. "NeurIPS 2025 poster"
+    decision: str
     openreview_url: str
-    pdf_path: str        # path relative to repo root
+    pdf_path: str
 
 
 def _content_value(content: dict, field: str) -> str:
-    """Pull a content field's `.value` (API v2 wraps every field in {value: ...})."""
     raw = content.get(field)
     if isinstance(raw, dict):
         return str(raw.get("value", "") or "")
@@ -82,7 +60,6 @@ def _content_value(content: dict, field: str) -> str:
 
 
 def fetch_all_accepted(session: requests.Session) -> list[dict]:
-    """Page through OpenReview API v2 for NeurIPS 2025 and return accepted notes."""
     all_notes: list[dict] = []
     offset = 0
     while True:
@@ -115,12 +92,11 @@ def fetch_all_accepted(session: requests.Session) -> list[dict]:
 
 
 def build_record(note: dict) -> PaperRecord | None:
-    """Build a PaperRecord from a note. Returns None if a required field is missing."""
     content = note.get("content", {})
     paper_id = note.get("id")
     title = _content_value(content, "title").strip()
     venue = _content_value(content, "venue").strip()
-    pdf_field = _content_value(content, "pdf")  # truthy if a pdf attachment exists
+    pdf_field = _content_value(content, "pdf")
 
     if not paper_id or not title or not pdf_field:
         return None
@@ -130,15 +106,11 @@ def build_record(note: dict) -> PaperRecord | None:
         title=title,
         decision=venue,
         openreview_url=f"https://openreview.net/forum?id={paper_id}",
-        pdf_path="",  # filled after successful download
+        pdf_path="",
     )
 
 
 def download_pdf(session: requests.Session, paper_id: str, dest: Path) -> bool:
-    """Download a paper's PDF to `dest` atomically. Returns True if `dest` is good after.
-
-    Retries on HTTP 429 with exponential backoff; gives up after PDF_MAX_RETRIES.
-    """
     if dest.exists() and dest.stat().st_size > 1024:
         log.debug("skip already-downloaded: %s", dest.name)
         return True

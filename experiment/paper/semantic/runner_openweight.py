@@ -1,12 +1,4 @@
-"""Open-weight (HuggingFace) semantic runner. Counterpart to ``runner.py`` (OpenAI API).
-
-Usage
------
-    python -m experiment.paper.semantic.runner_openweight --model Qwen/Qwen3-8B --full
-    python -m experiment.paper.semantic.runner_openweight --model Qwen/Qwen3-8B --smoke
-    python -m experiment.paper.semantic.runner_openweight --model Qwen/Qwen3-8B \
-        --conditions title_only title_abstract title_abstract_passages --full
-"""
+"""Open-weight (HuggingFace) semantic runner. Counterpart to ``runner.py`` (OpenAI API)."""
 
 from __future__ import annotations
 
@@ -25,7 +17,7 @@ _REPO_ROOT = _PAPER_ROOT.parent.parent
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
-from experiment.paper._shared.openweight_client import (  # noqa: E402
+from experiment.paper._shared.openweight_client import (
     PARSE_RETRY_SUFFIX,
     TransformersClient,
     append_partial,

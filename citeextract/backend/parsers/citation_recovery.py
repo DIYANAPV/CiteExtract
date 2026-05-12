@@ -174,7 +174,7 @@ def recover_citations(
     for c in deduped:
         ctx = extract_context(body_text, c.position)
         out.append(Citation(
-            ref_id=c.ref_id,  # type: ignore[arg-type]  # None filtered above
+            ref_id=c.ref_id,
             citing_sentence=ctx["citing_sentence"],
             context_before=ctx["context_before"],
             context_after=ctx["context_after"],
