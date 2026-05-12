@@ -26,6 +26,7 @@ rsync -a \
     "$PAPER_DIR/" "$STAGING/"
 
 cat >"$STAGING/RELEASE_NOTES.md" <<'EOF'
+# Notes for reviewers
 
 This is a trimmed copy of `experiment/paper/`. The following items have been
 omitted to keep the archive small; everything is reproducible from what is
