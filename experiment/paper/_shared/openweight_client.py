@@ -1,17 +1,5 @@
-"""Shared infrastructure for running open-weight HuggingFace models against the
-metadata/semantic benchmarks.
-
-Provides:
-  - ``TransformersClient``  — async wrapper around ``transformers`` greedy decode
-  - ``CallResult``          — uniform response container
-  - ``stratified_sample``   — deterministic per-source sampler used by --smoke
-  - JSONL/CSV helpers       — partial-checkpoint append + read + final write
-  - ``parse_two_class``     — robust two-label JSON parser (handles ``<think>``,
-                              code fences, and embedded objects)
-  - ``PARSE_RETRY_SUFFIX``  — retry instruction appended on a parse failure
-
-Imported by ``experiment/paper/{metadata,semantic}/runner_openweight.py``.
-The closed-weight (OpenAI) runners do not need this module.
+"""Shared HuggingFace runtime + parsing helpers for the open-weight benchmark
+runners in ``metadata/runner_openweight.py`` and ``semantic/runner_openweight.py``.
 """
 
 from __future__ import annotations
@@ -39,13 +27,8 @@ class CallResult:
 
 
 class TransformersClient:
-    """Greedy-decode HuggingFace causal-LM client.
-
-    Loads weights once on construction; ``call`` runs generation off the asyncio
-    thread so it co-operates with the runner's existing async loop. Qwen3 models
-    get the ``enable_thinking=False`` chat-template flag (otherwise they emit
-    ``<think>`` blocks the parser would have to strip).
-    """
+    """Greedy-decode HuggingFace causal-LM client. Qwen3 gets ``enable_thinking=False``
+    on the chat template (otherwise it emits ``<think>`` blocks the parser would have to strip)."""
 
     def __init__(self, model_id: str, dtype: str = "auto"):
         try:
@@ -162,12 +145,8 @@ PARSE_RETRY_SUFFIX = (
 def parse_two_class(
     raw: str, allowed: tuple[str, str], *, evidence_key: str,
 ) -> tuple[str, str, str, str | None]:
-    """Parse a two-label JSON verdict, tolerating ``<think>`` blocks, ```` ``` ```` fences,
-    and JSON embedded in surrounding prose.
-
-    Returns ``(verdict, reasoning, evidence_or_confidence, error)``. ``error`` is
-    one of ``empty_response``, ``parse_failure``, ``bad_verdict_label``, or None.
-    """
+    """Parse a two-label JSON verdict, tolerating ``<think>`` blocks, code fences,
+    and JSON embedded in prose. Returns ``(verdict, reasoning, evidence_or_confidence, error)``."""
     raw = (raw or "").strip()
     if not raw:
         return ("", "", "", "empty_response")
@@ -267,11 +246,8 @@ def append_partial(p: Path, row) -> None:
 
 def read_partial_as_rows(p: Path, kept_ids: set[int], row_cls,
                          metadata_defaults: bool = False):
-    """Replay a partial-results JSONL into typed rows, filtering by ``kept_ids``.
-
-    ``metadata_defaults=True`` backfills missing search-related fields with
-    sensible defaults — older partials predate those columns.
-    """
+    """Replay a partial JSONL into typed rows. ``metadata_defaults=True`` backfills
+    search-related fields that older partials predate."""
     rows = []
     if not p.exists():
         return rows

@@ -1,11 +1,4 @@
-"""Open-weight (HuggingFace) metadata runner.
-
-Counterpart to ``runner.py`` (which targets the OpenAI API). Uses the shared
-``TransformersClient`` from ``experiment/paper/_shared/openweight_client.py`` to
-execute greedy decode locally on a GPU box, and writes results to the same
-metadata results layout (``results/metadata/csv/``, ``results/metadata/partial/``,
-``results/metadata/summaries/``) so ``make_table.py`` and ``analysis/significance.py``
-pick them up uniformly.
+"""Open-weight (HuggingFace) metadata runner. Counterpart to ``runner.py`` (OpenAI API).
 
 Usage
 -----

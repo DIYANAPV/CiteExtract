@@ -1,11 +1,4 @@
-"""Open-weight (HuggingFace) semantic runner.
-
-Counterpart to ``runner.py`` (which targets the OpenAI API). Uses the shared
-``TransformersClient`` from ``experiment/paper/_shared/openweight_client.py`` to
-execute greedy decode locally on a GPU box, and writes results to the same
-semantic results layout (``results/semantic/csv/``, ``results/semantic/partial/``,
-``results/semantic/summaries/``) so ``make_table.py`` and ``analysis/significance.py``
-pick them up uniformly.
+"""Open-weight (HuggingFace) semantic runner. Counterpart to ``runner.py`` (OpenAI API).
 
 Usage
 -----
