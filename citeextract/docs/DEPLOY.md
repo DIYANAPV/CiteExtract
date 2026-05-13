@@ -46,3 +46,43 @@ REVIEW_ACCESS_TOKEN=testtoken python -m citeextract_ui
 ```
 
 Then open `http://localhost:7860/?token=testtoken`.
+
+## Cloud Run deploy
+
+`scripts/deploy_gcp.sh` creates the project, links billing, stores secrets, deploys GROBID + the main app, and prints the reviewer URL. Re-running is safe.
+
+### Prerequisites
+1. Activate the $300 / 90-day free trial at https://console.cloud.google.com
+2. Install [gcloud CLI](https://cloud.google.com/sdk/docs/install), then `gcloud auth login`
+3. Create an OpenAI project-scoped key with a monthly cap (see above)
+4. `gcloud billing accounts list` → copy the `ACCOUNT_ID`
+
+### Run
+
+```bash
+PROJECT_ID=your-project-id \
+BILLING_ACCOUNT_ID=XXXXXX-XXXXXX-XXXXXX \
+OPENAI_API_KEY=your-openai-key \
+REVIEW_ACCESS_TOKEN=$(python3 -c "import secrets; print(secrets.token_urlsafe(16))") \
+./scripts/deploy_gcp.sh
+```
+
+Pick a `PROJECT_ID` that doesn't contain your name or institution — it shows up in build logs.
+
+First run takes ~15–20 minutes (Cloud Build on the torch image). Re-runs take ~3–5.
+
+The script prints the reviewer URL at the end: `https://<service>.run.app/?token=<token>`. Put that in the paper.
+
+### Rotate the token after camera-ready
+
+```bash
+printf "%s" "<new-token>" | gcloud secrets versions add review-access-token --data-file=-
+gcloud run services update citeextract --region=us-central1 \
+  --update-secrets="REVIEW_ACCESS_TOKEN=review-access-token:latest"
+```
+
+### Wind down
+
+```bash
+gcloud projects delete <PROJECT_ID>
+```

@@ -43,13 +43,7 @@ For every reference, two independent verdicts plus the evidence behind them:
 
 Three pipeline layers run in one pass: existence cascade across CrossRef → Semantic Scholar → OpenAlex → PubMed; field-level metadata comparison (chimera detection); multi-query semantic verification (claim decomposed into sub-claims, evidence retrieved per sub-claim, full claim re-scored on the unioned passage set).
 
-## Modes
 
-| Mode | LLM cost | Use when |
-|---|---|---|
-| `--quick` | Free | "Are my references real?" — deterministic, no LLM |
-| `--agentic` (recommended) | ~$0.05/paper | Best accuracy with semantic verification |
-| `comprehend` | Free | "What do my cited papers say?" — passages only |
 
 ## Inputs
 
@@ -68,19 +62,14 @@ OPENALEX_MAILTO=you@uni.edu     # optional polite-pool
 
 Pipeline thresholds and model choices live in [`config/config.yaml`](config/config.yaml).
 
-## Tests
 
-```bash
-pytest                       # all
-pytest -m "not network"      # offline only
-```
 
 ## Project layout
 
 ```
 citeextract/
-├── backend/                  import citeextract.X     (api, pipeline, parsers, verification, ...)
-├── frontend/                 import citeextract_ui.X  (Gradio UI)
+├── backend/                  import citeextract.X     
+├── frontend/                 import citeextract_ui.X  
 ├── tests/, config/, docs/, scripts/, assets/
 └── pyproject.toml, Dockerfile, docker-compose.yml, .env.example
 ```
@@ -88,19 +77,5 @@ citeextract/
 ## Documentation
 
 - [`docs/DEPLOY.md`](docs/DEPLOY.md) — self-hosted deployment (Cloud Run, OpenAI spend cap, token gate, rate limits)
-- [`../experiment/paper/README.md`](../experiment/paper/README.md) — paper benchmark tables + reproduction
 
-## Citation
 
-```bibtex
-@misc{citeextract,
-  title  = {CiteExtract},
-  author = {Anonymous},
-  year   = {2026},
-  note   = {Submitted for double-blind review}
-}
-```
-
-## Licence
-
-Released under a permissive open-source licence (`LICENSE` to be added post-acceptance).
