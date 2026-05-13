@@ -20,7 +20,7 @@ venv/
 *.pre_recovery
 *.log
 data/cache/
-trash/
+
 
 .DS_Store
 Thumbs.db

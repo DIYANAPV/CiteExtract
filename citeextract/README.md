@@ -7,7 +7,6 @@ CiteExtract takes a paper — PDF, LaTeX, BibTeX, or plain text — and for ever
 ## Install
 
 ```bash
-git clone <anonymized-repository-url>
 cd citeextract
 python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
@@ -41,7 +40,6 @@ For every reference, two independent verdicts plus the evidence behind them:
 - **Metadata verdict** — `VALID`, `FABRICATED`, `UNVERIFIABLE`
 - **Claim-support verdict** — `SUPPORTED`, `CONTRADICTS`, `NEUTRAL`, `UNVERIFIABLE`
 
-Three pipeline layers run in one pass: existence cascade across CrossRef → Semantic Scholar → OpenAlex → PubMed; field-level metadata comparison (chimera detection); multi-query semantic verification (claim decomposed into sub-claims, evidence retrieved per sub-claim, full claim re-scored on the unioned passage set).
 
 
 
