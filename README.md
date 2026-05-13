@@ -4,14 +4,14 @@
 
 **Live demo:** https://checkcitation-i7es4lszrq-uc.a.run.app/?token=PpDzIPg9V9Q2bFuiy0M0-w
 
-<video src="citeextract/assets/citeextract.mp4" controls width="720"></video>
+![Demo](citeextract/assets/citeextract.gif)
 
 This repository contains:
 
 - **[`citeextract/`](citeextract/)** — the system (pipeline, web UI, HTTP API, tests, Dockerfile). See [`citeextract/README.md`](citeextract/README.md) to install and run.
-- **[`experiment/paper/`](experiment/paper/)** — benchmark data, prompts, runners, and per-cell results behind the paper's tables. See [`experiment/paper/README.md`](experiment/paper/README.md) for reproduction.
+- **[`experiment/paper/`](experiment/paper/)** — Experiments conducted for benchmarking. 
 
-## Quick start
+## To run  locally - Quick start
 
 ```bash
 cd checkcitation/citeextract
