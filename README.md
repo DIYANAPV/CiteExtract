@@ -2,7 +2,7 @@
 
 **Citation verification for scientific papers.** Given a paper (PDF, LaTeX, BibTeX, or plain text), CiteExtract returns two independent verdicts per reference: whether the cited paper *exists* with the stated metadata, and whether it actually *supports* the claim made for it. Each verdict also provide the passage from cited paper that grounds it.
 
-**Live demo:** https://checkcitation-i7es4lszrq-uc.a.run.app/?token=PpDzIPg9V9Q2bFuiy0M0-w
+
 
 ![Demo](citeextract/assets/citeextract.gif)
 
